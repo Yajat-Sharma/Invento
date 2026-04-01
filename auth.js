@@ -97,9 +97,9 @@ seedAdminIfNeeded();
 // =====================
 
 const SYSTEM_EMAILJS_CONFIG = {
-    serviceId: 'YOUR_SERVICE_ID', // e.g. service_xxxxxx
-    templateId: 'YOUR_TEMPLATE_ID', // e.g. template_xxxxxx
-    publicKey: 'YOUR_PUBLIC_KEY' // e.g. xxxxxxxxxxxxxxxx
+    serviceId: 'service_ydqwptg', // e.g. service_xxxxxx
+    templateId: 'template_0ba0a2a', // e.g. template_xxxxxx
+    publicKey: 'erxLyJs0D_TClA-j2' // e.g. xxxxxxxxxxxxxxxx
 };
 
 /**
@@ -110,7 +110,7 @@ async function sendWelcomeEmail(userName, userEmail, shopName) {
         console.warn('Welcome Email skipped: EmailJS config is missing in auth.js');
         return false;
     }
-    
+
     if (typeof emailjs === 'undefined') {
         console.warn('Welcome Email skipped: EmailJS SDK is not loaded.');
         return false;
