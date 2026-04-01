@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshAlert - Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css"> <!-- Import base styles first -->
+    <link rel="stylesheet" href="admin.css"> <!-- Admin specific styles -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="auth.js"></script>
+    <script>requireAdmin();</script>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="" width="32" height="32" onerror="this.style.display='none'">
+                <span class="brand-name">FreshAlert Admin</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item active"><span class="icon">📊</span> Overview</a>
+                <a href="#" class="nav-item"><span class="icon">👥</span> Users</a>
+                <a href="#" class="nav-item"><span class="icon">📦</span> Inventory</a>
+                <a href="suggestions.html" class="nav-item" title="Smart AI Suggestions"><span class="icon">🧠</span> AI
+                    Suggestions</a>
+                <a href="#" class="nav-item"><span class="icon">⚙️</span> Settings</a>
+                <div class="divider"></div>
+                <a href="index.html" class="nav-item back-home"><span class="icon">🏠</span> Back to App</a>
+                <a href="login.html" class="nav-item back-home" onclick="event.preventDefault();logoutUser()"
+                    style="color:#ff8585;"><span class="icon">🚪</span> Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Header -->
+            <header class="admin-header">
+                <div>
+                    <h1 class="page-title">Dashboard Overview</h1>
+                    <p class="page-subtitle">Real-time insights and analytics</p>
+                </div>
+                <div class="header-actions">
+                    <button class="theme-toggle" id="adminThemeToggle" aria-label="Toggle dark mode">🌙</button>
+                    <div class="admin-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=10B981&color=fff" alt="Admin"
+                            class="avatar">
+                        <div class="profile-info">
+                            <span class="profile-name">Admin User</span>
+                            <span class="profile-role">Superadmin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Cards Deck -->
+            <section class="admin-cards">
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-blue">
+                        <span class="card-icon">👥</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Total Users</h3>
+                        <p id="totalUsers" class="card-value">0</p>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-purple">
+                        <span class="card-icon">📦</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Total Items Tracked</h3>
+                        <p id="totalItems" class="card-value">0</p>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-green">
+                        <span class="card-icon">💊</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Medicines Added</h3>
+                        <p id="totalMedicines" class="card-value">0</p>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-orange">
+                        <span class="card-icon">🍎</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Grocery Items Added</h3>
+                        <p id="totalGroceries" class="card-value">0</p>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-yellow">
+                        <span class="card-icon">⚠️</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Items Expiring Soon</h3>
+                        <p id="expiringSoon" class="card-value">0</p>
+                    </div>
+                </div>
+                <div class="admin-card">
+                    <div class="card-icon-wrapper bg-red">
+                        <span class="card-icon">❌</span>
+                    </div>
+                    <div class="card-info">
+                        <h3>Expired Items</h3>
+                        <p id="expiredItems" class="card-value">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="admin-charts">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Category Usage Analytics</h2>
+                        <span class="chart-badge">Most Tracked</span>
+                    </div>
+                    <p id="categoryInsight" class="insight-text">Loading...</p>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h2>Expiry Insights</h2>
+                        <span class="chart-badge warning">Needs Attention</span>
+                    </div>
+                    <p id="expiryInsight" class="insight-text">Loading...</p>
+                    <div class="chart-wrapper">
+                        <canvas id="expiryInsightChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lower Section: Tables & Activity -->
+            <section class="admin-bottom-grid">
+                <!-- User Activity Insights -->
+                <div class="insight-box">
+                    <div class="box-header">
+                        <h2>User Activity Insights</h2>
+                    </div>
+                    <div class="insight-stats">
+                        <div class="stat-mini">
+                            <span class="label">Avg Items/User</span>
+                            <span class="value" id="avgItemsUser">0</span>
+                        </div>
+                        <div class="stat-mini">
+                            <span class="label">Items Added Today</span>
+                            <span class="value" id="itemsAddedToday">0</span>
+                        </div>
+                        <div class="stat-mini">
+                            <span class="label">Consumed Fresh</span>
+                            <span class="value text-green" id="consumedBeforeExp">0%</span>
+                        </div>
+                    </div>
+
+                    <h3 class="sub-heading">Most Active Users</h3>
+                    <ul class="user-list" id="mostActiveUsers">
+                        <!-- Rendered by JS -->
+                    </ul>
+                </div>
+
+                <!-- Most Tracked Items -->
+                <div class="insight-box">
+                    <div class="box-header">
+                        <h2>Most Tracked Items</h2>
+                    </div>
+                    <ul class="list-container" id="mostTrackedItems">
+                        <!-- Rendered by JS -->
+                    </ul>
+                </div>
+
+                <!-- Recent Activity Feed -->
+                <div class="insight-box">
+                    <div class="box-header">
+                        <h2>Recent Activity Feed</h2>
+                    </div>
+                    <ul class="activity-feed" id="activityFeed">
+                        <!-- Rendered by JS -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Registered Users Section -->
+            <section class="admin-bottom-grid" id="usersSection" style="margin-top:0;">
+                <div class="insight-box" style="grid-column: 1 / -1;">
+                    <div class="box-header" style="display:flex;align-items:center;justify-content:space-between;">
+                        <h2>👥 Registered Users</h2>
+                        <span id="usersBadge"
+                            style="background:rgba(79,131,255,0.15);border:1px solid rgba(79,131,255,0.3);color:#7eb3ff;padding:0.25rem 0.75rem;border-radius:20px;font-size:0.78rem;font-weight:600;">0
+                            users</span>
+                    </div>
+                    <div style="overflow-x:auto;margin-top:1rem;">
+                        <table id="usersTable" style="width:100%;border-collapse:collapse;font-size:0.85rem;">
+                            <thead>
+                                <tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+                                    <th
+                                        style="text-align:left;padding:0.65rem 0.75rem;color:#8899bb;font-weight:600;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.06em;">
+                                        #</th>
+                                    <th
+                                        style="text-align:left;padding:0.65rem 0.75rem;color:#8899bb;font-weight:600;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.06em;">
+                                        Name</th>
+                                    <th
+                                        style="text-align:left;padding:0.65rem 0.75rem;color:#8899bb;font-weight:600;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.06em;">
+                                        Email</th>
+                                    <th
+                                        style="text-align:left;padding:0.65rem 0.75rem;color:#8899bb;font-weight:600;text-transform:uppercase;font-size:0.72rem;letter-spacing:0.06em;">
+                                        Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Rendered by JS -->
+                            </tbody>
+                        </table>
+                        <div id="noUsersMsg" style="text-align:center;padding:2rem;color:#8899bb;display:none;">No
+                            registered users yet.</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>

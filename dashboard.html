@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Smart Inventory Dashboard">
+<title>Invento — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title" id="dashTitle">Dashboard</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="text" placeholder="Search products…" id="globalSearch" autocomplete="off"></div>
+        <a href="alerts.html" class="icon-btn" title="Alerts" style="position:relative;">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="notif-dot" id="notifDot" style="display:none"></span>
+          <span class="alert-count-badge" id="alertBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:var(--danger);color:#fff;font-size:.6rem;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px;"></span>
+        </a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content" id="mainContent"></main>
+  </div>
+</div>
+<div id="toast-container"></div>
+
+<!-- Discount Modal -->
+<div class="modal-overlay" id="discountModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <span class="modal-title">🏷️ Apply Discount</span>
+      <button class="modal-close" id="discModalClose"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="discProductId">
+      <div id="discProductInfo" style="background:var(--bg);border-radius:var(--r-md);padding:.85rem;margin-bottom:1rem;font-size:.85rem;"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Discount Price (₹) <span class="req">*</span></label>
+          <div class="input-group"><span class="input-prefix">₹</span><input type="number" class="form-control" id="discPrice" placeholder="0.00" min="0" step="0.01"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Or Discount %</label>
+          <div class="input-group"><input type="number" class="form-control" id="discPct" placeholder="e.g. 20" min="0" max="100"><span class="input-prefix" style="right:.75rem;left:auto;border-left:1px solid var(--border);border-right:none;">%</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" id="discStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date <span class="req">*</span></label>
+          <input type="date" class="form-control" id="discEnd">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:.25rem;">
+        <label class="form-label">Reason / Note</label>
+        <input type="text" class="form-control" id="discNote" placeholder="e.g. Expiry clearance" style="grid-column:1/-1">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="discModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="discModalSave">Apply Discount</button>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+initPage('dashboard');
+
+// ── Guard: must have a shop selected ──
+if (!getCurrentShopId()) { location.href = 'shop-select.html'; }
+
+// ── Global search forward ──
+document.getElementById('globalSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) location.href = `products.html?q=${encodeURIComponent(e.target.value.trim())}`;
+});
+
+// ── Page title ──
+const shop = DB.getCurrentShop();
+document.getElementById('dashTitle').textContent = shop?.name ? `${shop.name} — Dashboard` : 'Dashboard';
+
+// ── Charts registry ──
+const charts = {};
+function destroyChart(key) { if (charts[key]) { charts[key].destroy(); delete charts[key]; } }
+
+// ── Render full dashboard ──
+function renderDashboard() {
+  const products  = DB.getProducts();
+  const sales     = DB.getSales();
+  const cats      = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+  const today     = todayStr();
+  const month     = today.slice(0, 7);
+
+  // === EMPTY STATE ===
+  if (!products.length && !sales.length) {
+    document.getElementById('mainContent').innerHTML = `
+      <div class="empty-state" style="margin-top:4rem;">
+        <div class="empty-state-icon">📦</div>
+        <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:.5rem;">Welcome to Invento!</h2>
+        <p style="max-width:440px;">Your inventory dashboard is ready.<br>Start by adding categories, then your products — everything else follows automatically.</p>
+        <div class="step-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;max-width:580px;margin:1.5rem auto 2rem;">
+          ${['🏷️|Step 1|Add Categories', '🚚|Step 2|Add Suppliers', '📦|Step 3|Add Products', '💰|Step 4|Record Sales']
+            .map(s => { const [icon, step, label] = s.split('|'); return `<div class="card" style="text-align:center;padding:1.25rem .75rem;cursor:default;"><div style="font-size:2rem;margin-bottom:.5rem;">${icon}</div><div style="font-size:.7rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">${step}</div><div style="font-size:.85rem;font-weight:600;margin-top:.25rem;">${label}</div></div>`; }).join('')}
+        </div>
+        <a href="products.html" class="btn btn-primary" style="font-size:1rem;padding:.85rem 2rem;">+ Add Your First Product</a>
+      </div>`;
+    return;
+  }
+
+  // === COMPUTE STATS ===
+  const alerts   = getAlertCounts();
+  const profit   = getProfitStats();
+  const stockVal = getStockValue();
+  const deadStock = getDeadStockProducts();
+  const lossPrev  = getLossPreventionAlerts();
+
+  let todaySales = 0, monthSales = 0, totalSales = 0;
+  sales.forEach(s => {
+    totalSales += Number(s.totalAmount || 0);
+    if (s.date === today)                 todaySales  += Number(s.totalAmount || 0);
+    if ((s.date || '').startsWith(month)) monthSales  += Number(s.totalAmount || 0);
+  });
+
+  const currency = shop?.currency || '₹';
+  const fmt = n => currency + Number(n || 0).toLocaleString('en-IN');
+  const fmtP = n => { const p = Number(n || 0); return `<span class="${p >= 0 ? 'text-success' : 'text-danger'}">${p >= 0 ? '+' : ''}${currency}${Math.abs(p).toLocaleString('en-IN')}</span>`; };
+
+  // === STAT CARDS ===
+  const statCards = [
+    { label: 'Total Products',    value: products.length,      icon: '📦', color: '#4f8ef7', href: 'products.html' },
+    { label: 'Stock Value',       value: fmt(stockVal),        icon: '💰', color: '#22c55e', href: 'reports.html' },
+    { label: 'Low Stock',         value: alerts.low + alerts.out, icon: '⚠️', color: '#f59e0b', href: 'alerts.html', warn: alerts.low + alerts.out > 0 },
+    { label: 'Expiring (7d)',     value: alerts.exp7,          icon: '🔴', color: '#ef4444', href: 'alerts.html', warn: alerts.exp7 > 0 },
+    { label: 'Dead Stock',        value: deadStock.length,     icon: '💀', color: '#8b5cf6', href: 'reports.html#dead', warn: deadStock.length > 0 },
+    { label: "Today's Sales",     value: fmt(todaySales),      icon: '🛒', color: '#06b6d4', href: 'sales.html' },
+    { label: "Today's Profit",    value: fmtP(profit.todayProfit),   icon: '📈', color: '#22c55e', href: 'reports.html', raw: true },
+    { label: 'Monthly Sales',     value: fmt(monthSales),      icon: '📅', color: '#6c63ff', href: 'sales.html' },
+    { label: 'Monthly Profit',    value: fmtP(profit.monthProfit),   icon: '💹', color: '#f97316', href: 'reports.html', raw: true },
+    { label: 'Total Revenue',     value: fmt(totalSales),      icon: '🏆', color: '#ec4899', href: 'reports.html' },
+  ];
+
+  const statHTML = statCards.map(c => `
+    <a href="${c.href}" class="stat-card${c.warn ? ' stat-warn' : ''}" style="--card-accent:${c.color};">
+      <div class="stat-icon">${c.icon}</div>
+      <div class="stat-body">
+        <div class="stat-value">${c.raw ? c.value : escapeHtml(String(c.value))}</div>
+        <div class="stat-label">${c.label}</div>
+      </div>
+    </a>`).join('');
+
+  // === ALERT BANNERS ===
+  const expiryAlerts = products.filter(p => {
+    const es = getExpiryStatus(p.expiryDate);
+    return es.status === 'expiring' || es.status === 'warning';
+  }).sort((a, b) => getExpiryStatus(a.expiryDate).daysLeft - getExpiryStatus(b.expiryDate).daysLeft).slice(0, 5);
+
+  const expiryHTML = expiryAlerts.length ? `
+    <div class="card smart-alert-section">
+      <div class="section-header"><h3>🔴 Expiry Alerts</h3><a href="alerts.html" class="btn btn-secondary btn-sm">View All</a></div>
+      ${expiryAlerts.map(p => {
+        const es = getExpiryStatus(p.expiryDate);
+        const disc = isDiscountActive(p);
+        return `<div class="alert-row ${es.status === 'expiring' ? 'alert-high' : 'alert-medium'}">
+          <div class="alert-info">
+            <span class="alert-name">${escapeHtml(p.name)}</span>
+            <span class="badge ${es.badgeClass}">${es.label}</span>
+            ${disc ? `<span class="badge badge-info">Discount Active: ${currency}${p.discountPrice}</span>` : ''}
+          </div>
+          <div class="alert-meta">Qty: ${p.quantity} &nbsp;·&nbsp; Price: ${currency}${getEffectivePrice(p)}</div>
+          ${!disc ? `<button class="btn btn-warning btn-sm" onclick="openDiscountModal('${p.id}')">🏷️ Apply Discount</button>` : ''}
+        </div>`;
+      }).join('')}
+    </div>` : '';
+
+  const lossHTML = lossPrev.length ? `
+    <div class="card smart-alert-section loss-alert">
+      <div class="section-header"><h3>⚠️ Loss Prevention Alerts</h3><a href="alerts.html" class="btn btn-secondary btn-sm">Manage</a></div>
+      ${lossPrev.slice(0, 4).map(p => {
+        const es = getExpiryStatus(p.expiryDate);
+        return `<div class="alert-row alert-loss">
+          <div class="alert-info">
+            <span class="alert-name">${escapeHtml(p.name)}</span>
+            <span class="badge badge-expired">${es.label}</span>
+          </div>
+          <div class="alert-meta">Qty: ${p.quantity} — High stock, low sales. Risk of expiry loss.</div>
+          <button class="btn btn-warning btn-sm" onclick="openDiscountModal('${p.id}')">🏷️ Apply Discount</button>
+        </div>`;
+      }).join('')}
+      <p style="font-size:.78rem;color:var(--text-3);margin-top:.5rem;">💡 Consider discounting these products to clear stock before expiry.</p>
+    </div>` : '';
+
+  // === CHARTS SECTION ===
+  const html = `
+    <div class="stats-grid-10" style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;margin-bottom:1.5rem;">${statHTML}</div>
+    ${expiryHTML}
+    ${lossHTML}
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1rem;">
+      <div class="card"><div class="section-header"><h3>📈 Sales & Profit (Last 30 Days)</h3></div><div style="height:240px;"><canvas id="salesProfitChart"></canvas></div></div>
+      <div class="card"><div class="section-header"><h3>🏷️ Categories</h3></div><div style="height:240px;position:relative;"><canvas id="catPieChart"></canvas></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+      <div class="card"><div class="section-header"><h3>🚀 Fast Moving</h3></div><div style="height:200px;"><canvas id="fastChart"></canvas></div></div>
+      <div class="card"><div class="section-header"><h3>📊 ABC Analysis</h3></div><div style="height:200px;position:relative;"><canvas id="abcChart"></canvas></div></div>
+      <div class="card">
+        <div class="section-header"><h3>💀 Dead Stock <span class="badge badge-expired" style="font-size:.7rem;">${deadStock.length}</span></h3><a href="reports.html" class="btn btn-secondary btn-sm">Report</a></div>
+        ${deadStock.length === 0 ? '<div style="text-align:center;padding:2rem;color:var(--text-3);font-size:.85rem;">✅ No dead stock</div>' :
+          deadStock.slice(0, 5).map(p => `<div class="alert-row" style="border-left:3px solid var(--text-3);padding:.5rem .75rem;">
+            <div class="alert-info"><span class="alert-name">${escapeHtml(p.name)}</span></div>
+            <div class="alert-meta">Qty: ${p.quantity} · No sales in 30+ days</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('mainContent').innerHTML = html;
+
+  // ── Charts ──
+  requestAnimationFrame(() => {
+    // Sales + Profit line (30 days)
+    const days30 = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      days30.push(d.toISOString().split('T')[0]);
+    }
+    const salesByDay  = Object.fromEntries(days30.map(d => [d, 0]));
+    const profitByDay = Object.fromEntries(days30.map(d => [d, 0]));
+    const prodMap = Object.fromEntries(products.map(p => [p.id, p]));
+    sales.filter(s => days30.includes(s.date)).forEach(s => {
+      salesByDay[s.date]  = (salesByDay[s.date]  || 0) + Number(s.totalAmount || 0);
+      const cost = Number(prodMap[s.productId]?.costPrice || 0);
+      profitByDay[s.date] = (profitByDay[s.date] || 0) + (Number(s.sellingPrice || 0) - cost) * Number(s.quantitySold || 0);
+    });
+    destroyChart('sp');
+    charts['sp'] = new Chart(document.getElementById('salesProfitChart'), {
+      type: 'line',
+      data: {
+        labels: days30.map(d => { const dt = new Date(d + 'T00:00:00'); return dt.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }); }),
+        datasets: [
+          { label: 'Sales', data: days30.map(d => salesByDay[d]), borderColor: '#4f8ef7', backgroundColor: 'rgba(79,142,247,.08)', fill: true, tension: .4, pointRadius: 2 },
+          { label: 'Profit', data: days30.map(d => profitByDay[d]), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,.08)', fill: true, tension: .4, pointRadius: 2 }
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7d8a9a', font: { size: 11 } } } }, scales: { x: { ticks: { color: '#4d5a6d', maxTicksLimit: 8, font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { ticks: { color: '#4d5a6d', font: { size: 10 }, callback: v => currency + v.toLocaleString('en-IN') }, grid: { color: 'rgba(255,255,255,.04)' } } } }
+    });
+
+    // Category pie
+    const catCounts = {};
+    products.forEach(p => { const c = cats[p.categoryId]; const name = c ? c.name : 'Uncategorised'; catCounts[name] = (catCounts[name] || 0) + 1; });
+    const catNames  = Object.keys(catCounts);
+    const catColors = ['#4f8ef7','#6c63ff','#22c55e','#f59e0b','#ef4444','#ec4899','#06b6d4','#8b5cf6','#f97316'];
+    destroyChart('cat');
+    charts['cat'] = new Chart(document.getElementById('catPieChart'), {
+      type: 'doughnut',
+      data: { labels: catNames, datasets: [{ data: catNames.map(n => catCounts[n]), backgroundColor: catColors.slice(0, catNames.length), borderWidth: 0, hoverOffset: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { color: '#7d8a9a', font: { size: 10 }, boxWidth: 12 } } } }
+    });
+
+    // Fast moving bar
+    const fast = getFastMovingProducts(8);
+    destroyChart('fast');
+    charts['fast'] = new Chart(document.getElementById('fastChart'), {
+      type: 'bar',
+      data: { labels: fast.map(p => p.name.length > 12 ? p.name.slice(0, 12) + '…' : p.name), datasets: [{ label: 'Units Sold', data: fast.map(p => p.totalSold), backgroundColor: '#4f8ef7', borderRadius: 4 }] },
+      options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#4d5a6d', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,.04)' } }, y: { ticks: { color: '#7d8a9a', font: { size: 10 } }, grid: { display: false } } } }
+    });
+
+    // ABC Doughnut
+    const abc = computeABCAnalysis();
+    destroyChart('abc');
+    charts['abc'] = new Chart(document.getElementById('abcChart'), {
+      type: 'doughnut',
+      data: { labels: ['A (Top 70%)', 'B (Next 20%)', 'C (Last 10%)'], datasets: [{ data: [abc.aRev, abc.bRev, abc.cRev], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0, hoverOffset: 6 }] },
+      options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#7d8a9a', font: { size: 10 }, boxWidth: 12 } } } }
+    });
+  });
+}
+renderDashboard();
+
+// ── Discount Modal ──
+function openDiscountModal(productId) {
+  const prod = DB.getProductById(productId);
+  if (!prod) return;
+  document.getElementById('discProductId').value = productId;
+  document.getElementById('discPrice').value = prod.discountPrice || '';
+  document.getElementById('discPct').value   = '';
+  document.getElementById('discStart').value = prod.discountStart || todayStr();
+  document.getElementById('discEnd').value   = prod.discountEnd || prod.expiryDate || '';
+  document.getElementById('discNote').value  = prod.discountNote || '';
+  const es = getExpiryStatus(prod.expiryDate);
+  document.getElementById('discProductInfo').innerHTML = `
+    <strong>${escapeHtml(prod.name)}</strong><br>
+    <span style="color:var(--text-2);">Original Price: ₹${prod.sellingPrice} &nbsp;·&nbsp; Expiry: ${formatDate(prod.expiryDate)} &nbsp;·&nbsp; </span><span class="badge ${es.badgeClass}">${es.label}</span>`;
+
+  // Auto calc price from %
+  document.getElementById('discPct').oninput = function() {
+    const pct = Number(this.value);
+    if (pct > 0 && pct <= 100) document.getElementById('discPrice').value = (Number(prod.sellingPrice) * (1 - pct / 100)).toFixed(2);
+  };
+  document.getElementById('discountModal').classList.add('active');
+}
+document.getElementById('discModalSave').addEventListener('click', () => {
+  const id    = document.getElementById('discProductId').value;
+  const price = Number(document.getElementById('discPrice').value);
+  const end   = document.getElementById('discEnd').value;
+  if (!price || price <= 0) { showToast('Enter a valid discount price', 'error'); return; }
+  if (!end) { showToast('Set an end date for the discount', 'error'); return; }
+  const prod = DB.getProductById(id);
+  if (price >= Number(prod?.sellingPrice || 0)) { showToast('Discount price must be less than original price', 'warning'); return; }
+  DB.updateProduct(id, { discountPrice: price, discountStart: document.getElementById('discStart').value, discountEnd: end, discountNote: document.getElementById('discNote').value });
+  document.getElementById('discountModal').classList.remove('active');
+  showToast('Discount applied! Original price will resume after end date.', 'success');
+  renderDashboard();
+});
+// Fix modal ID typo
+document.getElementById('discModal')?.addEventListener?.('click', () => {}); // handled above
+</script>
+</body>
+</html>

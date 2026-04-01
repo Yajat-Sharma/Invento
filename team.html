@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Team Management">
+<title>Invento — Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Team</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn" title="Alerts"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Team Management</h2><p id="shopTeamDesc">Manage who can access this shop</p></div>
+        <div id="addMemberBtnWrap"></div>
+      </div>
+
+      <!-- Role Legend -->
+      <div class="card" style="display:flex;gap:1.5rem;flex-wrap:wrap;padding:1rem 1.25rem;margin-bottom:1rem;align-items:center;">
+        <span style="font-size:.82rem;font-weight:600;color:var(--text-2);">Roles:</span>
+        <span><span class="badge badge-accent">👑 Owner</span> <span style="font-size:.78rem;color:var(--text-2);">Full access — manage everything</span></span>
+        <span><span class="badge badge-info">🛠️ Manager</span> <span style="font-size:.78rem;color:var(--text-2);">Add/edit products, sales, categories</span></span>
+        <span><span class="badge badge-good">👤 Staff</span> <span style="font-size:.78rem;color:var(--text-2);">Only add sales at the register</span></span>
+      </div>
+
+      <!-- Members table -->
+      <div class="card">
+        <div id="teamEmpty" class="empty-state" style="display:none;">
+          <div class="empty-state-icon">👥</div>
+          <h3>No team members yet</h3>
+          <p>Add managers or staff to help manage this shop</p>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table" id="teamTable">
+            <thead><tr><th>Member</th><th>Email</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead>
+            <tbody id="teamBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal-overlay" id="memberModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <span class="modal-title" id="memberModalTitle">Add Team Member</span>
+      <button class="modal-close" id="memberModalClose"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:.83rem;color:var(--text-2);margin-bottom:1rem;">The person must have already registered a Invento account with this email before you add them.</p>
+      <div class="form-group">
+        <label class="form-label">Email Address <span class="req">*</span></label>
+        <input type="email" class="form-control" id="memberEmail" placeholder="colleague@example.com">
+        <div class="field-error" id="memberEmailErr">Please enter a valid email.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role <span class="req">*</span></label>
+        <select class="form-control" id="memberRole">
+          <option value="manager">🛠️ Manager — Manage products & sales</option>
+          <option value="staff">👤 Staff — POS / Sales only</option>
+        </select>
+      </div>
+      <div id="memberLookupResult" style="display:none;background:var(--bg);border-radius:var(--r-md);padding:.85rem;margin-top:.75rem;font-size:.85rem;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="memberModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="memberLookup">Look Up User</button>
+      <button class="btn btn-primary" id="memberAdd" style="display:none;">Add Member</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="shared.js"></script>
+<script>
+initPage('team');
+if (!getCurrentShopId()) { location.href = 'shop-select.html'; }
+
+const currentUser = getCurrentUser();
+const shop        = DB.getCurrentShop();
+const myRole      = DB.getCurrentUserRole();
+
+// Guard: only owners can manage team
+if (myRole !== 'owner') {
+  document.querySelector('.page-content').innerHTML = `<div class="empty-state" style="margin-top:4rem;"><div class="empty-state-icon">🔒</div><h3>Owner Access Required</h3><p>Only the shop owner can manage team members.</p><a href="dashboard.html" class="btn btn-primary" style="margin-top:1rem;">Back to Dashboard</a></div>`;
+} else {
+  document.getElementById('shopTeamDesc').textContent = `Managing access for ${shop?.name || 'this shop'}`;
+  document.getElementById('addMemberBtnWrap').innerHTML = `<button class="btn btn-primary" id="addMemberBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Add Member</button>`;
+  document.getElementById('addMemberBtn').addEventListener('click', openModal);
+}
+
+function renderTeam() {
+  const members = DB.getShopMembers();
+  const tbody   = document.getElementById('teamBody');
+  const empty   = document.getElementById('teamEmpty');
+  const table   = document.getElementById('teamTable');
+
+  if (!members.length) { tbody.innerHTML = ''; table.style.display = 'none'; empty.style.display = ''; return; }
+  empty.style.display = 'none'; table.style.display = '';
+
+  tbody.innerHTML = members.map(m => `
+    <tr>
+      <td>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;">${(m.name || 'U').slice(0,2).toUpperCase()}</div>
+          <div>
+            <div style="font-weight:600;font-size:.88rem;">${escapeHtml(m.name || 'Unknown')}</div>
+            ${m.userId === currentUser.id ? '<div style="font-size:.72rem;color:var(--accent);">That\'s you</div>' : ''}
+          </div>
+        </div>
+      </td>
+      <td class="td-dim">${escapeHtml(m.email || '—')}</td>
+      <td><span class="badge ${ROLE_BADGE_CLASS[m.role] || 'badge-good'}">${ROLE_LABELS[m.role] || m.role}</span></td>
+      <td class="td-dim">${formatDate(m.addedAt?.split('T')[0])}</td>
+      <td>
+        ${m.role !== 'owner' ? `
+          <div style="display:flex;gap:.4rem;">
+            <select class="form-control" style="padding:.3rem .6rem;font-size:.8rem;width:auto;" onchange="changeRole('${m.userId}', this.value)">
+              <option value="manager" ${m.role === 'manager' ? 'selected' : ''}>Manager</option>
+              <option value="staff"   ${m.role === 'staff'   ? 'selected' : ''}>Staff</option>
+            </select>
+            <button class="btn btn-danger btn-icon btn-sm" onclick="removeMember('${m.userId}', '${escapeHtml(m.name || m.email)}')" title="Remove">🗑️</button>
+          </div>` : '<span style="color:var(--text-3);font-size:.8rem;">—</span>'}
+      </td>
+    </tr>`).join('');
+}
+renderTeam();
+
+function changeRole(userId, newRole) {
+  DB.updateShopMember(userId, { role: newRole });
+  showToast('Role updated!');
+  renderTeam();
+}
+function removeMember(userId, name) {
+  showConfirm('Remove Member', `Remove "${name}" from this shop?`, () => {
+    DB.removeShopMember(userId);
+    showToast('Member removed', 'error');
+    renderTeam();
+  });
+}
+
+// Modal
+let foundUser = null;
+function openModal() {
+  foundUser = null;
+  document.getElementById('memberEmail').value = '';
+  document.getElementById('memberRole').value  = 'manager';
+  document.getElementById('memberLookupResult').style.display = 'none';
+  document.getElementById('memberAdd').style.display    = 'none';
+  document.getElementById('memberLookup').style.display = '';
+  document.getElementById('memberEmailErr').classList.remove('visible');
+  document.getElementById('memberModal').classList.add('active');
+}
+function closeModal() { document.getElementById('memberModal').classList.remove('active'); foundUser = null; }
+
+document.getElementById('memberModalClose').addEventListener('click', closeModal);
+document.getElementById('memberModalCancel').addEventListener('click', closeModal);
+document.getElementById('memberModal').addEventListener('click', e => { if (e.target === document.getElementById('memberModal')) closeModal(); });
+
+document.getElementById('memberLookup').addEventListener('click', () => {
+  const email = document.getElementById('memberEmail').value.trim().toLowerCase();
+  if (!email) { document.getElementById('memberEmailErr').classList.add('visible'); return; }
+
+  // Check if already a member
+  const existing = DB.getShopMembers().find(m => m.email.toLowerCase() === email);
+  if (existing) { showToast('This person is already a team member', 'warning'); return; }
+
+  // Find in registered users
+  const users = (() => { try { return JSON.parse(localStorage.getItem('freshalert_users')) || []; } catch { return []; } })();
+  const found = users.find(u => u.email.toLowerCase() === email);
+  const result = document.getElementById('memberLookupResult');
+  if (found) {
+    foundUser = found;
+    result.style.display = '';
+    result.innerHTML = `✅ <strong>${escapeHtml(found.name)}</strong> found — <span style="color:var(--text-2);">${escapeHtml(found.email)}</span>`;
+    document.getElementById('memberAdd').style.display    = '';
+    document.getElementById('memberLookup').style.display = 'none';
+  } else {
+    result.style.display = '';
+    result.innerHTML = `❌ No account found with this email. The person must <a href="signup.html" style="color:var(--accent);">register first</a>.`;
+    document.getElementById('memberAdd').style.display = 'none';
+  }
+});
+
+document.getElementById('memberAdd').addEventListener('click', () => {
+  if (!foundUser) return;
+  const role = document.getElementById('memberRole').value;
+  DB.addShopMember({ userId: foundUser.id, name: foundUser.name, email: foundUser.email, role, addedAt: new Date().toISOString() });
+  showToast(`${foundUser.name} added as ${role}!`);
+  closeModal();
+  renderTeam();
+});
+</script>
+</body>
+</html>

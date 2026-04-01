@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Category Management">
+<title>Invento — Categories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <h1 class="page-title">Categories</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn" title="Alerts"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Product Categories</h2><p>Organize your products into categories</p></div>
+        <button class="btn btn-primary" id="addCategoryBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Add Category
+        </button>
+      </div>
+      <div class="category-grid" id="categoryGrid"></div>
+      <div class="empty-state" id="categoryEmpty" style="display:none;">
+        <div class="empty-state-icon">🏷️</div>
+        <h3>No categories yet</h3>
+        <p>Add your first category to organize products</p>
+        <button class="btn btn-primary" onclick="openModal()">Add Category</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Add/Edit Category Modal -->
+<div class="modal-overlay" id="catModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title" id="catModalTitle">Add Category</span>
+      <button class="modal-close" id="catModalClose"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editCatId">
+      <div class="form-group">
+        <label class="form-label">Category Name <span class="req">*</span></label>
+        <input type="text" class="form-control" id="catName" placeholder="e.g. Dairy, Snacks…">
+        <div class="field-error" id="catNameErr">Category name is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Icon (Emoji) <span class="req">*</span></label>
+        <input type="text" class="form-control" id="catIcon" placeholder="e.g. 🥛" maxlength="4" style="font-size:1.2rem;">
+        <div class="field-error" id="catIconErr">Please add an icon.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Color</label>
+        <div class="color-swatches" id="colorSwatches"></div>
+        <input type="hidden" id="catColor" value="#4f8ef7">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="catModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="catModalSave">Save Category</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="shared.js"></script>
+<script>
+initPage('categories');
+
+const COLORS = ['#4f8ef7','#6c63ff','#22c55e','#f59e0b','#ef4444','#ec4899','#06b6d4','#8b5cf6','#14b8a6','#f97316','#6b7280','#a78bfa'];
+
+// Render swatches
+function renderSwatches(selected) {
+  document.getElementById('colorSwatches').innerHTML = COLORS.map(c =>
+    `<div class="color-swatch${selected===c?' selected':''}" data-color="${c}" style="background:${c};" title="${c}"></div>`
+  ).join('');
+  document.querySelectorAll('.color-swatch').forEach(s => s.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(x => x.classList.remove('selected'));
+    s.classList.add('selected');
+    document.getElementById('catColor').value = s.dataset.color;
+  }));
+}
+renderSwatches('#4f8ef7');
+
+// Render category cards
+function renderCategories() {
+  const cats     = DB.getCategories();
+  const products = DB.getProducts();
+  const countMap = {};
+  products.forEach(p => { countMap[p.categoryId] = (countMap[p.categoryId]||0) + 1; });
+  const grid  = document.getElementById('categoryGrid');
+  const empty = document.getElementById('categoryEmpty');
+  if (!cats.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = cats.map(c => `
+    <div class="category-card">
+      <div class="cat-icon-wrap" style="background:${c.color}22;border:1px solid ${c.color}33;">${c.icon}</div>
+      <div class="cat-name">${escapeHtml(c.name)}</div>
+      <div class="cat-count">${countMap[c.id]||0} product${(countMap[c.id]||0)!==1?'s':''}</div>
+      <div class="cat-actions">
+        <button class="btn btn-secondary btn-sm edit-cat" data-id="${c.id}">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm del-cat" data-id="${c.id}">🗑️</button>
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('.edit-cat').forEach(btn => btn.addEventListener('click', () => {
+    const c = DB.getCategoryById(btn.dataset.id); if (c) openModal(c);
+  }));
+  document.querySelectorAll('.del-cat').forEach(btn => btn.addEventListener('click', () => {
+    const c = DB.getCategoryById(btn.dataset.id);
+    const hasProds = DB.getProducts().some(p => p.categoryId === btn.dataset.id);
+    if (hasProds) { showToast('Cannot delete — category has products', 'error'); return; }
+    showConfirm('Delete Category', `Delete "${c?.name}"?`, () => { DB.deleteCategory(btn.dataset.id); renderCategories(); showToast('Category deleted', 'error'); });
+  }));
+}
+renderCategories();
+
+// Modal
+let editId = null;
+function openModal(cat = null) {
+  editId = cat?.id || null;
+  document.getElementById('catModalTitle').textContent = cat ? 'Edit Category' : 'Add Category';
+  document.getElementById('catName').value = cat?.name || '';
+  document.getElementById('catIcon').value = cat?.icon || '';
+  document.getElementById('catColor').value = cat?.color || '#4f8ef7';
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('visible'));
+  renderSwatches(cat?.color || '#4f8ef7');
+  document.getElementById('catModal').classList.add('active');
+}
+function closeModal() { document.getElementById('catModal').classList.remove('active'); editId = null; }
+
+document.getElementById('addCategoryBtn').addEventListener('click', () => openModal());
+document.getElementById('catModalClose').addEventListener('click', closeModal);
+document.getElementById('catModalCancel').addEventListener('click', closeModal);
+document.getElementById('catModal').addEventListener('click', e => { if (e.target===document.getElementById('catModal')) closeModal(); });
+
+document.getElementById('catModalSave').addEventListener('click', () => {
+  const name  = document.getElementById('catName').value.trim();
+  const icon  = document.getElementById('catIcon').value.trim();
+  const color = document.getElementById('catColor').value;
+  let ok = true;
+  if (!name) { document.getElementById('catNameErr').classList.add('visible'); document.getElementById('catName').classList.add('error'); ok = false; }
+  else { document.getElementById('catNameErr').classList.remove('visible'); document.getElementById('catName').classList.remove('error'); }
+  if (!icon) { document.getElementById('catIconErr').classList.add('visible'); document.getElementById('catIcon').classList.add('error'); ok = false; }
+  else { document.getElementById('catIconErr').classList.remove('visible'); document.getElementById('catIcon').classList.remove('error'); }
+  if (!ok) return;
+
+  if (editId) { DB.updateCategory(editId, { name, icon, color }); showToast('Category updated!'); }
+  else { DB.addCategory({ id: genId('cat'), name, icon, color }); showToast('Category added!'); }
+  closeModal(); renderCategories();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Stock & Expiry Alerts">
+<title>Invento — Alerts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Alerts</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Inventory Alerts</h2><p>Monitor products that need attention</p></div>
+        <div style="display:flex;gap:.65rem;flex-wrap:wrap;align-items:center;">
+          <button class="btn btn-secondary btn-sm" id="alertPageSendEmailBtn" style="display:none;">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg>
+            Send Alert Email
+          </button>
+          <a href="products.html" class="btn btn-primary">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add Stock
+          </a>
+        </div>
+      </div>
+
+      <!-- Notification Setup Banner -->
+      <div id="notifSetupBanner" style="border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;"></div>
+
+
+      <!-- Summary badges -->
+      <div class="stats-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:1.75rem;" id="alertStats"></div>
+
+      <!-- Expired -->
+      <div class="alert-section" id="sectionExpired">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">🔴</span><span class="alert-section-title">Expired Products</span><span class="alert-count" id="countExpired">0</span></div>
+        <div id="listExpired"><div class="text-muted text-sm" style="padding:.5rem 0;">No expired products. ✅</div></div>
+      </div>
+
+      <!-- Expiring 7 days -->
+      <div class="alert-section" id="sectionExp7">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">🟠</span><span class="alert-section-title">Expiring Within 7 Days</span><span class="alert-count" id="countExp7">0</span></div>
+        <div id="listExp7"><div class="text-muted text-sm" style="padding:.5rem 0;">No products expiring in 7 days. ✅</div></div>
+      </div>
+
+      <!-- Expiring 30 days -->
+      <div class="alert-section" id="sectionExp30">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">🟡</span><span class="alert-section-title">Expiring Within 30 Days</span><span class="alert-count warn" id="countExp30">0</span></div>
+        <div id="listExp30"><div class="text-muted text-sm" style="padding:.5rem 0;">No products expiring in 30 days. ✅</div></div>
+      </div>
+
+      <!-- Low Stock -->
+      <div class="alert-section" id="sectionLow">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">📦</span><span class="alert-section-title">Low Stock</span><span class="alert-count warn" id="countLow">0</span></div>
+        <div id="listLow"><div class="text-muted text-sm" style="padding:.5rem 0;">All products are well stocked. ✅</div></div>
+      </div>
+
+      <!-- Out of Stock -->
+      <div class="alert-section" id="sectionOut">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">⛔</span><span class="alert-section-title">Out of Stock</span><span class="alert-count" id="countOut">0</span></div>
+        <div id="listOut"><div class="text-muted text-sm" style="padding:.5rem 0;">No products are out of stock. ✅</div></div>
+      </div>
+
+      <!-- Loss Prevention -->
+      <div class="alert-section" id="sectionLoss">
+        <div class="alert-section-header"><span style="font-size:1.1rem;">⚠️</span><span class="alert-section-title">Loss Prevention Alerts</span><span class="alert-count warn" id="countLoss">0</span></div>
+        <div id="listLoss"><div class="text-muted text-sm" style="padding:.5rem 0;">No loss prevention alerts. ✅</div></div>
+      </div>
+
+<div id="toast-container"></div>
+<!-- Discount Modal -->
+<div class="modal-overlay" id="discountModal">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <span class="modal-title">🏷️ Apply Discount</span>
+      <button class="modal-close" onclick="document.getElementById('discountModal').classList.remove('active')"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="discProductId">
+      <div id="discProductInfo" style="background:var(--bg);border-radius:var(--r-md);padding:.85rem;margin-bottom:1rem;font-size:.85rem;"></div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Discount Price (₹) <span class="req">*</span></label>
+          <div class="input-group"><span class="input-prefix">₹</span><input type="number" class="form-control" id="discPrice" placeholder="0.00" min="0" step="0.01"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Or Discount %</label>
+          <input type="number" class="form-control" id="discPct" placeholder="e.g. 20" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Start Date</label>
+          <input type="date" class="form-control" id="discStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">End Date <span class="req">*</span></label>
+          <input type="date" class="form-control" id="discEnd">
+        </div>
+      </div>
+      <p style="font-size:.75rem;color:var(--text-3);margin-top:.25rem;">💡 The original selling price is kept unchanged. Discount is only active between the selected dates.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('discountModal').classList.remove('active')">Cancel</button>
+      <button class="btn btn-primary" id="discModalSave">Apply Discount</button>
+    </div>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+initPage('alerts');
+if (!getCurrentShopId()) { location.href = 'shop-select.html'; }
+
+function renderAlerts() {
+  const products = DB.getProducts();
+  const cats     = Object.fromEntries(DB.getCategories().map(c=>[c.id,c]));
+
+  const expired = [], exp7 = [], exp30 = [], low = [], out = [];
+
+  products.forEach(p => {
+    const es = getExpiryStatus(p.expiryDate);
+    const ss = getStockStatus(p.quantity, p.minStockLevel);
+    if (es.status === 'expired')                         expired.push({...p, _es:es, _ss:ss});
+    else if (es.status === 'expiring')                   exp7.push({...p, _es:es, _ss:ss});
+    else if (es.status === 'warning')                    exp30.push({...p, _es:es, _ss:ss});
+    if (ss.status === 'out')                             out.push({...p, _es:es, _ss:ss});
+    else if (ss.status === 'low')                        low.push({...p, _es:es, _ss:ss});
+  });
+
+  // Stat badges
+  document.getElementById('alertStats').innerHTML = [
+    {icon:'💀',label:'Expired',count:expired.length,cls:'red'},
+    {icon:'🔴',label:'Exp. 7d',count:exp7.length,cls:'red'},
+    {icon:'🟡',label:'Exp. 30d',count:exp30.length,cls:'orange'},
+    {icon:'📦',label:'Low Stock',count:low.length,cls:'orange'},
+    {icon:'⛔',label:'Out of Stock',count:out.length,cls:'red'},
+  ].map(s=>`<div class="stat-card"><div class="stat-icon ${s.cls}"><span style="font-size:1.1rem">${s.icon}</span></div><div class="stat-body"><div class="stat-label">${s.label}</div><div class="stat-value">${s.count}</div></div></div>`).join('');
+
+  function alertItem(p, lvl, showDiscount = false) {
+    const cat = cats[p.categoryId];
+    const disc = isDiscountActive(p);
+    return `<div class="alert-item lv-${lvl}">
+      <span style="font-size:1.3rem;">${cat?.icon||'📦'}</span>
+      <div style="flex:1;min-width:0;">
+        <div class="alert-item-name">${escapeHtml(p.name)}</div>
+        <div class="alert-item-meta">${cat?.name||'Unknown'} · Stock: ${p.quantity} · Supplier: ${escapeHtml(p.supplierName||'—')}${disc ? ' · <span class="discount-active-tag">DISC ACTIVE</span>' : ''}</div>
+      </div>
+      <div style="text-align:right;">
+        ${p._es.label !== '—' ? `<span class="badge ${p._es.badgeClass}" style="margin-bottom:.3rem;">${p._es.label}</span><br>` : ''}
+        <span class="badge ${p._ss.badgeClass}">${p._ss.label}</span>
+      </div>
+      ${showDiscount && !disc ? `<button class="btn btn-warning btn-sm" onclick="openDiscountModal('${p.id}')">🏷️ Discount</button>` : ''}
+      <a href="products.html" class="btn btn-secondary btn-sm" style="flex-shrink:0;">Edit</a>
+    </div>`;
+  }
+
+  const sets = [
+    {id:'listExpired', countId:'countExpired', data:expired, lvl:'danger',   showDiscount: false},
+    {id:'listExp7',    countId:'countExp7',    data:exp7,    lvl:'danger',   showDiscount: true},
+    {id:'listExp30',   countId:'countExp30',   data:exp30,   lvl:'warning',  showDiscount: true},
+    {id:'listLow',     countId:'countLow',     data:low,     lvl:'warning',  showDiscount: false},
+    {id:'listOut',     countId:'countOut',     data:out,     lvl:'danger',   showDiscount: false},
+  ];
+
+  // Loss prevention
+  const lossPrev = getLossPreventionAlerts().map(p => ({ ...p, _es: getExpiryStatus(p.expiryDate), _ss: getStockStatus(p.quantity, p.minStockLevel) }));
+  document.getElementById('countLoss').textContent = lossPrev.length;
+  document.getElementById('listLoss').innerHTML = lossPrev.length
+    ? lossPrev.map(p => alertItem(p, 'warning', true)).join('')
+    : '<div class="text-muted text-sm" style="padding:.5rem 0;">No loss prevention alerts. ✅</div>';
+
+  const ok = '<div class="text-muted text-sm" style="padding:.5rem 0;">All clear! ✅</div>';
+  sets.forEach(s => {
+    document.getElementById(s.countId).textContent = s.data.length;
+    document.getElementById(s.id).innerHTML = s.data.length ? s.data.map(p=>alertItem(p,s.lvl,s.showDiscount)).join('') : ok;
+  });
+}
+
+renderAlerts();
+
+// ── Discount Modal ──
+function openDiscountModal(productId) {
+  const prod = DB.getProductById(productId);
+  if (!prod) return;
+  document.getElementById('discProductId').value = productId;
+  document.getElementById('discPrice').value     = prod.discountPrice || '';
+  document.getElementById('discPct').value       = '';
+  document.getElementById('discStart').value     = todayStr();
+  document.getElementById('discEnd').value       = prod.discountEnd || prod.expiryDate || '';
+  const es = getExpiryStatus(prod.expiryDate);
+  document.getElementById('discProductInfo').innerHTML = `<strong>${escapeHtml(prod.name)}</strong><br><span style="color:var(--text-2);">Original: ₹${prod.sellingPrice} · Qty: ${prod.quantity} · </span><span class="badge ${es.badgeClass}">${es.label}</span>`;
+  document.getElementById('discPct').oninput = function() {
+    const pct = Number(this.value); if (pct > 0 && pct <= 100) document.getElementById('discPrice').value = (Number(prod.sellingPrice) * (1 - pct / 100)).toFixed(2);
+  };
+  document.getElementById('discountModal').classList.add('active');
+}
+
+document.getElementById('discModalSave').addEventListener('click', () => {
+  const id    = document.getElementById('discProductId').value;
+  const price = Number(document.getElementById('discPrice').value);
+  const end   = document.getElementById('discEnd').value;
+  if (!price || price <= 0) { showToast('Enter a valid discount price', 'error'); return; }
+  if (!end) { showToast('End date is required', 'error'); return; }
+  const prod = DB.getProductById(id);
+  if (price >= Number(prod?.sellingPrice || 0)) { showToast('Discount price must be less than original price', 'warning'); return; }
+  DB.updateProduct(id, { discountPrice: price, discountStart: document.getElementById('discStart').value, discountEnd: end });
+  document.getElementById('discountModal').classList.remove('active');
+  showToast('Discount applied! Reverts automatically on end date.', 'success');
+  renderAlerts();
+});
+
+// ── Notification Banner on Alerts Page ──────────────────────
+(function initNotifBanner() {
+  const banner   = document.getElementById('notifSetupBanner');
+  const emailBtn = document.getElementById('alertPageSendEmailBtn');
+  const cfg      = NotifEngine.getConfig();
+  const emailConfigured = cfg.ejsServiceId && cfg.ejsTemplateId && cfg.ejsPublicKey && cfg.emailEnabled;
+
+  // Show Send Alert Email button if configured
+  if (emailConfigured) emailBtn.style.display = '';
+
+  const notifGranted = ('Notification' in window) && Notification.permission === 'granted';
+
+  if (emailConfigured && notifGranted) {
+    // All good — both active
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.3rem;">✅</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:#4ade80;">Notifications Active</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Email alerts & browser notifications are both enabled.</div></div>
+      </div>
+      <a href="settings.html" class="btn btn-secondary btn-sm">⚙️ Manage Settings</a>`;
+  } else if (emailConfigured) {
+    // Email configured but browser notifs not granted
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.3rem;">📧</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:#a5b4fc;">Email Alerts Active</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Also enable browser notifications for instant alerts.</div></div>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="bannerEnableNotifBtn">🔔 Enable Browser Notifs</button>`;
+    document.getElementById('bannerEnableNotifBtn')?.addEventListener('click', async () => {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') { showToast('🔔 Browser notifications enabled!', 'success'); initNotifBanner(); }
+      else showToast('Permission denied', 'error');
+    });
+  } else if (notifGranted) {
+    // Browser notifs ok but no email
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.3rem;">🔔</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:#fbbf24;">Browser Notifications Active</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Set up email alerts to also receive reports in your inbox (free).</div></div>
+      </div>
+      <a href="settings.html" class="btn btn-secondary btn-sm">📧 Setup Email Alerts</a>`;
+  } else {
+    // Nothing set up
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);';
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.3rem;">🔕</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:#a5b4fc;">Notifications Not Set Up</div>
+        <div style="font-size:.78rem;color:var(--text-2);">Enable email or browser notifications to get alerted about expiring products.</div></div>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" id="bannerEnableNotifBtn">🔔 Enable Browser Notifs</button>
+        <a href="settings.html" class="btn btn-secondary btn-sm">📧 Setup Email</a>
+      </div>`;
+    document.getElementById('bannerEnableNotifBtn')?.addEventListener('click', async () => {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') { showToast('🔔 Browser notifications enabled!', 'success'); initNotifBanner(); }
+      else showToast('Permission denied. Please allow notifications in browser settings.', 'error');
+    });
+  }
+})();
+
+// ── "Send Alert Email" button on Alerts page ─────────────────
+document.getElementById('alertPageSendEmailBtn')?.addEventListener('click', async () => {
+  const btn = document.getElementById('alertPageSendEmailBtn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending…';
+  const res = await NotifEngine.checkAndNotify(true); // force=true
+  if (res && res.ok) {
+    showToast('📧 Alert email sent! Check your inbox.', 'success');
+  } else {
+    showToast((res && res.error) ? res.error : 'Email failed. Check Settings → Email Alerts.', 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg> Send Alert Email';
+});
+</script>
+</body>
+</html>
+

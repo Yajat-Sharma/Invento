@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Advanced Reports & Analytics">
+<title>Invento — Reports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.1/jspdf.plugin.autotable.min.js"></script>
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Reports & Analytics</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn" title="Alerts"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <!-- Tab Navigation -->
+      <div class="tab-nav" style="display:flex;gap:.35rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:.3rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <button class="tab-btn active" data-tab="profit">💰 Profit</button>
+        <button class="tab-btn" data-tab="abc">📊 ABC Analysis</button>
+        <button class="tab-btn" data-tab="movers">🚀 Stock Movement</button>
+        <button class="tab-btn" data-tab="supplier">🚚 Suppliers</button>
+        <button class="tab-btn" data-tab="loss">⚠️ Loss Prevention</button>
+        <div style="margin-left:auto;display:flex;gap:.35rem;">
+          <button class="btn btn-secondary btn-sm" id="exportExcelBtn">📤 Excel</button>
+          <button class="btn btn-secondary btn-sm" id="exportPdfBtn">📄 PDF</button>
+        </div>
+      </div>
+
+      <!-- ── TAB: Profit ── -->
+      <div id="tab-profit" class="tab-panel active">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.25rem;" id="profitStatCards"></div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.25rem;">
+          <div class="card"><div class="section-header"><h3>📈 Sales & Profit Trend</h3></div><div style="height:260px;"><canvas id="profitLineChart"></canvas></div></div>
+          <div class="card"><div class="section-header"><h3>💳 Payment Methods</h3></div><div style="height:260px;position:relative;"><canvas id="paymentPieChart"></canvas></div></div>
+        </div>
+        <div class="card">
+          <div class="section-header"><h3>Profit Per Product</h3></div>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead><tr><th>Product</th><th>Category</th><th>Cost ₹</th><th>Price ₹</th><th>Margin ₹</th><th>Margin %</th><th>Units Sold</th><th>Total Profit ₹</th></tr></thead>
+              <tbody id="profitBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: ABC Analysis ── -->
+      <div id="tab-abc" class="tab-panel" style="display:none;">
+        <div class="card" style="margin-bottom:1rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(79,142,247,.06),var(--surface));">
+          <h3 style="font-size:.95rem;font-weight:700;margin-bottom:.5rem;">What is ABC Analysis?</h3>
+          <p style="font-size:.82rem;color:var(--text-2);line-height:1.6;">ABC analysis classifies your products by revenue contribution. <strong style="color:var(--success);">A items</strong> (top 70% revenue) need close monitoring. <strong style="color:var(--warning);">B items</strong> (next 20%) require regular review. <strong style="color:var(--danger);">C items</strong> (last 10%) are candidates for discontinuation.</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:1rem;margin-bottom:1rem;">
+          <div class="card"><div class="section-header"><h3>Revenue Distribution</h3></div><div style="height:220px;position:relative;"><canvas id="abcDonutChart"></canvas></div><div id="abcSummaryCards" style="margin-top:.75rem;"></div></div>
+          <div class="card">
+            <div class="section-header"><h3>ABC Classification Table</h3></div>
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead><tr><th>Class</th><th>Product</th><th>Revenue ₹</th><th>Rev %</th><th>Cumulative %</th></tr></thead>
+                <tbody id="abcBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TAB: Stock Movement ── -->
+      <div id="tab-movers" class="tab-panel" style="display:none;">
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="section-header"><h3>🚀 Fast Moving Products <span class="badge badge-good" style="margin-left:.5rem;">Top sellers (30d)</span></h3></div>
+          <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>Product</th><th>Category</th><th>Units Sold (30d)</th><th>Revenue ₹</th><th>Stock Left</th></tr></thead><tbody id="fastBody"></tbody></table></div>
+          <div class="empty-state" id="fastEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🚀</div><h3>No sales data yet</h3><p>Record sales to see fast-moving products</p></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <div class="section-header"><h3>🐌 Slow Moving Products <span class="badge badge-low" style="margin-left:.5rem;">Low velocity (30d)</span></h3></div>
+          <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>Product</th><th>Category</th><th>Units (30d)</th><th>Stock</th><th>Expiry</th></tr></thead><tbody id="slowBody"></tbody></table></div>
+          <div class="empty-state" id="slowEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🐌</div><h3>No slow-moving products</h3><p>Great — everything is selling well!</p></div>
+        </div>
+        <div class="card" id="dead" style="margin-bottom:1rem;">
+          <div class="section-header"><h3>💀 Dead Stock <span class="badge badge-expired" id="deadBadge" style="margin-left:.5rem;"></span></h3><span style="font-size:.78rem;color:var(--text-2);">No sales in last 30 days</span></div>
+          <div class="table-wrapper"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Stock Qty</th><th>Stock Value ₹</th><th>Expiry</th><th>Action</th></tr></thead><tbody id="deadBody"></tbody></table></div>
+          <div class="empty-state" id="deadEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">✅</div><h3>No dead stock!</h3><p>All your products have had recent sales</p></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: Supplier Report ── -->
+      <div id="tab-supplier" class="tab-panel" style="display:none;">
+        <div id="supplierCards" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:1.25rem;"></div>
+        <div class="card">
+          <div class="section-header"><h3>Supplier-wise Sales Summary</h3></div>
+          <div class="table-wrapper"><table class="data-table"><thead><tr><th>Supplier</th><th>Phone</th><th>Products</th><th>Units Sold</th><th>Revenue ₹</th></tr></thead><tbody id="supplierBody"></tbody></table></div>
+          <div class="empty-state" id="supplierEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🚚</div><h3>No suppliers found</h3><a href="suppliers.html" class="btn btn-primary" style="margin-top:.75rem;">Add Suppliers</a></div>
+        </div>
+      </div>
+
+      <!-- ── TAB: Loss Prevention ── -->
+      <div id="tab-loss" class="tab-panel" style="display:none;">
+        <div class="card" style="margin-bottom:1rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(245,158,11,.06),var(--surface));border-left:3px solid var(--warning);">
+          <h3 style="font-size:.95rem;font-weight:700;margin-bottom:.4rem;">⚠️ How Loss Prevention Works</h3>
+          <p style="font-size:.82rem;color:var(--text-2);">Products flagged here have <strong>high stock quantity</strong>, <strong>low recent sales</strong>, and are <strong>expiring within 30 days</strong>. Acting quickly with discounts or promotions can prevent inventory loss.</p>
+        </div>
+        <div id="lossPrevContent"></div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container"></div>
+<style>
+.tab-btn { background: none; border: none; color: var(--text-2); font-size: .83rem; font-weight: 600; padding: .5rem .85rem; border-radius: var(--r-md); cursor: pointer; font-family: inherit; transition: all .15s; }
+.tab-btn.active { background: var(--accent); color: #fff; }
+.tab-btn:hover:not(.active) { background: var(--surface-2); color: var(--text-1); }
+</style>
+<script src="shared.js"></script>
+<script>
+initPage('reports');
+if (!getCurrentShopId()) { location.href = 'shop-select.html'; }
+
+const shop     = DB.getCurrentShop();
+const currency = shop?.currency || '₹';
+const fmt      = n => currency + Number(n || 0).toLocaleString('en-IN');
+
+// ── Tab switching ──
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).style.display = '';
+    if (btn.dataset.tab === 'abc')      renderABC();
+    if (btn.dataset.tab === 'movers')   renderMovers();
+    if (btn.dataset.tab === 'supplier') renderSupplier();
+    if (btn.dataset.tab === 'loss')     renderLoss();
+  });
+});
+
+// ── PROFIT TAB ──
+function renderProfit() {
+  const products  = DB.getProducts();
+  const sales     = DB.getSales();
+  const cats      = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+  const prodMap   = Object.fromEntries(products.map(p => [p.id, p]));
+  const today     = todayStr(); const month = today.slice(0, 7);
+  const profit    = getProfitStats();
+  let todaySales = 0, monthSales = 0, totalSales = 0;
+  sales.forEach(s => {
+    totalSales += Number(s.totalAmount || 0);
+    if (s.date === today)                 todaySales  += Number(s.totalAmount || 0);
+    if ((s.date || '').startsWith(month)) monthSales  += Number(s.totalAmount || 0);
+  });
+
+  const statCards = [
+    { l: "Today's Sales",    v: fmt(todaySales)      },
+    { l: "Today's Profit",   v: fmt(profit.todayProfit),  cls: profit.todayProfit >= 0 ? 'text-success' : 'text-danger' },
+    { l: 'Monthly Sales',    v: fmt(monthSales)      },
+    { l: 'Monthly Profit',   v: fmt(profit.monthProfit),  cls: profit.monthProfit >= 0 ? 'text-success' : 'text-danger' },
+    { l: 'Total Revenue',    v: fmt(totalSales)      },
+    { l: 'Total Profit',     v: fmt(profit.totalProfit),  cls: profit.totalProfit  >= 0 ? 'text-success' : 'text-danger' },
+  ];
+  document.getElementById('profitStatCards').innerHTML = statCards.map(c =>
+    `<div class="stat-card"><div class="stat-body"><div class="stat-value ${c.cls || ''}">${c.v}</div><div class="stat-label">${c.l}</div></div></div>`).join('');
+
+  // ── 30 day chart ──
+  const days30 = [];
+  for (let i=29;i>=0;i--) { const d=new Date(); d.setDate(d.getDate()-i); days30.push(d.toISOString().split('T')[0]); }
+  const sByD = Object.fromEntries(days30.map(d=>[d,0]));
+  const pByD = Object.fromEntries(days30.map(d=>[d,0]));
+  sales.filter(s => days30.includes(s.date)).forEach(s => {
+    sByD[s.date] += Number(s.totalAmount || 0);
+    const cost = Number(prodMap[s.productId]?.costPrice || 0);
+    pByD[s.date] += (Number(s.sellingPrice || 0) - cost) * Number(s.quantitySold || 0);
+  });
+  if (window._profitChart) window._profitChart.destroy();
+  window._profitChart = new Chart(document.getElementById('profitLineChart'), {
+    type: 'line',
+    data: {
+      labels: days30.map(d => { const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('en-IN', {day:'2-digit',month:'short'}); }),
+      datasets: [
+        { label: 'Sales', data: days30.map(d=>sByD[d]), borderColor:'#4f8ef7', backgroundColor:'rgba(79,142,247,.07)', fill:true, tension:.4, pointRadius:2 },
+        { label: 'Profit', data: days30.map(d=>pByD[d]), borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,.07)', fill:true, tension:.4, pointRadius:2 }
+      ]
+    },
+    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#7d8a9a',font:{size:11}}}}, scales:{ x:{ticks:{color:'#4d5a6d',maxTicksLimit:10,font:{size:10}},grid:{color:'rgba(255,255,255,.04)'}}, y:{ticks:{color:'#4d5a6d',font:{size:10},callback:v=>currency+v.toLocaleString('en-IN')},grid:{color:'rgba(255,255,255,.04)'}} } }
+  });
+
+  // Payment pie
+  const payMap = {};
+  sales.forEach(s => { payMap[s.paymentMethod || 'Other'] = (payMap[s.paymentMethod || 'Other'] || 0) + Number(s.totalAmount || 0); });
+  const payNames = Object.keys(payMap);
+  if (window._payChart) window._payChart.destroy();
+  window._payChart = new Chart(document.getElementById('paymentPieChart'), {
+    type: 'doughnut',
+    data: { labels: payNames, datasets: [{ data: payNames.map(n=>payMap[n]), backgroundColor: ['#4f8ef7','#22c55e','#f59e0b','#ef4444'], borderWidth:0, hoverOffset:6 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ position:'right', labels:{ color:'#7d8a9a', font:{size:11}, boxWidth:12 } } } }
+  });
+
+  // Profit per product table
+  const salesByProd = {};
+  sales.forEach(s => {
+    salesByProd[s.productId] = salesByProd[s.productId] || { qty: 0, profit: 0 };
+    const cost = Number(prodMap[s.productId]?.costPrice || 0);
+    salesByProd[s.productId].qty    += Number(s.quantitySold || 0);
+    salesByProd[s.productId].profit += (Number(s.sellingPrice || 0) - cost) * Number(s.quantitySold || 0);
+  });
+  const rows = products.map(p => {
+    const margin    = Number(p.sellingPrice || 0) - Number(p.costPrice || 0);
+    const marginPct = Number(p.costPrice) > 0 ? ((margin / Number(p.costPrice)) * 100).toFixed(1) : '—';
+    const sp        = salesByProd[p.id] || { qty: 0, profit: 0 };
+    const cat       = cats[p.categoryId];
+    return {
+      name: p.name, cat: cat ? `${cat.icon} ${cat.name}` : '—', cost: p.costPrice, price: p.sellingPrice,
+      margin, marginPct, qty: sp.qty, totalProfit: sp.profit
+    };
+  }).sort((a, b) => b.totalProfit - a.totalProfit);
+
+  document.getElementById('profitBody').innerHTML = rows.map(r => `<tr>
+    <td class="td-name">${escapeHtml(r.name)}</td>
+    <td class="td-dim">${escapeHtml(r.cat)}</td>
+    <td class="td-dim">${fmt(r.cost)}</td>
+    <td style="font-weight:600;">${fmt(r.price)}</td>
+    <td class="${r.margin >= 0 ? 'text-success' : 'text-danger'} fw-600">${fmt(r.margin)}</td>
+    <td class="${r.margin >= 0 ? 'text-success' : 'text-danger'}">${r.marginPct !== '—' ? r.marginPct + '%' : '—'}</td>
+    <td>${r.qty}</td>
+    <td class="${r.totalProfit >= 0 ? 'text-success' : 'text-danger'} fw-600">${fmt(r.totalProfit)}</td>
+  </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:2rem;">No data yet</td></tr>';
+}
+renderProfit();
+
+// ── ABC TAB ──
+function renderABC() {
+  const abc = computeABCAnalysis();
+  const total = abc.totalRevenue;
+  const fmt2 = n => total > 0 ? (n / total * 100).toFixed(1) + '%' : '0%';
+
+  document.getElementById('abcSummaryCards').innerHTML = [
+    { cls:'a', label:'A Items', count: abc.A.length, rev: abc.aRev, color: 'var(--success)' },
+    { cls:'b', label:'B Items', count: abc.B.length, rev: abc.bRev, color: 'var(--warning)' },
+    { cls:'c', label:'C Items', count: abc.C.length, rev: abc.cRev, color: 'var(--danger)' },
+  ].map(x => `<div style="display:flex;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid var(--border);">
+    <span class="abc-badge-${x.cls}">${x.cls.toUpperCase()}</span>
+    <div style="flex:1;"><div style="font-size:.8rem;font-weight:600;">${x.label} (${x.count})</div><div style="font-size:.72rem;color:var(--text-2);">${fmt(x.rev)} — ${fmt2(x.rev)}</div></div>
+  </div>`).join('');
+
+  if (window._abcChart) window._abcChart.destroy();
+  window._abcChart = new Chart(document.getElementById('abcDonutChart'), {
+    type: 'doughnut',
+    data: { labels: ['A (Top 70%)', 'B (Next 20%)', 'C (Last 10%)'], datasets: [{ data: [abc.aRev, abc.bRev, abc.cRev], backgroundColor: ['#22c55e','#f59e0b','#ef4444'], borderWidth:0, hoverOffset:6 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'66%', plugins:{ legend:{ display:false } } }
+  });
+
+  let cumRev = 0;
+  const allItems = [...abc.A.map(p=>({...p,abc:'A'})), ...abc.B.map(p=>({...p,abc:'B'})), ...abc.C.map(p=>({...p,abc:'C'}))];
+  document.getElementById('abcBody').innerHTML = allItems.map((p, i) => {
+    cumRev += p.revenue;
+    const pct    = total > 0 ? (p.revenue / total * 100).toFixed(1) : '0.0';
+    const cumPct = total > 0 ? (cumRev / total * 100).toFixed(1) : '0.0';
+    return `<tr>
+      <td><span class="abc-badge-${p.abc.toLowerCase()}">${p.abc}</span></td>
+      <td class="td-name">${escapeHtml(p.name)}</td>
+      <td style="font-weight:600;">${fmt(p.revenue)}</td>
+      <td>${pct}%</td>
+      <td style="color:${p.abc==='A'?'var(--success)':p.abc==='B'?'var(--warning)':'var(--danger)'};">${cumPct}%</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:2rem;">No sales data for ABC analysis</td></tr>';
+}
+
+// ── MOVERS TAB ──
+function renderMovers() {
+  const cats    = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+  // Fast
+  const fast    = getFastMovingProducts(20);
+  const fbody   = document.getElementById('fastBody');
+  const fempty  = document.getElementById('fastEmpty');
+  if (!fast.length) { fbody.closest('.table-wrapper').style.display='none'; fempty.style.display=''; }
+  else {
+    fbody.closest('.table-wrapper').style.display=''; fempty.style.display='none';
+    fbody.innerHTML = fast.map((p, i) => {
+      const cat = cats[p.categoryId];
+      return `<tr><td style="color:var(--text-3);font-weight:700;">${i+1}</td><td class="td-name">${escapeHtml(p.name)}</td><td class="td-dim">${cat ? `${cat.icon} ${cat.name}` : '—'}</td><td style="font-weight:700;color:var(--success);">${p.totalSold}</td><td>${fmt(p.totalRev)}</td><td>${p.quantity}</td></tr>`;
+    }).join('');
+  }
+
+  // Slow
+  const slow   = getSlowMovingProducts(20);
+  const sbody  = document.getElementById('slowBody');
+  const sempty = document.getElementById('slowEmpty');
+  if (!slow.length) { sbody.closest('.table-wrapper').style.display='none'; sempty.style.display=''; }
+  else {
+    sbody.closest('.table-wrapper').style.display=''; sempty.style.display='none';
+    sbody.innerHTML = slow.map((p,i) => {
+      const cat = cats[p.categoryId]; const es = getExpiryStatus(p.expiryDate);
+      return `<tr><td style="color:var(--text-3);font-weight:700;">${i+1}</td><td class="td-name">${escapeHtml(p.name)}</td><td class="td-dim">${cat ? `${cat.icon} ${cat.name}` : '—'}</td><td style="font-weight:700;color:var(--warning);">${p.recentSold}</td><td>${p.quantity}</td><td><span class="badge ${es.badgeClass}">${es.label}</span></td></tr>`;
+    }).join('');
+  }
+
+  // Dead
+  const dead   = getDeadStockProducts();
+  const dbody  = document.getElementById('deadBody');
+  const dempty = document.getElementById('deadEmpty');
+  document.getElementById('deadBadge').textContent = dead.length;
+  if (!dead.length) { dbody.closest('.table-wrapper').style.display='none'; dempty.style.display=''; }
+  else {
+    dbody.closest('.table-wrapper').style.display=''; dempty.style.display='none';
+    dbody.innerHTML = dead.map(p => {
+      const cat = cats[p.categoryId]; const es = getExpiryStatus(p.expiryDate);
+      const val = Number(p.costPrice || 0) * Number(p.quantity || 0);
+      return `<tr><td class="td-name">${escapeHtml(p.name)}</td><td class="td-dim">${cat ? `${cat.icon} ${cat.name}` : '—'}</td><td style="font-weight:600;">${p.quantity}</td><td style="color:var(--danger);">${fmt(val)}</td><td><span class="badge ${es.badgeClass}">${es.label}</span></td><td><a href="alerts.html" class="btn btn-warning btn-sm">Apply Discount</a></td></tr>`;
+    }).join('');
+  }
+}
+
+// ── SUPPLIER TAB ──
+function renderSupplier() {
+  const report = getSupplierReport();
+  const empty  = document.getElementById('supplierEmpty');
+  const tbody  = document.getElementById('supplierBody');
+  if (!report.length) { empty.style.display=''; tbody.parentElement.style.display='none'; document.getElementById('supplierCards').innerHTML=''; return; }
+  empty.style.display='none'; tbody.parentElement.style.display='';
+
+  document.getElementById('supplierCards').innerHTML = report.map(s => `
+    <div class="card" style="padding:1.1rem;">
+      <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--accent-dim);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;">${(s.name||'S').slice(0,2).toUpperCase()}</div>
+        <div><div style="font-weight:700;font-size:.9rem;">${escapeHtml(s.name)}</div><div style="font-size:.75rem;color:var(--text-2);">${s.phone || s.email || 'No contact'}</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;font-size:.8rem;">
+        <div><div style="color:var(--text-3);">Products</div><div style="font-weight:700;">${s.productCount}</div></div>
+        <div><div style="color:var(--text-3);">Units Sold</div><div style="font-weight:700;color:var(--success);">${s.salesQty}</div></div>
+        <div style="grid-column:1/-1;"><div style="color:var(--text-3);">Revenue</div><div style="font-weight:700;font-size:.95rem;">${fmt(s.salesRevenue)}</div></div>
+      </div>
+    </div>`).join('');
+
+  tbody.innerHTML = report.map(s => `<tr>
+    <td class="td-name">${escapeHtml(s.name)}</td>
+    <td class="td-dim">${s.phone || '—'}</td>
+    <td>${s.productCount}</td>
+    <td style="font-weight:600;">${s.salesQty}</td>
+    <td style="font-weight:700;color:var(--success);">${fmt(s.salesRevenue)}</td>
+  </tr>`).join('');
+}
+
+// ── LOSS PREVENTION TAB ──
+function renderLoss() {
+  const alerts = getLossPreventionAlerts();
+  const cats   = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+  const el     = document.getElementById('lossPrevContent');
+  if (!alerts.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:3rem;"><div class="empty-state-icon">✅</div><h3>No Loss Prevention Alerts</h3><p>All expiring products show healthy sales levels.</p></div>`;
+    return;
+  }
+  el.innerHTML = `<div class="card">
+    <div class="section-header"><h3>⚠️ At-Risk Products (${alerts.length})</h3></div>
+    <div class="table-wrapper">
+      <table class="data-table">
+        <thead><tr><th>Product</th><th>Category</th><th>Stock</th><th>Expiry</th><th>Recent Sales</th><th>Est. Loss</th><th>Action</th></tr></thead>
+        <tbody>${alerts.map(p => {
+          const cat    = cats[p.categoryId];
+          const es     = getExpiryStatus(p.expiryDate);
+          const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-30); const cStr = cutoff.toISOString().split('T')[0];
+          const recentSold = DB.getSales().filter(s=>s.productId===p.id && s.date>=cStr).reduce((s,x)=>s+Number(x.quantitySold||0),0);
+          const estLoss = Number(p.costPrice||0) * Number(p.quantity||0);
+          return `<tr>
+            <td class="td-name">${escapeHtml(p.name)}</td>
+            <td class="td-dim">${cat ? `${cat.icon} ${cat.name}` : '—'}</td>
+            <td style="font-weight:600;">${p.quantity}</td>
+            <td><span class="badge ${es.badgeClass}">${es.label}</span></td>
+            <td>${recentSold} units</td>
+            <td style="color:var(--danger);font-weight:700;">${fmt(estLoss)}</td>
+            <td><a href="alerts.html" class="btn btn-warning btn-sm">🏷️ Discount</a></td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>
+    <p style="font-size:.78rem;color:var(--text-3);margin-top:.75rem;padding:0 .5rem;">💡 Applying a 10–30% discount can help clear stock before expiry and recover cost.</p>
+  </div>`;
+}
+
+// ── EXPORTS ──
+document.getElementById('exportExcelBtn').addEventListener('click', () => {
+  try {
+    const wb = XLSX.utils.book_new();
+    // Sheet 1: Profit per product
+    const products = DB.getProducts(); const sales = DB.getSales();
+    const prodMap  = Object.fromEntries(products.map(p=>[p.id,p]));
+    const cats     = Object.fromEntries(DB.getCategories().map(c=>[c.id,c]));
+    const salesM   = {};
+    sales.forEach(s => { salesM[s.productId]=salesM[s.productId]||{qty:0,profit:0}; const c=Number(prodMap[s.productId]?.costPrice||0); salesM[s.productId].qty+=Number(s.quantitySold||0); salesM[s.productId].profit+=(Number(s.sellingPrice||0)-c)*Number(s.quantitySold||0); });
+    const profitRows = products.map(p => ({ 'Product': p.name, 'Category': cats[p.categoryId]?.name||'', 'Cost Price': p.costPrice, 'Selling Price': p.sellingPrice, 'Margin': Number(p.sellingPrice||0)-Number(p.costPrice||0), 'Units Sold': (salesM[p.id]||{}).qty||0, 'Total Profit': (salesM[p.id]||{}).profit||0 }));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(profitRows), 'Profit Report');
+    // Sheet 2: ABC
+    const abc = computeABCAnalysis();
+    const abcRows = [...abc.A.map(p=>({...p,Class:'A'})),...abc.B.map(p=>({...p,Class:'B'})),...abc.C.map(p=>({...p,Class:'C'}))].map(p=>({'Class':p.Class,'Product':p.name,'Revenue':p.revenue}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(abcRows), 'ABC Analysis');
+    // Sheet 3: Dead Stock
+    const deadRows = getDeadStockProducts().map(p=>({'Product':p.name,'Quantity':p.quantity,'Cost Price':p.costPrice,'Estimated Loss':Number(p.costPrice||0)*Number(p.quantity||0),'Expiry':p.expiryDate}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(deadRows), 'Dead Stock');
+    // Sheet 4: Supplier Report
+    const supRows = getSupplierReport().map(s=>({'Supplier':s.name,'Phone':s.phone,'Products':s.productCount,'Units Sold':s.salesQty,'Revenue':s.salesRevenue}));
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(supRows), 'Supplier Report');
+    XLSX.writeFile(wb, `Invento_Reports_${todayStr()}.xlsx`);
+    showToast('Exported 4 report sheets to Excel!');
+  } catch(e) { showToast('Export failed: ' + e.message, 'error'); }
+});
+
+document.getElementById('exportPdfBtn').addEventListener('click', () => {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    doc.setFontSize(18); doc.setTextColor(30);
+    doc.text(`Invento — Reports (${shop?.name || 'My Shop'})`, 40, 50);
+    doc.setFontSize(10); doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 40, 68);
+
+    const abc = computeABCAnalysis(); let y = 90;
+    doc.setFontSize(13); doc.setTextColor(30); doc.text('ABC Analysis', 40, y); y += 15;
+    doc.autoTable({ startY: y, head:[['Class','Product','Revenue ₹','Revenue %']], body:[...abc.A,...abc.B,...abc.C].map(p=>([p.abc||'?', p.name, p.revenue.toFixed(2), abc.totalRevenue>0?(p.revenue/abc.totalRevenue*100).toFixed(1)+'%':'0%']), body => body), margin:{left:40}, styles:{fontSize:8,cellPadding:4}, headStyles:{fillColor:[79,142,247]} });
+    y = doc.lastAutoTable.finalY + 20;
+
+    doc.addPage(); y = 40;
+    doc.setFontSize(13); doc.text('Dead Stock', 40, y); y += 15;
+    const dead = getDeadStockProducts();
+    doc.autoTable({ startY: y, head:[['Product','Quantity','Cost Price','Est. Loss','Expiry']], body: dead.map(p=>[p.name, p.quantity, p.costPrice, (Number(p.costPrice||0)*Number(p.quantity||0)).toFixed(2), p.expiryDate||'—']), margin:{left:40}, styles:{fontSize:8,cellPadding:4}, headStyles:{fillColor:[239,68,68]} });
+    doc.save(`Invento_Reports_${todayStr()}.pdf`);
+    showToast('PDF downloaded!');
+  } catch(e) { showToast('PDF failed: ' + e.message, 'error'); }
+});
+
+// Check deep-link hash
+if (location.hash === '#dead') {
+  document.querySelector('[data-tab="movers"]').click();
+  setTimeout(() => document.getElementById('dead')?.scrollIntoView({ behavior:'smooth' }), 400);
+}
+</script>
+</body>
+</html>

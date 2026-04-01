@@ -1,0 +1,475 @@
+/* ===== FreshAlert — suggestions.css ===== */
+
+:root {
+    --ai-primary: #8B5CF6;
+    /* Purple for AI */
+    --ai-secondary: #D946EF;
+    /* Pink-ish for gradient */
+    --ai-glow: rgba(139, 92, 246, 0.4);
+
+    /* Reusing base dashboard themes */
+    --clr-bg: #F4F7FE;
+    --clr-card: #FFFFFF;
+    --clr-text: #2B3674;
+    --clr-text-light: #A3AED0;
+    --clr-border: #E0E5F2;
+}
+
+[data-theme="dark"] {
+    --clr-bg: #0B1437;
+    --clr-card: #111C44;
+    --clr-text: #FFFFFF;
+    --clr-text-light: #8F9BBA;
+    --clr-border: #1B2559;
+}
+
+/* Gradient text specifically for AI */
+.ai-gradient {
+    background: linear-gradient(135deg, var(--ai-primary) 0%, var(--ai-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* =========================================
+   Anti-Gravity UI & Neural Background
+========================================= */
+
+/* Entrance Wrapper */
+.page-entrance-wrapper {
+    animation: pageEntrance 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    position: relative;
+    z-index: 10;
+}
+
+@keyframes pageEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.98);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Particles Background */
+#particles-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--ai-primary);
+    box-shadow: 0 0 10px 2px var(--ai-glow);
+    animation: float-particle 15s infinite linear;
+    opacity: 0;
+}
+
+@keyframes float-particle {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.6;
+    }
+
+    80% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-100px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* Floating AI Icons */
+.floating-icons-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.float-icon {
+    position: absolute;
+    font-size: 3rem;
+    filter: drop-shadow(0 10px 15px rgba(139, 92, 246, 0.3));
+    opacity: 0.5;
+    will-change: transform;
+    animation: float-obj 8s ease-in-out infinite alternate;
+}
+
+.fi-brain {
+    top: 15%;
+    right: 10%;
+    font-size: 4rem;
+    animation-delay: 0s;
+}
+
+.fi-meds {
+    bottom: 20%;
+    left: 8%;
+    font-size: 3.5rem;
+    animation-delay: -2s;
+    animation-duration: 7s;
+}
+
+.fi-milk {
+    top: 30%;
+    left: 15%;
+    font-size: 2.5rem;
+    animation-delay: -4s;
+    animation-duration: 9s;
+}
+
+.fi-veg {
+    bottom: 30%;
+    right: 15%;
+    font-size: 3rem;
+    animation-delay: -1s;
+    animation-duration: 6s;
+}
+
+.fi-bell {
+    top: 50%;
+    right: 5%;
+    font-size: 2rem;
+    animation-delay: -3s;
+    animation-duration: 10s;
+}
+
+@keyframes float-obj {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+    }
+
+    100% {
+        transform: translateY(-40px) rotate(10deg) scale(1.05);
+    }
+}
+
+/* =========================================
+   UI Components
+========================================= */
+
+/* Custom Icon Button */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: var(--clr-card);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.icon-btn:hover {
+    transform: scale(1.05);
+    background: var(--clr-bg);
+}
+
+/* Glass panel */
+.glass-panel {
+    background: var(--clr-card);
+    border: 1px solid var(--clr-border);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    border-radius: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Loader State */
+.ai-loader-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    text-align: center;
+}
+
+.ai-loader-container h2 {
+    color: var(--clr-text);
+    margin-top: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.ai-loader-container p {
+    color: var(--clr-text-light);
+    margin-top: 0.5rem;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(139, 92, 246, 0.1);
+    border-left-color: var(--ai-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 20px var(--ai-glow);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Empty State */
+.ai-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    text-align: center;
+}
+
+.ai-empty-state .empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.1));
+}
+
+.ai-empty-state h2 {
+    color: var(--clr-text);
+    margin-bottom: 0.5rem;
+}
+
+.ai-empty-state p {
+    color: var(--clr-text-light);
+    margin-bottom: 1.5rem;
+    max-width: 400px;
+}
+
+/* Insights Summary Section */
+.insights-summary {
+    padding: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.insights-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(217, 70, 239, 0.1) 100%);
+    color: var(--ai-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.insights-text h3 {
+    margin: 0 0 12px 0;
+    color: var(--clr-text);
+    font-size: 1.1rem;
+}
+
+.insights-text ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.insights-text li {
+    font-size: 0.95rem;
+    color: var(--clr-text-light);
+    position: relative;
+    padding-left: 20px;
+}
+
+.insights-text li::before {
+    content: "•";
+    color: var(--ai-primary);
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-weight: 800;
+}
+
+.refresh-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--clr-border);
+    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--clr-text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--ai-primary);
+    border-color: var(--ai-primary);
+}
+
+/* Suggestions Grid */
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+/* Suggestion Card */
+.suggestion-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    /* Strong Glassmorphism */
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(139, 92, 246, 0.1);
+
+    border-top: 4px solid var(--ai-primary);
+    border-radius: 20px;
+
+    /* Anti-gravity continuous float */
+    animation: card-float 5s ease-in-out infinite alternate;
+
+    /* Smooth transition for 3D tilt JS */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    will-change: transform;
+}
+
+[data-theme="dark"] .suggestion-card {
+    background: rgba(17, 28, 68, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+@keyframes card-float {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-12px);
+    }
+}
+
+/* Hover effect enhances the glow */
+.suggestion-card:hover {
+    box-shadow: 0 15px 45px rgba(139, 92, 246, 0.25);
+    border-color: rgba(139, 92, 246, 0.5);
+    z-index: 10;
+}
+
+/* For animation entry */
+.card-enter {
+    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards, card-float 5s ease-in-out infinite alternate 0.6s;
+    opacity: 0;
+    transform: translateY(30px);
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.item-info h4 {
+    margin: 0 0 4px 0;
+    color: var(--clr-text);
+    font-size: 1.1rem;
+}
+
+.item-expiry {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.item-expiry.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.item-expiry.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.card-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.card-body {
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    flex: 1;
+}
+
+[data-theme="dark"] .card-body {
+    background: rgba(139, 92, 246, 0.1);
+}
+
+.card-body p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--clr-text);
+    line-height: 1.5;
+}
+
+.ai-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ai-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}

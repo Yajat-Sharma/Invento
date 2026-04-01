@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Suppliers">
+<title>Invento — Suppliers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Suppliers</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Suppliers</h2><p>Manage product suppliers and their contact details</p></div>
+        <button class="btn btn-primary" id="addSupBtn">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Supplier
+        </button>
+      </div>
+
+      <div class="table-toolbar">
+        <div class="search-box"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><input type="text" id="supSearch" placeholder="Search suppliers…"></div>
+      </div>
+
+      <div class="supplier-grid" id="supplierGrid"></div>
+      <div class="empty-state" id="supEmpty" style="display:none;">
+        <div class="empty-state-icon">🚚</div>
+        <h3>No suppliers yet</h3>
+        <p>Add suppliers to link them with your products for better traceability.</p>
+        <button class="btn btn-primary" onclick="openModal()">Add Supplier</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="supModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title" id="supModalTitle">Add Supplier</span>
+      <button class="modal-close" id="supModalClose"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editSupId">
+      <div class="form-grid">
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Company / Supplier Name <span class="req">*</span></label>
+          <input type="text" class="form-control" id="supName" placeholder="e.g. Amul Distributors">
+          <div class="field-error" id="supNameErr">Supplier name is required.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Person</label>
+          <input type="text" class="form-control" id="supContact" placeholder="Contact person name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-control" id="supPhone" placeholder="+91 98765 43210">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="supEmail" placeholder="supplier@example.com">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">City / Address</label>
+          <input type="text" class="form-control" id="supCity" placeholder="e.g. Mumbai, Maharashtra">
+        </div>
+        <div class="form-group" style="grid-column:1/-1">
+          <label class="form-label">Notes</label>
+          <textarea class="form-control" id="supNotes" rows="2" placeholder="Any special terms, notes…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="supModalCancel">Cancel</button>
+      <button class="btn btn-primary" id="supModalSave">Save Supplier</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="shared.js"></script>
+<script>
+initPage('suppliers');
+
+function renderSuppliers() {
+  const q   = document.getElementById('supSearch').value.toLowerCase();
+  let sups   = DB.getSuppliers();
+  if (q) sups = sups.filter(s => s.name.toLowerCase().includes(q) || (s.contact||'').toLowerCase().includes(q) || (s.city||'').toLowerCase().includes(q));
+
+  const prods    = DB.getProducts();
+  const countMap = {};
+  prods.forEach(p => { countMap[p.supplierId] = (countMap[p.supplierId] || 0) + 1; });
+
+  const grid  = document.getElementById('supplierGrid');
+  const empty = document.getElementById('supEmpty');
+  if (!sups.length) { grid.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = sups.map(s => `
+    <div class="supplier-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;">
+        <div>
+          <div class="sup-name">${escapeHtml(s.name)}</div>
+          ${s.contact ? `<div class="sup-meta">👤 ${escapeHtml(s.contact)}</div>` : ''}
+        </div>
+        <span class="badge badge-accent">${countMap[s.id] || 0} product${(countMap[s.id] || 0) !== 1 ? 's' : ''}</span>
+      </div>
+      ${s.phone ? `<div class="sup-meta">📞 ${escapeHtml(s.phone)}</div>` : ''}
+      ${s.email ? `<div class="sup-meta">✉️ ${escapeHtml(s.email)}</div>` : ''}
+      ${s.city  ? `<div class="sup-meta">📍 ${escapeHtml(s.city)}</div>` : ''}
+      ${s.notes ? `<div style="font-size:.75rem;color:var(--text-3);border-top:1px solid var(--border);padding-top:.5rem;margin-top:.25rem;">${escapeHtml(s.notes)}</div>` : ''}
+      <div class="sup-actions">
+        <button class="btn btn-secondary btn-sm edit-sup" data-id="${s.id}">✏️ Edit</button>
+        <button class="btn btn-danger btn-sm del-sup" data-id="${s.id}">🗑️ Delete</button>
+      </div>
+    </div>`).join('');
+
+  document.querySelectorAll('.edit-sup').forEach(btn => btn.addEventListener('click', () => openModal(DB.getSupplierById(btn.dataset.id))));
+  document.querySelectorAll('.del-sup').forEach(btn => btn.addEventListener('click', () => {
+    const s   = DB.getSupplierById(btn.dataset.id);
+    const cnt = countMap[btn.dataset.id] || 0;
+    if (cnt > 0) { showToast(`Cannot delete — ${cnt} product(s) use this supplier`, 'error'); return; }
+    showConfirm('Delete Supplier', `Delete "${s?.name}"? This cannot be undone.`, () => { DB.deleteSupplier(btn.dataset.id); renderSuppliers(); showToast('Supplier deleted', 'error'); });
+  }));
+}
+renderSuppliers();
+
+document.getElementById('supSearch').addEventListener('input', renderSuppliers);
+
+let editId = null;
+function openModal(sup = null) {
+  editId = sup?.id || null;
+  document.getElementById('supModalTitle').textContent = sup ? 'Edit Supplier' : 'Add Supplier';
+  document.getElementById('supName').value    = sup?.name    || '';
+  document.getElementById('supContact').value  = sup?.contact || '';
+  document.getElementById('supPhone').value    = sup?.phone   || '';
+  document.getElementById('supEmail').value    = sup?.email   || '';
+  document.getElementById('supCity').value     = sup?.city    || '';
+  document.getElementById('supNotes').value    = sup?.notes   || '';
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.form-control').forEach(e => e.classList.remove('error'));
+  document.getElementById('supModal').classList.add('active');
+}
+function closeModal() { document.getElementById('supModal').classList.remove('active'); editId = null; }
+
+document.getElementById('addSupBtn').addEventListener('click', () => openModal());
+document.getElementById('supModalClose').addEventListener('click', closeModal);
+document.getElementById('supModalCancel').addEventListener('click', closeModal);
+document.getElementById('supModal').addEventListener('click', e => { if (e.target === document.getElementById('supModal')) closeModal(); });
+
+document.getElementById('supModalSave').addEventListener('click', () => {
+  const name = document.getElementById('supName').value.trim();
+  if (!name) { document.getElementById('supNameErr').classList.add('visible'); document.getElementById('supName').classList.add('error'); return; }
+  document.getElementById('supNameErr').classList.remove('visible'); document.getElementById('supName').classList.remove('error');
+
+  const data = {
+    name,
+    contact: document.getElementById('supContact').value.trim(),
+    phone:   document.getElementById('supPhone').value.trim(),
+    email:   document.getElementById('supEmail').value.trim(),
+    city:    document.getElementById('supCity').value.trim(),
+    notes:   document.getElementById('supNotes').value.trim()
+  };
+  if (editId) { DB.updateSupplier(editId, data); showToast('Supplier updated!'); }
+  else { DB.addSupplier({ id: genId('sup'), ...data, createdAt: now() }); showToast('Supplier added!'); }
+  closeModal(); renderSuppliers();
+});
+</script>
+</body>
+</html>

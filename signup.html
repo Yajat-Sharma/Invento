@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Create your Invento account — Inventory & Expiry Management">
+<title>Invento — Create Account</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--accent:#4f8ef7;--accent-2:#6c63ff;--text-1:#e8edf5;--text-2:#7d8a9a;--text-3:#4d5a6d;--danger:#ef4444;--success:#22c55e;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:768px){body{grid-template-columns:1fr;} .auth-brand-panel{display:none;}}
+
+.auth-brand-panel{background:linear-gradient(145deg,#0f1628 0%,#0d1117 100%);display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:3rem;border-right:1px solid var(--border);position:relative;overflow:hidden;}
+.brand-panel-glow{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(108,99,255,.15) 0%,transparent 70%);top:-80px;right:-80px;border-radius:50%;pointer-events:none;}
+.bp-logo{width:52px;height:52px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:2rem;box-shadow:0 4px 20px rgba(79,142,247,.35);}
+.bp-title{font-size:1.9rem;font-weight:800;letter-spacing:-.04em;margin-bottom:.75rem;line-height:1.25;}
+.bp-desc{font-size:.9rem;color:var(--text-2);line-height:1.7;margin-bottom:2rem;max-width:330px;}
+.bp-step{display:flex;align-items:flex-start;gap:.85rem;margin-bottom:1.25rem;}
+.bp-step-num{width:28px;height:28px;border-radius:50%;background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.3);color:var(--accent);font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;}
+.bp-step-text{font-size:.855rem;color:var(--text-2);line-height:1.5;}
+.bp-step-text strong{color:var(--text-1);font-weight:600;}
+
+.auth-form-panel{display:flex;align-items:center;justify-content:center;padding:2rem;background:var(--bg);overflow-y:auto;}
+.auth-card{width:100%;max-width:420px;animation:slide-up .5s cubic-bezier(.16,1,.3,1) both;}
+@keyframes slide-up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.auth-logo-row{display:flex;align-items:center;gap:.65rem;margin-bottom:1.75rem;}
+.auth-logo{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.auth-logo-name{font-size:1.1rem;font-weight:700;}
+.auth-heading{font-size:1.55rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.3rem;}
+.auth-sub{font-size:.875rem;color:var(--text-2);margin-bottom:1.75rem;}
+.form-group{margin-bottom:1rem;}
+.form-label{display:block;font-size:.75rem;font-weight:600;color:var(--text-2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem;}
+.input-wrap{position:relative;}
+.input-icon{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-size:.95rem;pointer-events:none;opacity:.55;}
+.form-input{width:100%;padding:.72rem 1rem .72rem 2.6rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text-1);font-size:.9rem;font-family:inherit;outline:none;transition:all .2s;}
+.form-input::placeholder{color:rgba(125,138,154,.5);}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,.15);background:rgba(79,142,247,.04);}
+.form-input.err{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+.toggle-pw{position:absolute;right:.85rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-2);font-size:1rem;transition:color .2s;}
+.toggle-pw:hover{color:var(--accent);}
+.field-error{font-size:.75rem;color:var(--danger);margin-top:.3rem;display:none;}
+.field-error.vis{display:block;}
+.alert-banner{display:none;align-items:center;gap:.5rem;padding:.75rem 1rem;border-radius:10px;font-size:.84rem;margin-bottom:1.25rem;}
+.alert-banner.vis{display:flex;}
+.alert-banner.error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+.alert-banner.success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#86efac;}
+.btn-submit{width:100%;padding:.85rem;background:linear-gradient(135deg,var(--accent),var(--accent-2));border:none;border-radius:10px;color:#fff;font-size:.95rem;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 18px rgba(79,142,247,.35);transition:all .2s;margin-top:.25rem;}
+.btn-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 24px rgba(79,142,247,.5);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;}
+.btn-spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin:0 auto;}
+.btn-spinner.vis{display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-divider{text-align:center;font-size:.83rem;color:var(--text-2);margin:1.3rem 0;}
+.switch-link{color:var(--accent);font-weight:600;text-decoration:none;transition:opacity .2s;}
+.switch-link:hover{opacity:.75;}
+.back-home{display:inline-flex;align-items:center;gap:.35rem;font-size:.8rem;color:var(--text-3);margin-bottom:1.5rem;transition:color .2s;text-decoration:none;}
+.back-home:hover{color:var(--text-1);}
+.pwd-hint{font-size:.73rem;color:var(--text-3);margin-top:.3rem;}
+</style>
+</head>
+<body>
+
+<div class="auth-brand-panel">
+  <div class="brand-panel-glow"></div>
+  <div class="bp-logo">📦</div>
+  <h1 class="bp-title">Start managing your shop today</h1>
+  <p class="bp-desc">Join hundreds of shop owners who use Invento to reduce losses and increase profits.</p>
+  <div class="bp-step"><div class="bp-step-num">1</div><div class="bp-step-text"><strong>Create your account</strong><br>Sign up with your shop name and email</div></div>
+  <div class="bp-step"><div class="bp-step-num">2</div><div class="bp-step-text"><strong>Add your products</strong><br>Import inventory with prices and expiry dates</div></div>
+  <div class="bp-step"><div class="bp-step-num">3</div><div class="bp-step-text"><strong>Track & grow</strong><br>Get alerts, view reports, maximize profits</div></div>
+</div>
+
+<div class="auth-form-panel">
+  <div class="auth-card">
+    <a href="index.html" class="back-home">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M19 12H5m7-7l-7 7 7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Back to home
+    </a>
+    <div class="auth-logo-row">
+      <div class="auth-logo">📦</div>
+      <span class="auth-logo-name">Invento</span>
+    </div>
+    <h2 class="auth-heading">Create account</h2>
+    <p class="auth-sub">Set up your store's inventory management in minutes</p>
+
+    <div class="alert-banner" id="alertBanner" role="alert">
+      <span id="alertIcon">⚠️</span>
+      <span id="alertText"></span>
+    </div>
+
+    <form id="signupForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="shopName">Shop Name <span style="color:var(--danger)">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🏪</span>
+          <input type="text" class="form-input" id="shopName" placeholder="e.g. Sharma General Store" autocomplete="organization">
+        </div>
+        <div class="field-error" id="shopErr">Shop name is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="ownerName">Owner Name <span style="color:var(--danger)">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" class="form-input" id="ownerName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="field-error" id="nameErr">Owner name is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="signupEmail">Email Address <span style="color:var(--danger)">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input type="email" class="form-input" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+        </div>
+        <div class="field-error" id="emailErr">Please enter a valid email address.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="signupPwd">Password <span style="color:var(--danger)">*</span></label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input type="password" class="form-input" id="signupPwd" placeholder="Minimum 6 characters" autocomplete="new-password">
+          <button type="button" class="toggle-pw" id="togglePwd" aria-label="Toggle password">👁️</button>
+        </div>
+        <div class="field-error" id="pwdErr">Password must be at least 6 characters.</div>
+        <div class="pwd-hint">Minimum 6 characters</div>
+      </div>
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span id="btnText">Create Account</span>
+        <span class="btn-spinner" id="btnSpinner"></span>
+      </button>
+    </form>
+
+    <div class="auth-divider">Already have an account? <a href="login.html" class="switch-link">Sign in →</a></div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+  redirectIfLoggedIn();
+
+  const toggleBtn = document.getElementById('togglePwd');
+  const pwdInput  = document.getElementById('signupPwd');
+  toggleBtn.addEventListener('click', () => {
+    const isText = pwdInput.type === 'text';
+    pwdInput.type = isText ? 'password' : 'text';
+    toggleBtn.textContent = isText ? '👁️' : '🙈';
+  });
+
+  function showAlert(type, msg) {
+    const b = document.getElementById('alertBanner');
+    document.getElementById('alertIcon').textContent = type === 'error' ? '⚠️' : '✅';
+    document.getElementById('alertText').textContent = msg;
+    b.className = `alert-banner vis ${type}`;
+  }
+  function setLoading(on) {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = on;
+    document.getElementById('btnText').style.display = on ? 'none' : '';
+    document.getElementById('btnSpinner').className = on ? 'btn-spinner vis' : 'btn-spinner';
+  }
+
+  document.getElementById('signupForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    document.getElementById('alertBanner').className = 'alert-banner';
+    const shop  = document.getElementById('shopName').value.trim();
+    const name  = document.getElementById('ownerName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const pwd   = document.getElementById('signupPwd').value;
+    let ok = true;
+
+    if (!shop)  { document.getElementById('shopErr').classList.add('vis');  ok = false; } else { document.getElementById('shopErr').classList.remove('vis'); }
+    if (!name)  { document.getElementById('nameErr').classList.add('vis');  ok = false; } else { document.getElementById('nameErr').classList.remove('vis'); }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { document.getElementById('emailErr').classList.add('vis'); ok = false; } else { document.getElementById('emailErr').classList.remove('vis'); }
+    if (!pwd || pwd.length < 6) { document.getElementById('pwdErr').classList.add('vis'); ok = false; } else { document.getElementById('pwdErr').classList.remove('vis'); }
+    if (!ok) return;
+
+    setLoading(true);
+    const result = await registerUser({ name, email, password: pwd, shopName: shop });
+    setLoading(false);
+    if (result.success) {
+      // Auto-login after signup and go to shop setup
+      const loginRes = await loginUser({ email, password: pwd });
+      if (loginRes.success) {
+        showAlert('success', 'Account created! Setting up your shop…');
+        setTimeout(() => location.href = 'shop-select.html', 900);
+      } else {
+        showAlert('success', 'Account created! Please sign in.');
+        setTimeout(() => location.href = 'login.html', 1200);
+      }
+    } else {
+      showAlert('error', result.error);
+    }
+  });
+</script>
+</body>
+</html>

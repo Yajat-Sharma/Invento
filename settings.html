@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Settings">
+<title>Invento — Settings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Settings</h1>
+      </div>
+      <div class="topbar-right">
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header"><div class="page-header-left"><h2>Settings</h2><p>Manage shop details, preferences, and account security</p></div></div>
+
+      <div style="max-width:700px;">
+        <div class="settings-tabs">
+          <button class="settings-tab active" data-panel="profile">🏪 Shop Details</button>
+          <button class="settings-tab" data-panel="security">🔒 Security</button>
+          <button class="settings-tab" data-panel="alerts">🔔 Alert Settings</button>
+          <button class="settings-tab" data-panel="email">📧 Email Alerts</button>
+          <button class="settings-tab" data-panel="appearance">🎨 Appearance</button>
+          <button class="settings-tab" data-panel="data">🗄️ Data</button>
+        </div>
+
+        <!-- ── Shop Details ── -->
+        <div class="settings-panel active" id="panel-profile">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Shop Profile</div></div>
+            <div class="form-group">
+              <label class="form-label">Shop Name</label>
+              <input type="text" class="form-control" id="settShopName" placeholder="e.g. Sharma General Store">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Owner Name</label>
+              <input type="text" class="form-control" id="settOwnerName" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" class="form-control" id="settEmail" readonly style="opacity:.65;cursor:not-allowed;">
+              <div class="form-hint">Email cannot be changed here</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="settPhone" placeholder="+91 98765 43210">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Shop Address</label>
+              <textarea class="form-control" id="settAddress" rows="2" placeholder="Shop address (optional)"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-label">GST Number (optional)</label>
+              <input type="text" class="form-control" id="settGST" placeholder="e.g. 27AAPFU0939F1ZV">
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" id="saveProfileBtn">Save Profile</button></div>
+          </div>
+        </div>
+
+        <!-- ── Security ── -->
+        <div class="settings-panel" id="panel-security">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Change Password</div></div>
+            <div id="pwdAlert" style="display:none;padding:.75rem 1rem;border-radius:10px;font-size:.84rem;margin-bottom:1rem;"></div>
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <input type="password" class="form-control" id="curPwd" placeholder="••••••••">
+              <div class="field-error" id="curPwdErr">Current password is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPwd" placeholder="Minimum 6 characters">
+              <div class="field-error" id="newPwdErr">New password must be at least 6 characters.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confPwd" placeholder="Repeat new password">
+              <div class="field-error" id="confPwdErr">Passwords do not match.</div>
+            </div>
+            <div class="form-actions"><button class="btn btn-primary" id="changePwdBtn">Update Password</button></div>
+          </div>
+        </div>
+
+        <!-- ── Alert Settings ── -->
+        <div class="settings-panel" id="panel-alerts">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Alert Thresholds</div><div class="card-sub">Customize when inventory alerts are triggered</div></div>
+            <div class="form-group">
+              <label class="form-label">Expiry Warning Window (days)</label>
+              <input type="number" class="form-control" id="settExpDays" placeholder="30" min="1" max="365">
+              <div class="form-hint">Show orange warning when product expires within this many days</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Critical Expiry Window (days)</label>
+              <input type="number" class="form-control" id="settCritDays" placeholder="7" min="1" max="30">
+              <div class="form-hint">Show red critical alert when product expires within this many days</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-header" style="margin-bottom:.75rem;"><div class="card-title">Notification Preferences</div></div>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">Low Stock Alerts</div><div class="form-hint" style="margin:0;">Show badge when stock drops below minimum</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="notifLowStock" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">Expiry Alerts</div><div class="form-hint" style="margin:0;">Show badge for products near expiry</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="notifExpiry" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+            <div class="form-actions" style="margin-top:1rem;"><button class="btn btn-primary" id="saveAlertsBtn">Save Settings</button></div>
+          </div>
+        </div>
+
+        <!-- ── Email Alerts ── -->
+        <div class="settings-panel" id="panel-email">
+
+          <!-- Status Banner -->
+          <div id="emailStatusBanner" style="display:none;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px;"></div>
+
+          <!-- Master toggle -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📧 Email Notifications</div>
+                <div class="card-sub">Automatically email inventory alerts to you every day</div>
+              </div>
+              <label class="toggle-switch" style="flex-shrink:0;">
+                <input type="checkbox" id="emailEnabledToggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notification email -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div class="card-title">Notification Recipient</div></div>
+            <div class="form-group">
+              <label class="form-label">Send alerts to this email <span class="req">*</span></label>
+              <input type="email" class="form-control" id="notifEmail" placeholder="you@example.com">
+              <div class="form-hint">This is where inventory alert emails will be sent</div>
+            </div>
+          </div>
+
+          <!-- Alert type toggles -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div class="card-title">Which alerts to include in email</div></div>
+            <div style="display:flex;flex-direction:column;gap:.65rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">🔴 Expired Products</div><div class="form-hint" style="margin:0;">Products past their expiry date</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="alertExpired" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">🟠 Expiring in 7 Days</div><div class="form-hint" style="margin:0;">Critical — expires within a week</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="alertExp7" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">🟡 Expiring in 30 Days</div><div class="form-hint" style="margin:0;">Early warning — expires this month</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="alertExp30"><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">📦 Low Stock</div><div class="form-hint" style="margin:0;">Qty dropped below minimum stock level</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="alertLow" checked><span class="toggle-slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">⛔ Out of Stock</div><div class="form-hint" style="margin:0;">Qty has reached zero</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="alertOut" checked><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- EmailJS Configuration -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">⚡ EmailJS Setup</div>
+                <div class="card-sub">Connect your free EmailJS account to send real emails</div>
+              </div>
+            </div>
+
+            <!-- Setup Guide -->
+            <div style="background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.12));border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:16px;margin-bottom:1.25rem;">
+              <div style="font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:10px;">📋 Quick Setup Guide (5 minutes, free)</div>
+              <ol style="margin:0;padding-left:1.3rem;font-size:.81rem;color:var(--text-2);line-height:1.8;">
+                <li>Go to <a href="https://www.emailjs.com" target="_blank" style="color:var(--accent);">emailjs.com</a> → Sign up free</li>
+                <li>Add an <strong>Email Service</strong> (Gmail, Outlook, Yahoo, etc.)</li>
+                <li>Create an <strong>Email Template</strong> — use these variables in it:<br>
+                  <code style="font-size:.79rem;background:var(--surface-2);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">{{to_email}} {{subject}} {{message}} {{shop_name}}</code>
+                </li>
+                <li>Go to <strong>Account → API Keys</strong> and copy your <strong>Public Key</strong></li>
+                <li>Paste all three IDs below and click Save</li>
+              </ol>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Service ID <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsServiceId" placeholder="e.g. service_xxxxxxx" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Email Services → your service</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Template ID <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsTemplateId" placeholder="e.g. template_xxxxxxx" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Email Templates → your template</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Public Key <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsPublicKey" placeholder="e.g. AbCdEfGhIjKlMnOpQ" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Account → API Keys</div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Actions</div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
+              <button class="btn btn-primary" id="saveEmailSettingsBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Save Settings
+              </button>
+              <button class="btn btn-secondary" id="sendTestEmailBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg>
+                Send Test Email Now
+              </button>
+              <button class="btn btn-secondary" id="enableBrowserNotifBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Enable Browser Notifications
+              </button>
+            </div>
+            <div id="testEmailResult" style="display:none;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;"></div>
+          </div>
+
+        </div>
+
+        <!-- ── Appearance ── -->
+        <div class="settings-panel" id="panel-appearance">
+          <div class="card">
+            <div class="card-header"><div class="card-title">Appearance</div></div>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div><div style="font-size:.875rem;font-weight:500;">☀️ Light Mode</div><div class="form-hint" style="margin:0;">Switch to a light-themed interface</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="lightModeToggle"><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Data ── -->
+        <div class="settings-panel" id="panel-data">
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div class="card-title">Data Overview</div></div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;text-align:center;padding:.5rem 0;">
+              <div><div style="font-size:1.5rem;font-weight:800;color:var(--text-1);" id="dProducts">—</div><div style="font-size:.76rem;color:var(--text-2);">Products</div></div>
+              <div><div style="font-size:1.5rem;font-weight:800;color:var(--text-1);" id="dCategories">—</div><div style="font-size:.76rem;color:var(--text-2);">Categories</div></div>
+              <div><div style="font-size:1.5rem;font-weight:800;color:var(--text-1);" id="dSuppliers">—</div><div style="font-size:.76rem;color:var(--text-2);">Suppliers</div></div>
+              <div><div style="font-size:1.5rem;font-weight:800;color:var(--text-1);" id="dSales">—</div><div style="font-size:.76rem;color:var(--text-2);">Sales</div></div>
+            </div>
+          </div>
+          <div class="card" style="border:1px solid rgba(239,68,68,.2);">
+            <div class="card-header"><div><div class="card-title" style="color:var(--danger);">⚠️ Danger Zone</div><div class="card-sub">These actions cannot be undone</div></div></div>
+            <div style="display:flex;flex-direction:column;gap:.75rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
+                <div><div style="font-size:.855rem;font-weight:500;">Clear All Sales</div><div class="form-hint" style="margin:0;">Delete all sales history</div></div>
+                <button class="btn btn-danger btn-sm" id="clearSalesBtn">Clear Sales</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
+                <div><div style="font-size:.855rem;font-weight:500;">Clear Disposal Log</div><div class="form-hint" style="margin:0;">Delete all waste disposal records</div></div>
+                <button class="btn btn-danger btn-sm" id="clearWasteBtn">Clear Log</button>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
+                <div><div style="font-size:.855rem;font-weight:500;">Reset All Data</div><div class="form-hint" style="margin:0;">Delete ALL products, categories, suppliers, and sales</div></div>
+                <button class="btn btn-danger btn-sm" id="resetAllBtn">Reset All</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="shared.js"></script>
+<script>
+initPage('settings');
+
+// ── Email Alerts Panel logic ────────────────────────────────
+function loadEmailSettings() {
+  const cfg = NotifEngine.getConfig();
+  const user = getCurrentUser();
+  document.getElementById('emailEnabledToggle').checked = cfg.emailEnabled === true;
+  document.getElementById('notifEmail').value     = cfg.notifEmail  || user?.email || '';
+  document.getElementById('ejsServiceId').value   = cfg.ejsServiceId  || '';
+  document.getElementById('ejsTemplateId').value  = cfg.ejsTemplateId || '';
+  document.getElementById('ejsPublicKey').value   = cfg.ejsPublicKey  || '';
+  document.getElementById('alertExpired').checked = cfg.alertExpired !== false;
+  document.getElementById('alertExp7').checked    = cfg.alertExp7    !== false;
+  document.getElementById('alertExp30').checked   = cfg.alertExp30   === true;
+  document.getElementById('alertLow').checked     = cfg.alertLow     !== false;
+  document.getElementById('alertOut').checked     = cfg.alertOut     !== false;
+
+  // Show configured status
+  const banner = document.getElementById('emailStatusBanner');
+  if (cfg.ejsServiceId && cfg.ejsTemplateId && cfg.ejsPublicKey && cfg.emailEnabled) {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
+    banner.innerHTML = '✅ &nbsp;Email alerts are <strong>active</strong>. You will receive a daily report at the email above.';
+  } else if (cfg.ejsServiceId && !cfg.emailEnabled) {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fbbf24;';
+    banner.innerHTML = '⚠️ &nbsp;EmailJS is configured but email notifications are <strong>disabled</strong>. Toggle the switch above to enable.';
+  } else {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;';
+    banner.innerHTML = 'ℹ️ &nbsp;Fill in your <strong>EmailJS credentials</strong> below and save to start receiving email alerts.';
+  }
+}
+loadEmailSettings();
+
+document.getElementById('saveEmailSettingsBtn').addEventListener('click', () => {
+  const email = document.getElementById('notifEmail').value.trim();
+  if (!email) { showToast('Please enter a notification email address', 'error'); return; }
+  NotifEngine.saveConfig({
+    emailEnabled:  document.getElementById('emailEnabledToggle').checked,
+    notifEmail:    email,
+    ejsServiceId:  document.getElementById('ejsServiceId').value.trim(),
+    ejsTemplateId: document.getElementById('ejsTemplateId').value.trim(),
+    ejsPublicKey:  document.getElementById('ejsPublicKey').value.trim(),
+    alertExpired:  document.getElementById('alertExpired').checked,
+    alertExp7:     document.getElementById('alertExp7').checked,
+    alertExp30:    document.getElementById('alertExp30').checked,
+    alertLow:      document.getElementById('alertLow').checked,
+    alertOut:      document.getElementById('alertOut').checked,
+    lastNotifiedDate: null  // reset so next page load re-sends
+  });
+  showToast('📧 Email alert settings saved!', 'success');
+  loadEmailSettings();
+});
+
+document.getElementById('sendTestEmailBtn').addEventListener('click', async () => {
+  const btn    = document.getElementById('sendTestEmailBtn');
+  const result = document.getElementById('testEmailResult');
+  const email  = document.getElementById('notifEmail').value.trim();
+  if (!email) { showToast('Enter a notification email first', 'error'); return; }
+
+  const svcId  = document.getElementById('ejsServiceId').value.trim();
+  const tplId  = document.getElementById('ejsTemplateId').value.trim();
+  const pubKey = document.getElementById('ejsPublicKey').value.trim();
+  if (!svcId || !tplId || !pubKey) {
+    showToast('Fill in all three EmailJS fields first', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending…';
+  result.style.display = 'none';
+
+  try {
+    // Temporarily apply the typed values (not yet saved) for the test
+    NotifEngine.saveConfig({ notifEmail: email, ejsServiceId: svcId, ejsTemplateId: tplId, ejsPublicKey: pubKey, emailEnabled: true });
+    const res = await NotifEngine.checkAndNotify(true); // force=true bypasses daily limit
+    if (res && res.ok) {
+      result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
+      result.innerHTML = '✅ <strong>Test email sent!</strong> Check your inbox at <em>' + escapeHtml(email) + '</em>. It may take a minute to arrive.';
+      showToast('📧 Test email sent successfully!', 'success');
+    } else {
+      const errMsg = (res && res.error) ? res.error : 'Unknown error. Check your EmailJS credentials.';
+      result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
+      result.innerHTML = '❌ <strong>Email failed:</strong> ' + escapeHtml(errMsg) + '<br><small style="color:var(--text-3);">Double-check your Service ID, Template ID and Public Key.</small>';
+      showToast('Email failed — check credentials', 'error');
+    }
+  } catch (e) {
+    result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
+    result.innerHTML = '❌ <strong>Error:</strong> ' + escapeHtml(String(e));
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="currentColor" stroke-width="2"/><polyline points="22,6 12,13 2,6" stroke="currentColor" stroke-width="2"/></svg> Send Test Email Now';
+});
+
+document.getElementById('enableBrowserNotifBtn').addEventListener('click', async () => {
+  if (!('Notification' in window)) {
+    showToast('Browser notifications not supported in this browser', 'error'); return;
+  }
+  const permission = await Notification.requestPermission();
+  if (permission === 'granted') {
+    showToast('🔔 Browser notifications enabled!', 'success');
+    new Notification('Invento', { body: '🔔 You will now receive inventory alerts in the browser!', tag: 'stocksense-test' });
+  } else {
+    showToast('Notification permission denied', 'error');
+  }
+});
+
+// Tabs
+document.querySelectorAll('.settings-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.panel).classList.add('active');
+  });
+});
+
+// Load profile
+function loadProfile() {
+  const user     = getCurrentUser();
+  const settings = DB.getSettings();
+  document.getElementById('settShopName').value  = settings.shopName  || user?.shopName || '';
+  document.getElementById('settOwnerName').value = settings.ownerName || user?.name     || '';
+  document.getElementById('settEmail').value      = user?.email || '';
+  document.getElementById('settPhone').value      = settings.phone    || '';
+  document.getElementById('settAddress').value    = settings.address  || '';
+  document.getElementById('settGST').value         = settings.gst     || '';
+  document.getElementById('settExpDays').value    = settings.expDays  || 30;
+  document.getElementById('settCritDays').value   = settings.critDays || 7;
+  document.getElementById('notifLowStock').checked = settings.notifLowStock !== false;
+  document.getElementById('notifExpiry').checked   = settings.notifExpiry !== false;
+  document.getElementById('lightModeToggle').checked = settings.darkMode === false;
+  document.getElementById('dProducts').textContent   = DB.getProducts().length;
+  document.getElementById('dCategories').textContent = DB.getCategories().length;
+  document.getElementById('dSuppliers').textContent  = DB.getSuppliers().length;
+  document.getElementById('dSales').textContent      = DB.getSales().length;
+}
+loadProfile();
+
+// Save profile
+document.getElementById('saveProfileBtn').addEventListener('click', () => {
+  const settings = DB.getSettings();
+  settings.shopName  = document.getElementById('settShopName').value.trim();
+  settings.ownerName = document.getElementById('settOwnerName').value.trim();
+  settings.phone     = document.getElementById('settPhone').value.trim();
+  settings.address   = document.getElementById('settAddress').value.trim();
+  settings.gst       = document.getElementById('settGST').value.trim();
+  DB.saveSettings(settings);
+  showToast('Profile saved!');
+  buildSidebar('settings');
+});
+
+// Save alerts
+document.getElementById('saveAlertsBtn').addEventListener('click', () => {
+  const settings = DB.getSettings();
+  settings.expDays       = Number(document.getElementById('settExpDays').value)  || 30;
+  settings.critDays      = Number(document.getElementById('settCritDays').value) || 7;
+  settings.notifLowStock = document.getElementById('notifLowStock').checked;
+  settings.notifExpiry   = document.getElementById('notifExpiry').checked;
+  DB.saveSettings(settings);
+  showToast('Alert settings saved!');
+});
+
+// Light mode toggle
+document.getElementById('lightModeToggle').addEventListener('change', function() {
+  const settings = DB.getSettings();
+  settings.darkMode = !this.checked; // false = light mode
+  DB.saveSettings(settings);
+  applyDarkMode();
+  showToast(this.checked ? 'Switched to light mode' : 'Switched to dark mode', 'info');
+});
+
+// Change password
+document.getElementById('changePwdBtn').addEventListener('click', async () => {
+  const curPwd  = document.getElementById('curPwd').value;
+  const newPwd  = document.getElementById('newPwd').value;
+  const confPwd = document.getElementById('confPwd').value;
+  const alertEl = document.getElementById('pwdAlert');
+  let ok = true;
+
+  const show = (id, errId, cond) => {
+    if (cond) { document.getElementById(id).classList.add('error'); document.getElementById(errId).classList.add('visible'); ok = false; }
+    else { document.getElementById(id).classList.remove('error'); document.getElementById(errId).classList.remove('visible'); }
+  };
+  show('curPwd', 'curPwdErr', !curPwd);
+  show('newPwd', 'newPwdErr', !newPwd || newPwd.length < 6);
+  show('confPwd', 'confPwdErr', newPwd !== confPwd);
+  if (!ok) return;
+
+  const user   = getCurrentUser();
+  const users  = getUsers();
+  const found  = users.find(u => u.id === user.id);
+  const hashed = await hashPassword(curPwd);
+  if (!found || found.password !== hashed) {
+    alertEl.style.cssText = 'display:block;padding:.75rem 1rem;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;margin-bottom:1rem;';
+    alertEl.textContent = 'Current password is incorrect.'; return;
+  }
+  const idx = users.findIndex(u => u.id === user.id);
+  users[idx].password = await hashPassword(newPwd);
+  saveUsers(users);
+  alertEl.style.cssText = 'display:block;padding:.75rem 1rem;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#86efac;margin-bottom:1rem;';
+  alertEl.textContent = 'Password changed successfully!';
+  document.getElementById('curPwd').value = document.getElementById('newPwd').value = document.getElementById('confPwd').value = '';
+});
+
+// Danger zone
+document.getElementById('clearSalesBtn').addEventListener('click', () => showConfirm('Clear All Sales', 'Delete all sales history?', () => { DB.saveSales([]); loadProfile(); showToast('Sales cleared', 'error'); }));
+document.getElementById('clearWasteBtn').addEventListener('click', () => showConfirm('Clear Disposal Log', 'Delete all disposal records?', () => { DB.saveWaste([]); loadProfile(); showToast('Disposal log cleared', 'error'); }));
+document.getElementById('resetAllBtn').addEventListener('click', () => showConfirm('Reset All Data', 'Delete ALL inventory data? This cannot be undone.', () => {
+  DB.saveProducts([]); DB.saveCategories([]); DB.saveSuppliers([]); DB.saveSales([]); DB.saveWaste([]);
+  showToast('All data reset', 'error'); loadProfile();
+  setTimeout(() => location.href = 'dashboard.html', 1200);
+}));
+</script>
+</body>
+</html>

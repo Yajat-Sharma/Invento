@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Smart Suggestions for FreshAlert - Reduce waste intelligently">
+    <title>FreshAlert - AI Smart Suggestions</title>
+    <!-- We will reuse base styles, admin dashboard styles for layout, and specific suggestions styles -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin.css"> <!-- Reusing sidebar layout -->
+    <link rel="stylesheet" href="suggestions.css">
+    <script src="auth.js"></script>
+    <script>requireAuth();</script>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar (Reusing Admin aesthetic for consistency) -->
+        <aside class="admin-sidebar" id="adminSidebar">
+            <div class="sidebar-header">
+                <div class="logo-box">
+                    <img src="assets/logo.png" alt="" width="32" height="32" onerror="this.style.display='none'">
+                </div>
+                <span class="brand-name">FreshAlert</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item"><span class="icon">📱</span> User Dashboard</a>
+                <a href="calendar.html" class="nav-item"><span class="icon">📅</span> Expiry Calendar</a>
+                <div class="divider"></div>
+                <a href="admin.html" class="nav-item"><span class="icon">📊</span> Admin Overview</a>
+                <a href="suggestions.html" class="nav-item active" title="Smart AI Suggestions"><span
+                        class="icon">🧠</span> AI Suggestions</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Anti-Gravity Background & Particles -->
+            <div id="particles-bg"></div>
+
+            <div class="floating-icons-container" id="floatingIconsContainer">
+                <div class="float-icon fi-brain">🧠</div>
+                <div class="float-icon fi-meds">💊</div>
+                <div class="float-icon fi-milk">🥛</div>
+                <div class="float-icon fi-veg">🥦</div>
+                <div class="float-icon fi-bell">🔔</div>
+            </div>
+
+            <div class="page-entrance-wrapper">
+                <!-- Header -->
+                <header class="admin-header">
+                    <div>
+                        <h1 class="page-title">
+                            <span class="ai-gradient">AI Smart Suggestions</span> 🧠
+                        </h1>
+                        <p class="page-subtitle">Our AI analyzes your inventory and provides recommendations to reduce
+                            waste
+                            and improve usage.</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
+                        <!-- Settings Gear for API setup (mock) -->
+                        <button class="icon-btn" id="apiSettingsBtn" aria-label="API Settings">⚙️</button>
+                    </div>
+                </header>
+
+                <!-- Loading State -->
+                <div id="aiLoader" class="ai-loader-container">
+                    <div class="spinner"></div>
+                    <h2>AI is analyzing your inventory...</h2>
+                    <p>Generating personalized recipes and action plans.</p>
+                </div>
+
+                <!-- Empty / Error State -->
+                <div id="aiEmptyState" class="ai-empty-state" style="display: none;">
+                    <div class="empty-icon">📦</div>
+                    <h2>No items expiring soon!</h2>
+                    <p>Add some groceries or medicines in your dashboard to get AI recommendations.</p>
+                    <button class="btn-primary" onclick="window.location.href='dashboard.html'">Go to Dashboard</button>
+                </div>
+
+                <div id="aiErrorState" class="ai-empty-state" style="display: none;">
+                    <div class="empty-icon">🤖</div>
+                    <h2>API Simulation Error</h2>
+                    <p id="aiErrorMessage">Could not fetch AI suggestions at this time.</p>
+                    <button class="btn-secondary" onclick="location.reload()">Try Again</button>
+                </div>
+
+                <!-- Content Container (Hidden until loaded) -->
+                <div id="aiContent" style="display: none;">
+
+                    <!-- Insights Summary -->
+                    <section class="insights-summary glass-panel">
+                        <div class="insights-icon">✨</div>
+                        <div class="insights-text">
+                            <h3>AI Inventory Insights</h3>
+                            <ul id="insightsList">
+                                <!-- Populated by JS -->
+                            </ul>
+                        </div>
+                        <button class="refresh-btn" id="refreshAiBtn" title="Regenerate Suggestions">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 2v6h-6"></path>
+                                <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+                                <path d="M3 22v-6h6"></path>
+                                <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+                            </svg>
+                        </button>
+                    </section>
+
+                    <!-- Recommendations Grid -->
+                    <section class="suggestions-grid" id="suggestionsList">
+                        <!-- Populated by JS -->
+                    </section>
+
+                </div>
+
+            </div> <!-- End page-entrance-wrapper -->
+        </main>
+    </div>
+
+    <!-- Hidden API Key modal for realism -->
+    <div class="modal-overlay" id="apiModal">
+        <div class="modal-container" style="max-width: 400px; padding: 24px;">
+            <div class="modal-header">
+                <h2 class="modal-title">AI Provider Settings</h2>
+                <button class="modal-close" id="closeApiModal">×</button>
+            </div>
+            <div style="margin-top:20px; color:#64748b; font-size:0.9rem; line-height: 1.5;">
+                <p>This page uses the <strong>Google Gemini API</strong> to generate intelligent recommendations.</p>
+                <br>
+                <label style="display:block; margin-bottom: 8px; font-weight: 600; color:var(--clr-text);">Google Gemini
+                    API Key</label>
+                <input type="password" id="geminiApiKeyInput" class="form-input" placeholder="AIzaSy..."
+                    style="margin-bottom: 20px;">
+
+                <button id="saveApiBtn" class="btn-primary" style="width: 100%;">Save Key & Generate</button>
+                <p style="font-size: 0.8rem; margin-top:10px; color:#94a3b8; text-align:center;">Your key is stored
+                    securely in your browser's local storage.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="suggestions.js"></script>
+</body>
+
+</html>

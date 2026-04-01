@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Sales Entry & History">
+<title>Invento — Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="auth.js"></script><script>requireAuth();</script>
+</head>
+<body>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Sales</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn" title="Alerts"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar" style="width:36px;height:36px;border-radius:50%;font-size:.7rem;cursor:default;flex-shrink:0;">?</div>
+      </div>
+    </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Sales Entry</h2><p>Record daily sales and track revenue</p></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:1.5rem;">
+        <div class="stat-card">
+          <div class="stat-icon green"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stat-body"><div class="stat-label">Today's Revenue</div><div class="stat-value" id="todayRev">₹0</div><div class="stat-sub" id="todayTxn">0 transactions</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stat-body"><div class="stat-label">Month Revenue</div><div class="stat-value" id="monthRev">₹0</div><div class="stat-sub" id="monthTxn">This month</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="stat-body"><div class="stat-label">Total Sales</div><div class="stat-value" id="totalRev">₹0</div><div class="stat-sub" id="totalTxn">All time</div></div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <!-- Sales Form -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">➕ Record Sale</div></div>
+          <form id="saleForm" novalidate>
+            <div class="form-group">
+              <label class="form-label">Product <span class="req">*</span></label>
+              <select class="form-control" id="saleProduct"><option value="">Select product…</option></select>
+              <div class="field-error" id="sProductErr">Please select a product.</div>
+            </div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Quantity Sold <span class="req">*</span></label>
+                <input type="number" class="form-control" id="saleQty" placeholder="1" min="1">
+                <div class="field-error" id="sQtyErr">Enter quantity sold.</div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Unit Price (₹)</label>
+                <div class="input-group"><span class="input-prefix">₹</span><input type="number" class="form-control" id="salePrice" placeholder="0.00" min="0" step="0.01"></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Total Amount</label>
+              <div class="input-group"><span class="input-prefix">₹</span><input type="number" class="form-control" id="saleTotalAmt" placeholder="0.00" readonly style="background:var(--surface-3);cursor:default;"></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date <span class="req">*</span></label>
+              <input type="date" class="form-control" id="saleDate">
+              <div class="field-error" id="sDateErr">Date is required.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <div class="payment-pills" id="paymentPills">
+                <div class="payment-pill selected" data-method="Cash">💵 Cash</div>
+                <div class="payment-pill" data-method="UPI">📲 UPI</div>
+                <div class="payment-pill" data-method="Card">💳 Card</div>
+              </div>
+              <input type="hidden" id="saleMethod" value="Cash">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Record Sale
+            </button>
+          </form>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-card">
+          <div class="card-header"><div class="card-title">Weekly Revenue</div><div class="card-sub">Last 7 days</div></div>
+          <div class="chart-wrapper"><canvas id="weeklyChart"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Sales History -->
+      <div class="card" style="margin-top:1.5rem;">
+        <div class="card-header">
+          <div><div class="card-title">📋 Sales History</div></div>
+          <div style="display:flex;gap:.5rem;align-items:center;">
+            <input type="date" class="form-control" id="filterDate" style="width:auto;padding:.4rem .75rem;font-size:.83rem;">
+            <button class="btn btn-secondary btn-sm" id="clearDateFilter">Clear</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th>Date</th><th>Method</th><th></th></tr></thead>
+            <tbody id="salesBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-state" id="salesEmpty" style="display:none;">
+          <div class="empty-state-icon">🛒</div>
+          <h3>No sales yet</h3>
+          <p>Record your first sale using the form</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="shared.js"></script>
+<script>
+initPage('sales');
+
+// Populate products
+function populateProducts() {
+  const products = DB.getProducts().filter(p => Number(p.quantity) > 0);
+  const sel = document.getElementById('saleProduct');
+  sel.innerHTML = '<option value="">Select product…</option>' + products.map(p => `<option value="${p.id}" data-price="${p.sellingPrice}">${escapeHtml(p.name)}</option>`).join('');
+}
+populateProducts();
+
+// Set default date to today
+document.getElementById('saleDate').value = todayStr();
+
+// Auto-fill price on product select
+document.getElementById('saleProduct').addEventListener('change', function() {
+  const sel = this.options[this.selectedIndex];
+  const price = sel.dataset.price || '';
+  document.getElementById('salePrice').value = price;
+  recalcTotal();
+});
+
+// Recalc total
+function recalcTotal() {
+  const qty   = Number(document.getElementById('saleQty').value)   || 0;
+  const price = Number(document.getElementById('salePrice').value) || 0;
+  document.getElementById('saleTotalAmt').value = (qty * price).toFixed(2);
+}
+document.getElementById('saleQty').addEventListener('input', recalcTotal);
+document.getElementById('salePrice').addEventListener('input', recalcTotal);
+
+// Payment method pills
+document.querySelectorAll('.payment-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.payment-pill').forEach(p => p.classList.remove('selected'));
+    pill.classList.add('selected');
+    document.getElementById('saleMethod').value = pill.dataset.method;
+  });
+});
+
+// Stats
+function loadStats() {
+  const sales    = DB.getSales();
+  const today    = todayStr();
+  const thisMonth = today.slice(0,7);
+  const todayS   = sales.filter(s => s.date === today);
+  const monthS   = sales.filter(s => (s.date||'').startsWith(thisMonth));
+  document.getElementById('todayRev').textContent  = formatCurrency(todayS.reduce((a,s)=>a+Number(s.totalAmount||0),0));
+  document.getElementById('todayTxn').textContent  = `${todayS.length} transaction${todayS.length!==1?'s':''}`;
+  document.getElementById('monthRev').textContent  = formatCurrency(monthS.reduce((a,s)=>a+Number(s.totalAmount||0),0));
+  document.getElementById('monthTxn').textContent  = `${monthS.length} this month`;
+  document.getElementById('totalRev').textContent  = formatCurrency(sales.reduce((a,s)=>a+Number(s.totalAmount||0),0));
+  document.getElementById('totalTxn').textContent  = `${sales.length} total`;
+}
+loadStats();
+
+// Chart
+function loadChart() {
+  const sales = DB.getSales();
+  const labels = [], amounts = [];
+  for (let i = 6; i >= 0; i--) {
+    const dt = new Date(); dt.setDate(dt.getDate()-i);
+    const ds = dt.toISOString().split('T')[0];
+    labels.push(dt.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}));
+    amounts.push(sales.filter(s=>s.date===ds).reduce((a,s)=>a+Number(s.totalAmount||0),0));
+  }
+  const ctx = document.getElementById('weeklyChart').getContext('2d');
+  const grad = ctx.createLinearGradient(0,0,0,200);
+  grad.addColorStop(0,'rgba(108,99,255,.28)');
+  grad.addColorStop(1,'rgba(108,99,255,.01)');
+  new Chart(ctx, {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Revenue', data:amounts, backgroundColor:grad, borderColor:'#6c63ff', borderWidth:2, borderRadius:6, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>' ₹'+Number(c.raw).toLocaleString('en-IN') } } }, scales:{ x:{ grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#7d8a9a',font:{size:11}} }, y:{ grid:{color:'rgba(255,255,255,.04)'}, ticks:{color:'#7d8a9a',font:{size:11},callback:v=>'₹'+Number(v).toLocaleString('en-IN')}, beginAtZero:true } } }
+  });
+}
+loadChart();
+
+// Sales history
+let filterDate = '';
+function renderSales() {
+  let sales = DB.getSales();
+  if (filterDate) sales = sales.filter(s => s.date === filterDate);
+  const tbody = document.getElementById('salesBody');
+  const empty = document.getElementById('salesEmpty');
+  if (!sales.length) { tbody.innerHTML=''; empty.style.display=''; return; }
+  empty.style.display='none';
+  const methodColors = { Cash:'badge-good', UPI:'badge-info', Card:'badge-accent' };
+  tbody.innerHTML = sales.map(s => {
+    const prod   = DB.getProductById(s.productId);
+    const profit = (Number(s.sellingPrice||0) - Number(prod?.costPrice||0)) * Number(s.quantitySold||0);
+    return `<tr>
+    <td class="td-name">${escapeHtml(s.productName||'—')}</td>
+    <td>${s.quantitySold}</td>
+    <td class="td-dim">₹${Number(s.sellingPrice||0).toLocaleString('en-IN')}</td>
+    <td style="font-weight:600;color:var(--success);">₹${Number(s.totalAmount||0).toLocaleString('en-IN')}</td>
+    <td class="${profit >= 0 ? 'text-success' : 'text-danger'} fw-600">₹${profit.toLocaleString('en-IN')}</td>
+    <td class="td-dim">${formatDate(s.date)}</td>
+    <td><span class="badge ${methodColors[s.paymentMethod]||'badge-expired'}">${s.paymentMethod||'—'}</span></td>
+    <td><button class="btn btn-danger btn-icon btn-sm del-sale" data-id="${s.id}" title="Delete">🗑️</button></td>
+  </tr>`;
+  }).join('');
+  document.querySelectorAll('.del-sale').forEach(btn => btn.addEventListener('click', () => {
+    showConfirm('Delete Sale', 'Delete this sale record?', () => { DB.deleteSale(btn.dataset.id); renderSales(); loadStats(); showToast('Sale deleted','error'); });
+  }));
+}
+renderSales();
+
+document.getElementById('filterDate').addEventListener('change', function(){ filterDate=this.value; renderSales(); });
+document.getElementById('clearDateFilter').addEventListener('click', () => { document.getElementById('filterDate').value=''; filterDate=''; renderSales(); });
+
+// Form submit
+document.getElementById('saleForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const productId = document.getElementById('saleProduct').value;
+  const qty       = Number(document.getElementById('saleQty').value);
+  const date      = document.getElementById('saleDate').value;
+  let ok = true;
+  if (!productId) { document.getElementById('sProductErr').classList.add('visible'); document.getElementById('saleProduct').classList.add('error'); ok=false; }
+  else { document.getElementById('sProductErr').classList.remove('visible'); document.getElementById('saleProduct').classList.remove('error'); }
+  if (!qty || qty < 1) { document.getElementById('sQtyErr').classList.add('visible'); document.getElementById('saleQty').classList.add('error'); ok=false; }
+  else { document.getElementById('sQtyErr').classList.remove('visible'); document.getElementById('saleQty').classList.remove('error'); }
+  if (!date) { document.getElementById('sDateErr').classList.add('visible'); document.getElementById('saleDate').classList.add('error'); ok=false; }
+  else { document.getElementById('sDateErr').classList.remove('visible'); document.getElementById('saleDate').classList.remove('error'); }
+  if (!ok) return;
+
+  const product = DB.getProductById(productId);
+  const price   = Number(document.getElementById('salePrice').value) || Number(product?.sellingPrice||0);
+  const total   = qty * price;
+  const method  = document.getElementById('saleMethod').value;
+
+  DB.addSale({ id:genId('sale'), productId, productName:product?.name||'Unknown', quantitySold:qty, sellingPrice:price, totalAmount:total, date, paymentMethod:method, createdAt:now() });
+  // Deduct stock
+  if (product) DB.updateProduct(productId, { quantity: Math.max(0, Number(product.quantity)-qty) });
+
+  document.getElementById('saleForm').reset();
+  document.getElementById('saleDate').value = todayStr();
+  document.getElementById('saleTotalAmt').value = '';
+  document.querySelectorAll('.payment-pill').forEach(p=>p.classList.remove('selected'));
+  document.querySelector('.payment-pill[data-method="Cash"]').classList.add('selected');
+  document.getElementById('saleMethod').value = 'Cash';
+  populateProducts();
+  renderSales();
+  loadStats();
+  showToast(`Sale of ₹${total.toLocaleString('en-IN')} recorded!`);
+});
+</script>
+</body>
+</html>
