@@ -93,6 +93,55 @@ async function seedAdminIfNeeded() {
 seedAdminIfNeeded();
 
 // =====================
+// EMAILJS WELCOME SYSTEM
+// =====================
+
+const SYSTEM_EMAILJS_CONFIG = {
+    serviceId: 'YOUR_SERVICE_ID', // e.g. service_xxxxxx
+    templateId: 'YOUR_TEMPLATE_ID', // e.g. template_xxxxxx
+    publicKey: 'YOUR_PUBLIC_KEY' // e.g. xxxxxxxxxxxxxxxx
+};
+
+/**
+ * Sends a welcome email containing a direct login link to new users.
+ */
+async function sendWelcomeEmail(userName, userEmail, shopName) {
+    if (!SYSTEM_EMAILJS_CONFIG.serviceId || SYSTEM_EMAILJS_CONFIG.serviceId === 'YOUR_SERVICE_ID') {
+        console.warn('Welcome Email skipped: EmailJS config is missing in auth.js');
+        return false;
+    }
+    
+    if (typeof emailjs === 'undefined') {
+        console.warn('Welcome Email skipped: EmailJS SDK is not loaded.');
+        return false;
+    }
+
+    try {
+        emailjs.init({ publicKey: SYSTEM_EMAILJS_CONFIG.publicKey });
+
+        // Construct the direct login link automatically based on current domain layout
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/([^\/]*)$/, '');
+        const loginLink = `${baseUrl}/login.html?email=${encodeURIComponent(userEmail)}`;
+
+        const response = await emailjs.send(
+            SYSTEM_EMAILJS_CONFIG.serviceId,
+            SYSTEM_EMAILJS_CONFIG.templateId,
+            {
+                to_email: userEmail,
+                to_name: userName,
+                shop_name: shopName,
+                login_link: loginLink
+            }
+        );
+        console.log('Welcome email dispatched successfully:', response.status);
+        return true;
+    } catch (err) {
+        console.error('Failed to send welcome email:', err.text || err.message || err);
+        return false;
+    }
+}
+
+// =====================
 // AUTH ACTIONS
 // =====================
 

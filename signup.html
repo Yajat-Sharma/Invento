@@ -137,6 +137,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="auth.js"></script>
 <script>
   redirectIfLoggedIn();
@@ -181,6 +182,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
     const result = await registerUser({ name, email, password: pwd, shopName: shop });
     setLoading(false);
     if (result.success) {
+      // Dispatch Welcome Email asynchronously
+      sendWelcomeEmail(name, email, shop);
+
       // Auto-login after signup and go to shop setup
       const loginRes = await loginUser({ email, password: pwd });
       if (loginRes.success) {

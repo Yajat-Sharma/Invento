@@ -128,6 +128,23 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
 <script>
   redirectIfLoggedIn();
 
+  // Smart Login Link: auto-fill email from URL parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const emailParam = urlParams.get('email');
+  if (emailParam) {
+    const emailInput = document.getElementById('loginEmail');
+    if (emailInput) {
+      emailInput.value = emailParam;
+      // Focus on the password field for immediate interaction
+      setTimeout(() => document.getElementById('loginPwd')?.focus(), 100);
+      
+      // Show a helpful welcome message
+      document.getElementById('alertIcon').textContent = '👋';
+      document.getElementById('alertText').textContent = 'Welcome! Enter your password to log in.';
+      document.getElementById('alertBanner').className = 'alert-banner vis success';
+    }
+  }
+
   const toggleBtn = document.getElementById('togglePwd');
   const pwdInput  = document.getElementById('loginPwd');
   toggleBtn.addEventListener('click', () => {
