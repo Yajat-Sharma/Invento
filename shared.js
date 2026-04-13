@@ -200,14 +200,24 @@ function getStockStatus(qty, minStock) {
 }
 
 function getProductStatus(p) {
-  const es = getExpiryStatus(p.expiryDate);
-  const ss = getStockStatus(p.quantity, p.minStockLevel);
-  if (es.status === 'expired')  return { label: 'Expired',      badgeClass: 'badge-expired' };
-  if (ss.status === 'out')      return { label: 'Out of Stock', badgeClass: 'badge-out' };
-  if (es.status === 'expiring') return { label: 'Expiring',     badgeClass: 'badge-expiring' };
-  if (ss.status === 'low')      return { label: 'Low Stock',    badgeClass: 'badge-low' };
-  if (es.status === 'warning')  return { label: 'Exp. 30d',     badgeClass: 'badge-low' };
-  return                               { label: 'In Stock',     badgeClass: 'badge-good' };
+  const stock = Number(p.quantity) || 0;
+  const min = Number(p.minStockLevel) || 0;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const exp = new Date(p.expiryDate ? p.expiryDate + 'T00:00:00' : NaN);
+  const diff = Math.ceil((exp - today) / (1000 * 60 * 60 * 24));
+
+  if (isNaN(diff)) {
+    if (stock <= min) return { label: 'Low Stock', badgeClass: 'badge-low' };
+    return { label: 'In Stock', badgeClass: 'badge-good' };
+  }
+
+  if (stock <= min) return { label: 'Low Stock', badgeClass: 'badge-low' };
+  if (diff <= 0) return { label: 'Expired', badgeClass: 'badge-expired' };
+  if (diff <= 7) return { label: 'Expiring Soon', badgeClass: 'badge-expiring' };
+  
+  return { label: 'In Stock', badgeClass: 'badge-good' };
 }
 
 // ── Alert Counts ─────────────────────────────────────────────
@@ -666,37 +676,35 @@ const NotifEngine = {
 </body></html>`;
   },
 
-  // ── Send via EmailJS ──────────────────────────────────────────
-  async sendViaEmailJS(to, subject, textBody, htmlBody) {
+  // ── Send via GAS ──────────────────────────────────────────
+  async sendViaGAS(to, subject, textBody, htmlBody) {
     const cfg = this.getConfig();
-    if (!cfg.ejsServiceId || !cfg.ejsTemplateId || !cfg.ejsPublicKey) {
-      return { ok: false, error: 'EmailJS not configured. Go to Settings → Email Alerts.' };
-    }
-
-    // Lazy-load EmailJS SDK
-    if (typeof emailjs === 'undefined') {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-        s.onload = resolve; s.onerror = reject;
-        document.head.appendChild(s);
-      });
+    if (!cfg.gasUrl) {
+      return { ok: false, error: 'Web App URL not configured. Go to Settings → Email Alerts.' };
     }
 
     try {
-      emailjs.init({ publicKey: cfg.ejsPublicKey });
-      const res = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateId, {
-        to_email:    to,
-        to_name:     DB.getCurrentShop()?.name || 'Shop Owner',
-        subject:     subject,
-        message:     textBody,
-        html_body:   htmlBody,
-        shop_name:   DB.getCurrentShop()?.name || 'Invento',
-        reply_to:    to
+      const response = await fetch(cfg.gasUrl, {
+        method: 'POST',
+        body: JSON.stringify({
+            to: to,
+            toName: DB.getCurrentShop()?.name || 'Shop Owner',
+            subject: subject,
+            message: textBody,
+            htmlBody: htmlBody,
+            fromName: DB.getCurrentShop()?.name || 'Invento',
+            replyTo: to
+        })
       });
-      return { ok: true, status: res.status };
+
+      const result = await response.json();
+      if (result.success) {
+        return { ok: true, status: 200 };
+      } else {
+        throw new Error(result.error || 'Unknown server error');
+      }
     } catch (err) {
-      return { ok: false, error: err?.text || err?.message || String(err) };
+      return { ok: false, error: err?.message || String(err) };
     }
   },
 
@@ -753,11 +761,11 @@ const NotifEngine = {
 
     // Email notification
     const toEmail = cfg.notifEmail || getCurrentUser()?.email;
-    if (toEmail && cfg.emailEnabled && (cfg.ejsServiceId || force)) {
+    if (toEmail && cfg.emailEnabled && (cfg.gasUrl || force)) {
       const subject  = `[Invento] ${filtered.total} Inventory Alert${filtered.total !== 1 ? 's' : ''} — ${shop.name}`;
       const textBody = this.buildEmailText(filtered, shop);
       const htmlBody = this.buildEmailHtml(filtered, shop);
-      const result   = await this.sendViaEmailJS(toEmail, subject, textBody, htmlBody);
+      const result   = await this.sendViaGAS(toEmail, subject, textBody, htmlBody);
       this.saveConfig({ lastNotifiedDate: today, lastEmailResult: result.ok ? 'sent' : result.error });
       return result;
     }

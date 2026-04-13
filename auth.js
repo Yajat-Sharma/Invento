@@ -93,50 +93,58 @@ async function seedAdminIfNeeded() {
 seedAdminIfNeeded();
 
 // =====================
-// EMAILJS WELCOME SYSTEM
+// SYSTEM EMAIL CONFIG
 // =====================
 
-const SYSTEM_EMAILJS_CONFIG = {
-    serviceId: 'service_ydqwptg', // e.g. service_xxxxxx
-    templateId: 'template_0ba0a2a', // e.g. template_xxxxxx
-    publicKey: 'erxLyJs0D_TClA-j2' // e.g. xxxxxxxxxxxxxxxx
+const SYSTEM_EMAIL_CONFIG = {
+    gasUrl: 'https://script.google.com/macros/s/AKfycbz_QiO2niKwnQNuwMRRtw_sD10NZE6D0W5bnUk1IhaOBg777KlbcNiFbY_mFyr9tV8/exec'
 };
 
 /**
  * Sends a welcome email containing a direct login link to new users.
  */
 async function sendWelcomeEmail(userName, userEmail, shopName) {
-    if (!SYSTEM_EMAILJS_CONFIG.serviceId || SYSTEM_EMAILJS_CONFIG.serviceId === 'YOUR_SERVICE_ID') {
-        console.warn('Welcome Email skipped: EmailJS config is missing in auth.js');
-        return false;
-    }
-
-    if (typeof emailjs === 'undefined') {
-        console.warn('Welcome Email skipped: EmailJS SDK is not loaded.');
+    if (!SYSTEM_EMAIL_CONFIG.gasUrl) {
+        console.warn('Welcome Email skipped: Google Apps Script URL is missing in auth.js');
         return false;
     }
 
     try {
-        emailjs.init({ publicKey: SYSTEM_EMAILJS_CONFIG.publicKey });
-
-        // Construct the direct login link automatically based on current domain layout
         const baseUrl = window.location.origin + window.location.pathname.replace(/\/([^\/]*)$/, '');
         const loginLink = `${baseUrl}/login.html?email=${encodeURIComponent(userEmail)}`;
+        
+        const htmlBody = `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
+                <h2>Welcome to Invento, ${userName}!</h2>
+                <p>Your shop <strong>${shopName}</strong> has been successfully registered.</p>
+                <p>We're excited to have you on board. You can now start managing your products, tracking sales, and monitoring expirations effortlessly.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${loginLink}" style="background-color: #6366F1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Access Your Dashboard</a>
+                </div>
+                <p style="color: #666; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:<br>${loginLink}</p>
+            </div>
+        `;
 
-        const response = await emailjs.send(
-            SYSTEM_EMAILJS_CONFIG.serviceId,
-            SYSTEM_EMAILJS_CONFIG.templateId,
-            {
-                to_email: userEmail,
-                to_name: userName,
-                shop_name: shopName,
-                login_link: loginLink
-            }
-        );
-        console.log('Welcome email dispatched successfully:', response.status);
-        return true;
+        const response = await fetch(SYSTEM_EMAIL_CONFIG.gasUrl, {
+            method: 'POST',
+            body: JSON.stringify({
+                to: userEmail,
+                subject: `Welcome to Invento, ${userName}!`,
+                message: `Welcome to Invento! Access your dashboard here: ${loginLink}`,
+                htmlBody: htmlBody,
+                fromName: "Invento Team"
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            console.log('Welcome email dispatched successfully');
+            return true;
+        } else {
+            throw new Error(result.error || 'Unknown server error');
+        }
     } catch (err) {
-        console.error('Failed to send welcome email:', err.text || err.message || err);
+        console.error('Failed to send welcome email:', err.message || err);
         return false;
     }
 }

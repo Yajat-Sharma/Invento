@@ -184,43 +184,19 @@
             </div>
           </div>
 
-          <!-- EmailJS Configuration -->
+          <!-- Google Apps Script Configuration -->
           <div class="card" style="margin-bottom:1rem;">
             <div class="card-header">
               <div>
-                <div class="card-title">⚡ EmailJS Setup</div>
-                <div class="card-sub">Connect your free EmailJS account to send real emails</div>
+                <div class="card-title">⚡ Google Apps Script Setup</div>
+                <div class="card-sub">Connect your free Google Apps Script to send real emails via Gmail</div>
               </div>
             </div>
 
-            <!-- Setup Guide -->
-            <div style="background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(139,92,246,.12));border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:16px;margin-bottom:1.25rem;">
-              <div style="font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:10px;">📋 Quick Setup Guide (5 minutes, free)</div>
-              <ol style="margin:0;padding-left:1.3rem;font-size:.81rem;color:var(--text-2);line-height:1.8;">
-                <li>Go to <a href="https://www.emailjs.com" target="_blank" style="color:var(--accent);">emailjs.com</a> → Sign up free</li>
-                <li>Add an <strong>Email Service</strong> (Gmail, Outlook, Yahoo, etc.)</li>
-                <li>Create an <strong>Email Template</strong> — use these variables in it:<br>
-                  <code style="font-size:.79rem;background:var(--surface-2);padding:3px 7px;border-radius:5px;display:inline-block;margin-top:4px;">{{to_email}} {{subject}} {{message}} {{shop_name}}</code>
-                </li>
-                <li>Go to <strong>Account → API Keys</strong> and copy your <strong>Public Key</strong></li>
-                <li>Paste all three IDs below and click Save</li>
-              </ol>
-            </div>
-
             <div class="form-group">
-              <label class="form-label">Service ID <span class="req">*</span></label>
-              <input type="text" class="form-control" id="ejsServiceId" placeholder="e.g. service_xxxxxxx" autocomplete="off">
-              <div class="form-hint">Found in EmailJS → Email Services → your service</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Template ID <span class="req">*</span></label>
-              <input type="text" class="form-control" id="ejsTemplateId" placeholder="e.g. template_xxxxxxx" autocomplete="off">
-              <div class="form-hint">Found in EmailJS → Email Templates → your template</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Public Key <span class="req">*</span></label>
-              <input type="text" class="form-control" id="ejsPublicKey" placeholder="e.g. AbCdEfGhIjKlMnOpQ" autocomplete="off">
-              <div class="form-hint">Found in EmailJS → Account → API Keys</div>
+              <label class="form-label">Web App URL <span class="req">*</span></label>
+              <input type="text" class="form-control" id="gasUrl" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+              <div class="form-hint">Paste the Web app URL generated from your Google Apps Script deployment</div>
             </div>
           </div>
 
@@ -304,9 +280,7 @@ function loadEmailSettings() {
   const user = getCurrentUser();
   document.getElementById('emailEnabledToggle').checked = cfg.emailEnabled === true;
   document.getElementById('notifEmail').value     = cfg.notifEmail  || user?.email || '';
-  document.getElementById('ejsServiceId').value   = cfg.ejsServiceId  || '';
-  document.getElementById('ejsTemplateId').value  = cfg.ejsTemplateId || '';
-  document.getElementById('ejsPublicKey').value   = cfg.ejsPublicKey  || '';
+  document.getElementById('gasUrl').value         = cfg.gasUrl || '';
   document.getElementById('alertExpired').checked = cfg.alertExpired !== false;
   document.getElementById('alertExp7').checked    = cfg.alertExp7    !== false;
   document.getElementById('alertExp30').checked   = cfg.alertExp30   === true;
@@ -315,15 +289,15 @@ function loadEmailSettings() {
 
   // Show configured status
   const banner = document.getElementById('emailStatusBanner');
-  if (cfg.ejsServiceId && cfg.ejsTemplateId && cfg.ejsPublicKey && cfg.emailEnabled) {
+  if (cfg.gasUrl && cfg.emailEnabled) {
     banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
     banner.innerHTML = '✅ &nbsp;Email alerts are <strong>active</strong>. You will receive a daily report at the email above.';
-  } else if (cfg.ejsServiceId && !cfg.emailEnabled) {
+  } else if (cfg.gasUrl && !cfg.emailEnabled) {
     banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fbbf24;';
-    banner.innerHTML = '⚠️ &nbsp;EmailJS is configured but email notifications are <strong>disabled</strong>. Toggle the switch above to enable.';
+    banner.innerHTML = '⚠️ &nbsp;Google Apps Script is configured but email notifications are <strong>disabled</strong>. Toggle the switch above to enable.';
   } else {
     banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;';
-    banner.innerHTML = 'ℹ️ &nbsp;Fill in your <strong>EmailJS credentials</strong> below and save to start receiving email alerts.';
+    banner.innerHTML = 'ℹ️ &nbsp;Fill in your <strong>Web App URL</strong> below and save to start receiving email alerts.';
   }
 }
 loadEmailSettings();
@@ -334,9 +308,7 @@ document.getElementById('saveEmailSettingsBtn').addEventListener('click', () => 
   NotifEngine.saveConfig({
     emailEnabled:  document.getElementById('emailEnabledToggle').checked,
     notifEmail:    email,
-    ejsServiceId:  document.getElementById('ejsServiceId').value.trim(),
-    ejsTemplateId: document.getElementById('ejsTemplateId').value.trim(),
-    ejsPublicKey:  document.getElementById('ejsPublicKey').value.trim(),
+    gasUrl:        document.getElementById('gasUrl').value.trim(),
     alertExpired:  document.getElementById('alertExpired').checked,
     alertExp7:     document.getElementById('alertExp7').checked,
     alertExp30:    document.getElementById('alertExp30').checked,
@@ -354,11 +326,9 @@ document.getElementById('sendTestEmailBtn').addEventListener('click', async () =
   const email  = document.getElementById('notifEmail').value.trim();
   if (!email) { showToast('Enter a notification email first', 'error'); return; }
 
-  const svcId  = document.getElementById('ejsServiceId').value.trim();
-  const tplId  = document.getElementById('ejsTemplateId').value.trim();
-  const pubKey = document.getElementById('ejsPublicKey').value.trim();
-  if (!svcId || !tplId || !pubKey) {
-    showToast('Fill in all three EmailJS fields first', 'error'); return;
+  const gasUrl = document.getElementById('gasUrl').value.trim();
+  if (!gasUrl) {
+    showToast('Fill in the Web App URL first', 'error'); return;
   }
 
   btn.disabled = true;
@@ -367,17 +337,17 @@ document.getElementById('sendTestEmailBtn').addEventListener('click', async () =
 
   try {
     // Temporarily apply the typed values (not yet saved) for the test
-    NotifEngine.saveConfig({ notifEmail: email, ejsServiceId: svcId, ejsTemplateId: tplId, ejsPublicKey: pubKey, emailEnabled: true });
+    NotifEngine.saveConfig({ notifEmail: email, gasUrl: gasUrl, emailEnabled: true });
     const res = await NotifEngine.checkAndNotify(true); // force=true bypasses daily limit
     if (res && res.ok) {
       result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
       result.innerHTML = '✅ <strong>Test email sent!</strong> Check your inbox at <em>' + escapeHtml(email) + '</em>. It may take a minute to arrive.';
       showToast('📧 Test email sent successfully!', 'success');
     } else {
-      const errMsg = (res && res.error) ? res.error : 'Unknown error. Check your EmailJS credentials.';
+      const errMsg = (res && res.error) ? res.error : 'Unknown error. Check your Web App URL.';
       result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
-      result.innerHTML = '❌ <strong>Email failed:</strong> ' + escapeHtml(errMsg) + '<br><small style="color:var(--text-3);">Double-check your Service ID, Template ID and Public Key.</small>';
-      showToast('Email failed — check credentials', 'error');
+      result.innerHTML = '❌ <strong>Email failed:</strong> ' + escapeHtml(errMsg) + '<br><small style="color:var(--text-3);">Double-check your Web App URL.</small>';
+      showToast('Email failed — check URL', 'error');
     }
   } catch (e) {
     result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';

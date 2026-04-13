@@ -329,13 +329,24 @@ document.getElementById('excelFileInput').addEventListener('change', function() 
       let imported = 0, skipped = 0;
 
       rows.forEach(row => {
-        const name = (row['Product Name'] || row['product_name'] || row['Name'] || '').toString().trim();
+        const rawName = row["Product"];
+        const name = (rawName || '').toString().trim();
         if (!name) { skipped++; return; }
 
-        const catName  = (row['Category'] || row['category'] || '').toString().trim();
-        const supName  = (row['Supplier'] || row['supplier'] || '').toString().trim();
+        const catName  = (row["Category"] || '').toString().trim();
+        const supName  = (row["Supplier"] || '').toString().trim();
         const catMatch = cats.find(c => c.name.toLowerCase() === catName.toLowerCase());
         const supMatch = sups.find(s => s.name.toLowerCase() === supName.toLowerCase());
+
+        let expiryVal = row["Expiry"];
+        let finalExpiry = '';
+        if (typeof expiryVal === 'number') {
+           // Handle Excel serial date
+           const d = new Date(Math.round((expiryVal - 25569) * 86400 * 1000));
+           finalExpiry = !isNaN(d) ? d.toISOString().split('T')[0] : '';
+        } else if (expiryVal) {
+           finalExpiry = expiryVal.toString().trim().slice(0, 10);
+        }
 
         DB.addProduct({
           id: genId('prod'),
@@ -343,12 +354,12 @@ document.getElementById('excelFileInput').addEventListener('change', function() 
           categoryId:    catMatch?.id || '',
           supplierId:    supMatch?.id || '',
           supplierName:  supMatch?.name || supName,
-          barcode:       (row['Barcode'] || row['barcode'] || '').toString().trim(),
-          quantity:      Number(row['Quantity'] || row['quantity'] || 0),
-          minStockLevel: Number(row['Min Stock Level'] || row['min_stock_level'] || 5),
-          costPrice:     Number(row['Cost Price'] || row['cost_price'] || 0),
-          sellingPrice:  Number(row['Selling Price'] || row['selling_price'] || 0),
-          expiryDate:    (row['Expiry Date'] || row['expiry_date'] || '').toString().slice(0, 10),
+          barcode:       '',
+          quantity:      Number(row["Stock"] || 0),
+          minStockLevel: Number(row["Min"] || 0),
+          costPrice:     Number(row["Cost"] || 0),
+          sellingPrice:  Number(row["Price"] || 0),
+          expiryDate:    finalExpiry,
           createdAt:     now()
         });
         imported++;
