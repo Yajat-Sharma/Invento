@@ -546,11 +546,13 @@ function initPage(pageName) {
   if (!sessionStorage.getItem('stocksense_notif_checked')) {
     sessionStorage.setItem('stocksense_notif_checked', '1');
     setTimeout(() => NotifEngine.checkAndNotify(), 1500);
+    // EmailJS per-product alerts — run silently in background
+    setTimeout(() => EmailJSEngine.run(), 3000);
   }
 }
 
 // ══════════════════════════════════════════════════════════════
-// NOTIFICATION ENGINE  (EmailJS + Browser Notifications)
+// NOTIFICATION ENGINE  (Google Apps Script + Browser Notifs)
 // ══════════════════════════════════════════════════════════════
 const NotifEngine = {
 
@@ -772,4 +774,237 @@ const NotifEngine = {
 
     this.saveConfig({ lastNotifiedDate: today });
   }
+};
+
+// ══════════════════════════════════════════════════════════════
+// EMAILJS ENGINE  — Per-Product Real-Time Expiry Alerts
+// Deduplication: tracks {productId}_{status} in localStorage.
+// Re-sends when status escalates (e.g. warning → urgent).
+// Never sends for SAFE products.
+// ══════════════════════════════════════════════════════════════
+const EmailJSEngine = {
+
+  // ── Status rank (higher = more urgent) ───────────────────────
+  _rank: { safe: 0, warning: 1, urgent: 2, expired: 3 },
+
+  // ── Sent-state key (per user + shop) ─────────────────────────
+  _stateKey() {
+    return getShopKey('ejs_alert_state');
+  },
+
+  // ── Load sent-state map from localStorage ────────────────────
+  _loadState() {
+    try { return JSON.parse(localStorage.getItem(this._stateKey())) || {}; } catch { return {}; }
+  },
+
+  // ── Persist sent-state map ───────────────────────────────────
+  _saveState(state) {
+    localStorage.setItem(this._stateKey(), JSON.stringify(state));
+  },
+
+  // ── Config helpers ───────────────────────────────────────────
+  // Defaults are pre-seeded so fields auto-populate on first use.
+  // Any saved value in localStorage takes precedence over defaults.
+  getConfig() {
+    const s        = DB.getSettings();
+    const saved    = s.ejsConfig || {};
+    const defaults = {
+      ejsServiceId:  'service_ydqwptg',
+      ejsTemplateId: 'template_73kfz4a',
+      ejsPublicKey:  'erxLyJs0D_TClA-j2',
+    };
+    return { ...defaults, ...saved };
+  },
+
+  saveConfig(patch) {
+    const s = DB.getSettings();
+    s.ejsConfig = { ...(s.ejsConfig || {}), ...patch };
+    DB.saveSettings(s);
+  },
+
+  // ── Map getExpiryStatus → canonical alert level ──────────────
+  _toLevel(esStatus) {
+    if (esStatus === 'expired')  return 'expired';
+    if (esStatus === 'expiring') return 'urgent';   // ≤ 7 days
+    if (esStatus === 'warning')  return 'warning';  // ≤ 30 days
+    return 'safe';
+  },
+
+  // ── Human status label ───────────────────────────────────────
+  _statusLabel(level) {
+    return { expired: '🔴 EXPIRED', urgent: '🟠 URGENT', warning: '🟡 WARNING', safe: '✅ SAFE' }[level] || level;
+  },
+
+  // ── Build alert message ──────────────────────────────────────
+  _buildMessage(product, level, daysLeft) {
+    if (level === 'expired')
+      return `${product.name} has expired. Remove immediately or mark as waste.`;
+    if (level === 'urgent')
+      return `${product.name} expires in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}. Apply a discount now to clear stock.`;
+    if (level === 'warning')
+      return `${product.name} expires in ${daysLeft} days. Monitor stock closely.`;
+    return '';
+  },
+
+  // ── Should we email this product right now? ──────────────────
+  // Returns true if: (a) level is urgent/expired, (b) not already
+  // sent for this level, (c) status escalated since last send.
+  _shouldSend(productId, level, state, cfg) {
+    if (level === 'safe') return false;
+    if (level === 'warning' && !cfg.ejsSendWarning) return false;
+
+    const prev = state[productId]; // { level, sentAt }
+    if (!prev) return true;                          // first time
+    if (prev.level === level) return false;          // same status, already sent
+    return this._rank[level] > this._rank[prev.level]; // escalated → resend
+  },
+
+  // ── Load EmailJS SDK lazily from CDN ─────────────────────────
+  async _ensureSDK() {
+    if (window.emailjs) return true;
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      script.onload  = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.head.appendChild(script);
+    });
+  },
+
+  // ── Send a single product alert via EmailJS ──────────────────
+  async _sendOne(product, level, daysLeft, cfg) {
+    const loaded = await this._ensureSDK();
+    if (!loaded) return { ok: false, error: 'EmailJS SDK failed to load' };
+
+    try {
+      emailjs.init({ publicKey: cfg.ejsPublicKey });
+      const shop    = DB.getCurrentShop();
+      const toEmail = cfg.ejsToEmail || getCurrentUser()?.email;
+      if (!toEmail) return { ok: false, error: 'No recipient email configured' };
+
+      const params = {
+        to_email:     toEmail,
+        to_name:      shop?.name || 'Shop Owner',
+        shop_name:    shop?.name || 'Your Shop',
+        product_name: product.name,
+        days_left:    level === 'expired' ? 'EXPIRED' : String(daysLeft),
+        status_label: this._statusLabel(level),
+        alert_message: this._buildMessage(product, level, daysLeft),
+        quantity:     String(product.quantity || 0),
+        category:     product._catName || '—',
+        sent_at:      new Date().toLocaleString('en-IN'),
+        action_link:  (typeof location !== 'undefined') ? location.origin + '/alerts.html' : 'Invento → Alerts',
+      };
+
+      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateId, params);
+      return { ok: result.status === 200, status: result.status };
+    } catch (err) {
+      return { ok: false, error: err?.text || err?.message || String(err) };
+    }
+  },
+
+  // ── Core: scan all products, queue & send alerts ─────────────
+  async run(opts = {}) {
+    const cfg   = this.getConfig();
+    const force = opts.force === true;
+
+    // Guard: must be configured and enabled
+    if (!cfg.ejsEnabled)    return { skipped: 'EmailJS disabled' };
+    if (!cfg.ejsServiceId)  return { skipped: 'No Service ID' };
+    if (!cfg.ejsTemplateId) return { skipped: 'No Template ID' };
+    if (!cfg.ejsPublicKey)  return { skipped: 'No Public Key' };
+
+    const products = DB.getProducts();
+    const cats     = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+    const state    = this._loadState();
+    const queue    = [];    // products that need an email
+    const today    = todayStr();
+
+    for (const p of products) {
+      const es    = getExpiryStatus(p.expiryDate);
+      const level = this._toLevel(es.status);
+
+      if (!this._shouldSend(p.id, level, state, cfg)) continue;
+
+      queue.push({
+        product:  { ...p, _catName: cats[p.categoryId]?.name || '—' },
+        level,
+        daysLeft: Math.max(0, es.daysLeft ?? 0),
+      });
+    }
+
+    if (!queue.length) return { sent: 0, skipped: 'No new alerts to send' };
+
+    // Throttle: send max N emails in one run to avoid spam
+    const MAX_PER_RUN = opts.max || 5;
+    const batch = queue.slice(0, MAX_PER_RUN);
+
+    let sent = 0, failed = 0;
+    const results = [];
+
+    for (const item of batch) {
+      const res = await this._sendOne(item.product, item.level, item.daysLeft, cfg);
+      if (res.ok) {
+        state[item.product.id] = { level: item.level, sentAt: today };
+        sent++;
+      } else {
+        failed++;
+      }
+      results.push({ productId: item.product.id, name: item.product.name, level: item.level, ...res });
+      // Small delay between sends to avoid rate-limiting
+      if (batch.length > 1) await new Promise(r => setTimeout(r, 350));
+    }
+
+    this._saveState(state);
+    this.saveConfig({ ejsLastRunDate: today, ejsLastRunSent: sent, ejsLastRunFailed: failed });
+    return { sent, failed, results };
+  },
+
+  // ── Convenience: run after product add/edit/delete ───────────
+  async runAfterProductChange() {
+    const cfg = this.getConfig();
+    if (!cfg.ejsEnabled) return;
+    // Small delay so DB write finishes first
+    setTimeout(() => this.run({ max: 3 }), 500);
+  },
+
+  // ── Convenience: run after sale recorded ─────────────────────
+  async runAfterSale() {
+    const cfg = this.getConfig();
+    if (!cfg.ejsEnabled) return;
+    setTimeout(() => this.run({ max: 3 }), 400);
+  },
+
+  // ── Send a test email ─────────────────────────────────────────
+  async sendTest(cfg) {
+    const loaded = await this._ensureSDK();
+    if (!loaded) return { ok: false, error: 'EmailJS SDK failed to load from CDN' };
+
+    try {
+      emailjs.init({ publicKey: cfg.ejsPublicKey });
+      const shop = DB.getCurrentShop();
+      const params = {
+        to_email:      cfg.ejsToEmail || getCurrentUser()?.email || '',
+        to_name:       shop?.name || 'Shop Owner',
+        shop_name:     shop?.name || 'Your Shop',
+        product_name:  'Sample Milk (Test Product)',
+        days_left:     '3',
+        status_label:  '🟠 URGENT',
+        alert_message: 'Sample Milk expires in 3 days. Apply a discount now to clear stock.',
+        quantity:       '24',
+        category:       'Dairy',
+        sent_at:        new Date().toLocaleString('en-IN'),
+        action_link:    (typeof location !== 'undefined') ? location.origin + '/alerts.html' : 'Invento → Alerts',
+      };
+      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateId, params);
+      return { ok: result.status === 200, status: result.status };
+    } catch (err) {
+      return { ok: false, error: err?.text || err?.message || String(err) };
+    }
+  },
+
+  // ── Clear all sent-state (reset deduplication) ───────────────
+  clearState() {
+    localStorage.removeItem(this._stateKey());
+  },
 };

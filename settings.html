@@ -200,7 +200,7 @@
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Actions (GAS) -->
           <div class="card">
             <div class="card-header"><div class="card-title">Actions</div></div>
             <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
@@ -218,6 +218,130 @@
               </button>
             </div>
             <div id="testEmailResult" style="display:none;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;"></div>
+          </div>
+
+          <!-- ── DIVIDER ── -->
+          <div class="divider" style="margin:1.5rem 0;"></div>
+
+          <!-- ═══════════════════════════════════════════════
+               EmailJS — Per-Product Real-Time Alert Emails
+          ════════════════════════════════════════════════ -->
+
+          <!-- EJS Status Banner -->
+          <div id="ejsStatusBanner" style="display:none;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;"></div>
+
+          <!-- EJS Master Toggle -->
+          <div class="card" style="margin-bottom:1rem;border:1px solid rgba(99,102,241,.18);">
+            <div class="card-header">
+              <div>
+                <div class="card-title">⚡ EmailJS — Per-Product Alerts</div>
+                <div class="card-sub">Send individual email alerts the moment a product becomes URGENT or EXPIRED — no server needed</div>
+              </div>
+              <label class="toggle-switch" style="flex-shrink:0;">
+                <input type="checkbox" id="ejsEnabledToggle">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <!-- How it works info box -->
+            <div style="background:rgba(99,102,241,.07);border:1px solid rgba(99,102,241,.15);border-radius:var(--r-md);padding:.9rem 1rem;font-size:.8rem;color:var(--text-2);line-height:1.6;margin-top:.25rem;">
+              <strong style="color:#a5b4fc;">How it works:</strong> EmailJS sends emails directly from the browser — no backend or server required.
+              Each product gets an email <em>only once per status level</em>. If a product escalates from Warning → Urgent, a new email is sent automatically.
+              Safe products are never emailed.
+            </div>
+          </div>
+
+          <!-- EJS Recipient -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div class="card-title">Alert Recipient</div></div>
+            <div class="form-group">
+              <label class="form-label">Send per-product alerts to <span class="req">*</span></label>
+              <input type="email" class="form-control" id="ejsToEmail" placeholder="owner@yourshop.com">
+              <div class="form-hint">Each expiry alert email goes to this address</div>
+            </div>
+          </div>
+
+          <!-- EJS Credentials -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">EmailJS Credentials</div>
+                <div class="card-sub">Get these from <a href="https://www.emailjs.com" target="_blank" style="color:var(--led-blue);">emailjs.com</a> → free account → Email Services + Templates</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Service ID <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsServiceId" placeholder="service_xxxxxxx" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Email Services → your service</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Template ID <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsTemplateId" placeholder="template_xxxxxxx" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Email Templates → your template</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Public Key <span class="req">*</span></label>
+              <input type="text" class="form-control" id="ejsPublicKey" placeholder="your_public_key_here" autocomplete="off">
+              <div class="form-hint">Found in EmailJS → Account → General → Public Key</div>
+            </div>
+
+            <!-- Template variables hint -->
+            <div style="background:rgba(59,158,255,.06);border:1px solid rgba(59,158,255,.14);border-radius:var(--r-md);padding:.85rem 1rem;font-size:.78rem;color:var(--text-2);line-height:1.7;margin-top:.25rem;">
+              <strong style="color:var(--led-blue);">📋 Template variables to use in your EmailJS template:</strong><br>
+              <code style="color:#a5b4fc;">{{to_name}}</code> · <code style="color:#a5b4fc;">{{shop_name}}</code> · <code style="color:#a5b4fc;">{{product_name}}</code> · <code style="color:#a5b4fc;">{{days_left}}</code> · <code style="color:#a5b4fc;">{{status_label}}</code> · <code style="color:#a5b4fc;">{{alert_message}}</code> · <code style="color:#a5b4fc;">{{quantity}}</code> · <code style="color:#a5b4fc;">{{category}}</code> · <code style="color:#a5b4fc;">{{sent_at}}</code> · <code style="color:#a5b4fc;">{{action_link}}</code>
+            </div>
+          </div>
+
+          <!-- EJS Options -->
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div class="card-title">Alert Options</div></div>
+            <div style="display:flex;flex-direction:column;gap:.65rem;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:.875rem;font-weight:500;">🔴 Expired Products</div>
+                  <div class="form-hint" style="margin:0;">Always sends — cannot be disabled</div>
+                </div>
+                <span class="badge badge-good">Always On</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:.875rem;font-weight:500;">🟠 Urgent (≤ 7 days)</div>
+                  <div class="form-hint" style="margin:0;">Always sends — cannot be disabled</div>
+                </div>
+                <span class="badge badge-good">Always On</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
+                <div>
+                  <div style="font-size:.875rem;font-weight:500;">🟡 Warning (≤ 30 days)</div>
+                  <div class="form-hint" style="margin:0;">Optional — send early warning emails</div>
+                </div>
+                <label class="toggle-switch"><input type="checkbox" id="ejsSendWarning"><span class="toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+
+          <!-- EJS Actions -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">EmailJS Actions</div></div>
+            <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
+              <button class="btn btn-primary" id="saveEjsSettingsBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Save EmailJS Settings
+              </button>
+              <button class="btn btn-secondary" id="sendEjsTestBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Send Test Alert
+              </button>
+              <button class="btn btn-secondary" id="ejsRunNowBtn">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Run Alert Check Now
+              </button>
+              <button class="btn btn-danger btn-sm" id="ejsClearStateBtn" title="Reset sent-state so all alerts are re-evaluated">
+                <svg width="13" height="13" fill="none" viewBox="0 0 24 24"><path d="M4 4l16 16M4 20L20 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Reset Sent History
+              </button>
+            </div>
+            <div id="ejsActionResult" style="display:none;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;"></div>
           </div>
 
         </div>
@@ -477,6 +601,179 @@ document.getElementById('resetAllBtn').addEventListener('click', () => showConfi
   showToast('All data reset', 'error'); loadProfile();
   setTimeout(() => location.href = 'dashboard.html', 1200);
 }));
+
+// ── EmailJS Settings Panel ─────────────────────────────────────────────────
+function loadEjsSettings() {
+  const cfg = EmailJSEngine.getConfig();
+
+  document.getElementById('ejsEnabledToggle').checked = cfg.ejsEnabled === true;
+  document.getElementById('ejsToEmail').value         = cfg.ejsToEmail   || getCurrentUser()?.email || '';
+  document.getElementById('ejsServiceId').value       = cfg.ejsServiceId  || '';
+  document.getElementById('ejsTemplateId').value      = cfg.ejsTemplateId || '';
+  document.getElementById('ejsPublicKey').value       = cfg.ejsPublicKey  || '';
+  document.getElementById('ejsSendWarning').checked   = cfg.ejsSendWarning === true;
+
+  // Status banner
+  const banner = document.getElementById('ejsStatusBanner');
+  const fullyConfigured = cfg.ejsServiceId && cfg.ejsTemplateId && cfg.ejsPublicKey && cfg.ejsToEmail;
+
+  if (fullyConfigured && cfg.ejsEnabled) {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
+    const lastRun = cfg.ejsLastRunDate ? `Last run: ${cfg.ejsLastRunDate}` : 'Not run yet — will fire on next page load.';
+    const lastRes = cfg.ejsLastRunSent != null ? ` · ${cfg.ejsLastRunSent} sent, ${cfg.ejsLastRunFailed || 0} failed.` : '';
+    banner.innerHTML = `⚡ &nbsp;<div><strong>EmailJS Active</strong> — per-product alerts are live.<br><small style="color:var(--text-2);">${lastRun}${lastRes}</small></div>`;
+  } else if (fullyConfigured && !cfg.ejsEnabled) {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);color:#fbbf24;';
+    banner.innerHTML = '⚠️ &nbsp;EmailJS is configured but <strong>disabled</strong>. Toggle the switch above to activate.';
+  } else if (cfg.ejsServiceId || cfg.ejsTemplateId || cfg.ejsPublicKey) {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
+    banner.innerHTML = '❌ &nbsp;EmailJS is <strong>partially configured</strong>. Fill in all three credentials and save.';
+  } else {
+    banner.style.cssText = 'display:flex;padding:12px 16px;border-radius:12px;font-size:.85rem;margin-bottom:1rem;align-items:center;gap:10px;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;';
+    banner.innerHTML = 'ℹ️ &nbsp;Fill in your <strong>EmailJS credentials</strong> below and save to enable per-product alert emails.';
+  }
+}
+loadEjsSettings();
+
+// Save EmailJS settings
+document.getElementById('saveEjsSettingsBtn').addEventListener('click', () => {
+  const serviceId  = document.getElementById('ejsServiceId').value.trim();
+  const templateId = document.getElementById('ejsTemplateId').value.trim();
+  const publicKey  = document.getElementById('ejsPublicKey').value.trim();
+  const toEmail    = document.getElementById('ejsToEmail').value.trim();
+  const enabled    = document.getElementById('ejsEnabledToggle').checked;
+
+  if (enabled && (!serviceId || !templateId || !publicKey)) {
+    showToast('Fill in Service ID, Template ID, and Public Key to enable', 'error');
+    return;
+  }
+  if (enabled && !toEmail) {
+    showToast('Enter a recipient email address', 'error');
+    return;
+  }
+
+  EmailJSEngine.saveConfig({
+    ejsEnabled:     enabled,
+    ejsToEmail:     toEmail,
+    ejsServiceId:   serviceId,
+    ejsTemplateId:  templateId,
+    ejsPublicKey:   publicKey,
+    ejsSendWarning: document.getElementById('ejsSendWarning').checked,
+  });
+  showToast('⚡ EmailJS settings saved!', 'success');
+  loadEjsSettings();
+});
+
+// Send test alert
+document.getElementById('sendEjsTestBtn').addEventListener('click', async () => {
+  const btn    = document.getElementById('sendEjsTestBtn');
+  const result = document.getElementById('ejsActionResult');
+
+  const cfg = {
+    ejsServiceId:  document.getElementById('ejsServiceId').value.trim(),
+    ejsTemplateId: document.getElementById('ejsTemplateId').value.trim(),
+    ejsPublicKey:  document.getElementById('ejsPublicKey').value.trim(),
+    ejsToEmail:    document.getElementById('ejsToEmail').value.trim(),
+  };
+
+  if (!cfg.ejsServiceId || !cfg.ejsTemplateId || !cfg.ejsPublicKey) {
+    showToast('Fill in all three EmailJS credentials first', 'error'); return;
+  }
+  if (!cfg.ejsToEmail) {
+    showToast('Enter a recipient email address', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Sending…';
+  result.style.display = 'none';
+
+  try {
+    const res = await EmailJSEngine.sendTest(cfg);
+    if (res.ok) {
+      result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
+      result.innerHTML = `✅ <strong>Test email sent!</strong> Check <em>${escapeHtml(cfg.ejsToEmail)}</em> — it may take a minute to arrive.`;
+      showToast('⚡ Test alert sent via EmailJS!', 'success');
+    } else {
+      result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
+      result.innerHTML = `❌ <strong>Send failed:</strong> ${escapeHtml(res.error || 'Unknown error')}<br><small style="color:var(--text-3);">Double-check your Service ID, Template ID , and Public Key.</small>`;
+      showToast('EmailJS send failed — check credentials', 'error');
+    }
+  } catch (e) {
+    result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
+    result.innerHTML = `❌ <strong>Error:</strong> ${escapeHtml(String(e))}`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Send Test Alert';
+});
+
+// Run alert check now
+document.getElementById('ejsRunNowBtn').addEventListener('click', async () => {
+  const btn    = document.getElementById('ejsRunNowBtn');
+  const result = document.getElementById('ejsActionResult');
+
+  // Temporarily save current form values for immediate use
+  const cfg = EmailJSEngine.getConfig();
+  const serviceId  = document.getElementById('ejsServiceId').value.trim();
+  const templateId = document.getElementById('ejsTemplateId').value.trim();
+  const publicKey  = document.getElementById('ejsPublicKey').value.trim();
+  const toEmail    = document.getElementById('ejsToEmail').value.trim();
+
+  if (!serviceId || !templateId || !publicKey || !toEmail) {
+    showToast('Save your EmailJS settings first', 'error'); return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> Checking…';
+  result.style.display = 'none';
+
+  // Ensure latest form values are saved before run
+  EmailJSEngine.saveConfig({
+    ejsEnabled: document.getElementById('ejsEnabledToggle').checked,
+    ejsToEmail: toEmail, ejsServiceId: serviceId,
+    ejsTemplateId: templateId, ejsPublicKey: publicKey,
+    ejsSendWarning: document.getElementById('ejsSendWarning').checked,
+  });
+
+  const res = await EmailJSEngine.run({ force: true, max: 10 });
+
+  if (res.skipped) {
+    result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(59,158,255,.08);border:1px solid rgba(59,158,255,.2);color:#93c5fd;';
+    result.innerHTML = `ℹ️ <strong>No new alerts to send.</strong> ${escapeHtml(res.skipped)}`;
+    showToast('No new expiry alerts found', 'info');
+  } else {
+    const failed = res.failed || 0;
+    const allRows = (res.results || []).map(r =>
+      `<div style="padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.8rem;">
+        ${r.ok ? '✅' : '❌'} <strong>${escapeHtml(r.name)}</strong> — ${escapeHtml(r.level?.toUpperCase())}
+        ${!r.ok ? `<span style="color:var(--text-3);"> · ${escapeHtml(r.error || '')}</span>` : ''}
+      </div>`
+    ).join('');
+
+    result.style.cssText = `display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;${res.sent > 0 ? 'background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:#4ade80;' : 'background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;'}`;
+    result.innerHTML = `<strong>${res.sent} alert email${res.sent !== 1 ? 's' : ''} sent</strong>${failed ? `, ${failed} failed` : ''}.<div style="margin-top:.5rem;">${allRows}</div>`;
+
+    if (res.sent > 0) showToast(`⚡ ${res.sent} expiry alert${res.sent !== 1 ? 's' : ''} sent!`, 'success');
+    else showToast('Alert check ran — 0 emails sent', 'warning');
+  }
+
+  loadEjsSettings();
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Run Alert Check Now';
+});
+
+// Reset sent history
+document.getElementById('ejsClearStateBtn').addEventListener('click', () => {
+  showConfirm(
+    'Reset Sent History',
+    'This clears the deduplication log so all expiry alerts will be re-sent on the next check. Continue?',
+    () => {
+      EmailJSEngine.clearState();
+      showToast('✅ Sent history cleared — alerts will re-fire on next check', 'success');
+    },
+    'Reset'
+  );
+});
 </script>
 </body>
 </html>
