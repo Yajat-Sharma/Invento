@@ -46,7 +46,7 @@
       <!-- Expired products table -->
       <div class="card mb-2">
         <div class="card-header">
-          <div><div class="card-title">🔴Expired Products</div><div class="card-sub">Products past their expiry date with remaining stock</div></div>
+          <div><div class="card-title">Expired Products</div><div class="card-sub">Products past their expiry date with remaining stock</div></div>
           <button class="btn btn-danger btn-sm" id="disposeAllBtn">Dispose All</button>
         </div>
         <div class="table-wrapper">
@@ -56,7 +56,7 @@
           </table>
         </div>
         <div class="empty-state" id="expiredEmpty" style="display:none;">
-          <div class="empty-state-icon">✅</div>
+          <div class="empty-state-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="opacity:.3"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h3>No expired products!</h3>
           <p>All your products are within their expiry dates.</p>
         </div>
@@ -65,7 +65,7 @@
       <!-- Waste / Disposed log -->
       <div class="card">
         <div class="card-header">
-          <div><div class="card-title">🗑️ Disposal Log</div><div class="card-sub">Products you have marked as disposed</div></div>
+          <div><div class="card-title">Disposal Log</div><div class="card-sub">Products you have marked as disposed</div></div>
         </div>
         <div class="table-wrapper">
           <table class="data-table">
@@ -74,7 +74,7 @@
           </table>
         </div>
         <div class="empty-state" id="wasteEmpty" style="display:none;">
-          <div class="empty-state-icon">📋</div>
+          <div class="empty-state-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="opacity:.3"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h3>No disposals recorded</h3>
           <p>When you dispose expired products, they'll appear here.</p>
         </div>
@@ -125,7 +125,7 @@ function renderPage() {
         <td><span class="badge badge-expired">${es.label}</span><div class="td-dim">${formatDate(p.expiryDate)}</div></td>
         <td>
           <button class="btn btn-danger btn-sm dispose-btn" data-id="${p.id}" data-name="${escapeHtml(p.name)}" data-qty="${p.quantity}" data-cost="${p.costPrice}" data-loss="${loss}">
-            🗑️ Dispose
+            Dispose
           </button>
         </td>
       </tr>`;
@@ -152,7 +152,7 @@ function renderPage() {
       <td style="font-weight:600;">${w.quantityDisposed}</td>
       <td style="color:var(--danger);font-weight:600;">₹${Number(w.lossAmount || 0).toLocaleString('en-IN')}</td>
       <td class="td-dim">${formatDate(w.date)}</td>
-      <td><button class="btn btn-danger btn-icon btn-sm del-waste" data-id="${w.id}" title="Remove from log">🗑️</button></td>
+      <td><button class="btn btn-danger btn-icon btn-sm del-waste" data-id="${w.id}" title="Remove from log"><svg width="13" height="13" fill="none" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></td>
     </tr>`).join('');
     document.querySelectorAll('.del-waste').forEach(btn => btn.addEventListener('click', () => {
       showConfirm('Remove Disposal Record', 'Remove this entry from the disposal log?', () => { DB.deleteWaste(btn.dataset.id); renderPage(); showToast('Entry removed', 'error'); });

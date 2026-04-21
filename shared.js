@@ -421,7 +421,7 @@ const NAV_ITEMS = [
   { href:'settings.html',   label:'Settings',     page:'settings',   icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" stroke-width="1.75"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.75"/></svg>` }
 ];
 
-const ROLE_LABELS = { owner: '👑 Owner', manager: '🛠️ Manager', staff: '👤 Staff' };
+const ROLE_LABELS = { owner: 'Owner', manager: 'Manager', staff: 'Staff' };
 const ROLE_BADGE_CLASS = { owner: 'badge-accent', manager: 'badge-info', staff: 'badge-good' };
 
 function buildSidebar(activePage) {
@@ -443,12 +443,12 @@ function buildSidebar(activePage) {
     }).join('');
 
   const shopSwitchHtml = DB.getShops().length > 1
-    ? `<a href="shop-select.html" class="shop-switcher-btn sidebar-brand-text" title="Switch Shop">🏪 Switch Shop</a>`
+    ? `<a href="shop-select.html" class="shop-switcher-btn sidebar-brand-text" title="Switch Shop"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Switch Shop</a>`
     : '';
 
   const sidebarHTML = `
     <div class="sidebar-brand">
-      <div class="brand-icon">📦</div>
+      <div class="brand-icon"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7l8 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="sidebar-brand-text">
         <div class="brand-name">Invento</div>
         <div class="brand-tag">${escapeHtml(shopName)}</div>
@@ -512,10 +512,15 @@ function buildSidebar(activePage) {
 function showToast(message, type = 'success', duration = 3500) {
   let container = document.getElementById('toast-container');
   if (!container) { container = document.createElement('div'); container.id = 'toast-container'; document.body.appendChild(container); }
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const icons = {
+    success: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    error:   `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="15" y1="9" x2="9" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="9" x2="15" y2="15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+    warning: `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+    info:    `<svg width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+  };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span class="toast-msg">${escapeHtml(message)}</span>`;
+  toast.innerHTML = `<span class="toast-icon">${icons[type] || icons.info}</span><span class="toast-msg">${escapeHtml(message)}</span>`;
   container.appendChild(toast);
   setTimeout(() => { toast.style.transition = 'all .3s ease'; toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, duration);
 }
@@ -525,7 +530,7 @@ function showConfirm(title, message, onConfirm, confirmLabel = 'Delete') {
   let overlay = document.getElementById('confirm-overlay');
   if (!overlay) {
     overlay = document.createElement('div'); overlay.id = 'confirm-overlay'; overlay.className = 'confirm-overlay';
-    overlay.innerHTML = `<div class="confirm-box"><div class="confirm-icon">⚠️</div><h3 id="confirm-title"></h3><p id="confirm-msg"></p><div class="confirm-actions"><button class="btn btn-secondary" id="confirm-cancel">Cancel</button><button class="btn btn-danger" id="confirm-ok">Delete</button></div></div>`;
+    overlay.innerHTML = `<div class="confirm-box"><div class="confirm-icon"><svg width="28" height="28" fill="none" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></div><h3 id="confirm-title"></h3><p id="confirm-msg"></p><div class="confirm-actions"><button class="btn btn-secondary" id="confirm-cancel">Cancel</button><button class="btn btn-danger" id="confirm-ok">Delete</button></div></div>`;
     document.body.appendChild(overlay);
   }
   document.getElementById('confirm-title').textContent = title;
@@ -562,11 +567,11 @@ function initQuickFAB(activePage) {
   if (document.getElementById('quickFab')) return;
 
   const items = [
-    { icon: '📦', label: 'Add Product',    href: 'products.html',   page: 'products'  },
-    { icon: '💰', label: 'Record Sale',    href: 'sales.html',      page: 'sales'     },
-    { icon: '🔔', label: 'View Alerts',    href: 'alerts.html',     page: 'alerts'    },
-    { icon: '📊', label: 'View Reports',   href: 'reports.html',    page: 'reports'   },
-  ].filter(i => i.page !== activePage); // hide link to current page
+    { icon: `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7l8 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`, label: 'Add Product',  href: 'products.html', page: 'products' },
+    { icon: `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 006 17h12M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`, label: 'Record Sale',  href: 'sales.html',    page: 'sales'    },
+    { icon: `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`, label: 'View Alerts',  href: 'alerts.html',   page: 'alerts'   },
+    { icon: `<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`, label: 'View Reports', href: 'reports.html',  page: 'reports'  },
+  ].filter(i => i.page !== activePage);
 
   const itemsHTML = items.map(i => `
     <a href="${i.href}" class="fab-item" title="${i.label}">

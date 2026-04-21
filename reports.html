@@ -33,14 +33,14 @@
     <main class="page-content">
       <!-- Tab Navigation -->
       <div class="tab-nav" style="display:flex;gap:.35rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:.3rem;margin-bottom:1.25rem;flex-wrap:wrap;">
-        <button class="tab-btn active" data-tab="profit">💰 Profit</button>
-        <button class="tab-btn" data-tab="abc">📊 ABC Analysis</button>
-        <button class="tab-btn" data-tab="movers">🚀 Stock Movement</button>
-        <button class="tab-btn" data-tab="supplier">🚚 Suppliers</button>
-        <button class="tab-btn" data-tab="loss">⚠️ Loss Prevention</button>
+        <button class="tab-btn active" data-tab="profit">Profit</button>
+        <button class="tab-btn" data-tab="abc">ABC Analysis</button>
+        <button class="tab-btn" data-tab="movers">Stock Movement</button>
+        <button class="tab-btn" data-tab="supplier">Suppliers</button>
+        <button class="tab-btn" data-tab="loss">Loss Prevention</button>
         <div style="margin-left:auto;display:flex;gap:.35rem;">
-          <button class="btn btn-secondary btn-sm" id="exportExcelBtn">📤 Excel</button>
-          <button class="btn btn-secondary btn-sm" id="exportPdfBtn">📄 PDF</button>
+          <button class="btn btn-secondary btn-sm" id="exportExcelBtn">Export Excel</button>
+          <button class="btn btn-secondary btn-sm" id="exportPdfBtn">Export PDF</button>
         </div>
       </div>
 
@@ -48,8 +48,8 @@
       <div id="tab-profit" class="tab-panel active">
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.25rem;" id="profitStatCards"></div>
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:1rem;margin-bottom:1.25rem;">
-          <div class="card"><div class="section-header"><h3>📈 Sales & Profit Trend</h3></div><div style="height:260px;"><canvas id="profitLineChart"></canvas></div></div>
-          <div class="card"><div class="section-header"><h3>💳 Payment Methods</h3></div><div style="height:260px;position:relative;"><canvas id="paymentPieChart"></canvas></div></div>
+          <div class="card"><div class="section-header"><h3>Sales &amp; Profit Trend</h3></div><div style="height:260px;"><canvas id="profitLineChart"></canvas></div></div>
+          <div class="card"><div class="section-header"><h3>Payment Methods</h3></div><div style="height:260px;position:relative;"><canvas id="paymentPieChart"></canvas></div></div>
         </div>
         <div class="card">
           <div class="section-header"><h3>Profit Per Product</h3></div>
@@ -85,19 +85,19 @@
       <!-- ── TAB: Stock Movement ── -->
       <div id="tab-movers" class="tab-panel" style="display:none;">
         <div class="card" style="margin-bottom:1rem;">
-          <div class="section-header"><h3>🚀 Fast Moving Products <span class="badge badge-good" style="margin-left:.5rem;">Top sellers (30d)</span></h3></div>
+        <div class="section-header"><h3>Fast Moving Products <span class="badge badge-good" style="margin-left:.5rem;">Top sellers (30d)</span></h3></div>
           <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>Product</th><th>Category</th><th>Units Sold (30d)</th><th>Revenue ₹</th><th>Stock Left</th></tr></thead><tbody id="fastBody"></tbody></table></div>
-          <div class="empty-state" id="fastEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🚀</div><h3>No sales data yet</h3><p>Record sales to see fast-moving products</p></div>
+          <div class="empty-state" id="fastEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon"><svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="opacity:.35"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 006 17h12M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>No sales data yet</h3><p>Record sales to see fast-moving products</p></div>
         </div>
         <div class="card" style="margin-bottom:1rem;">
-          <div class="section-header"><h3>🐌 Slow Moving Products <span class="badge badge-low" style="margin-left:.5rem;">Low velocity (30d)</span></h3></div>
+          <div class="section-header"><h3>Slow Moving Products <span class="badge badge-low" style="margin-left:.5rem;">Low velocity (30d)</span></h3></div>
           <div class="table-wrapper"><table class="data-table"><thead><tr><th>#</th><th>Product</th><th>Category</th><th>Units (30d)</th><th>Stock</th><th>Expiry</th></tr></thead><tbody id="slowBody"></tbody></table></div>
-          <div class="empty-state" id="slowEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🐌</div><h3>No slow-moving products</h3><p>Great — everything is selling well!</p></div>
+          <div class="empty-state" id="slowEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon"><svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="opacity:.35"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>No slow-moving products</h3><p>Everything is selling well</p></div>
         </div>
         <div class="card" id="dead" style="margin-bottom:1rem;">
-          <div class="section-header"><h3>💀 Dead Stock <span class="badge badge-expired" id="deadBadge" style="margin-left:.5rem;"></span></h3><span style="font-size:.78rem;color:var(--text-2);">No sales in last 30 days</span></div>
+          <div class="section-header"><h3>Dead Stock <span class="badge badge-expired" id="deadBadge" style="margin-left:.5rem;"></span></h3><span style="font-size:.78rem;color:var(--text-2);">No sales in last 30 days</span></div>
           <div class="table-wrapper"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Stock Qty</th><th>Stock Value ₹</th><th>Expiry</th><th>Action</th></tr></thead><tbody id="deadBody"></tbody></table></div>
-          <div class="empty-state" id="deadEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">✅</div><h3>No dead stock!</h3><p>All your products have had recent sales</p></div>
+          <div class="empty-state" id="deadEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon"><svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="opacity:.35"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>No dead stock</h3><p>All your products have had recent sales</p></div>
         </div>
       </div>
 
@@ -107,14 +107,14 @@
         <div class="card">
           <div class="section-header"><h3>Supplier-wise Sales Summary</h3></div>
           <div class="table-wrapper"><table class="data-table"><thead><tr><th>Supplier</th><th>Phone</th><th>Products</th><th>Units Sold</th><th>Revenue ₹</th></tr></thead><tbody id="supplierBody"></tbody></table></div>
-          <div class="empty-state" id="supplierEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon">🚚</div><h3>No suppliers found</h3><a href="suppliers.html" class="btn btn-primary" style="margin-top:.75rem;">Add Suppliers</a></div>
+          <div class="empty-state" id="supplierEmpty" style="display:none;padding:2rem;"><div class="empty-state-icon"><svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="opacity:.35"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>No suppliers found</h3><a href="suppliers.html" class="btn btn-primary" style="margin-top:.75rem;">Add Suppliers</a></div>
         </div>
       </div>
 
       <!-- ── TAB: Loss Prevention ── -->
       <div id="tab-loss" class="tab-panel" style="display:none;">
         <div class="card" style="margin-bottom:1rem;padding:1rem 1.25rem;background:linear-gradient(135deg,rgba(245,158,11,.06),var(--surface));border-left:3px solid var(--warning);">
-          <h3 style="font-size:.95rem;font-weight:700;margin-bottom:.4rem;">⚠️ How Loss Prevention Works</h3>
+          <h3 style="font-size:.95rem;font-weight:700;margin-bottom:.4rem;">How Loss Prevention Works</h3>
           <p style="font-size:.82rem;color:var(--text-2);">Products flagged here have <strong>high stock quantity</strong>, <strong>low recent sales</strong>, and are <strong>expiring within 30 days</strong>. Acting quickly with discounts or promotions can prevent inventory loss.</p>
         </div>
         <div id="lossPrevContent"></div>
@@ -362,7 +362,7 @@ function renderLoss() {
   const cats   = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
   const el     = document.getElementById('lossPrevContent');
   if (!alerts.length) {
-    el.innerHTML = `<div class="empty-state" style="padding:3rem;"><div class="empty-state-icon">✅</div><h3>No Loss Prevention Alerts</h3><p>All expiring products show healthy sales levels.</p></div>`;
+    el.innerHTML = `<div class="empty-state" style="padding:3rem;"><div class="empty-state-icon"><svg width="36" height="36" fill="none" viewBox="0 0 24 24" style="opacity:.35"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></div><h3>No Loss Prevention Alerts</h3><p>All expiring products show healthy sales levels.</p></div>`;
     return;
   }
   el.innerHTML = `<div class="card">

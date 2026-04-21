@@ -30,12 +30,12 @@
 
       <div style="max-width:700px;">
         <div class="settings-tabs">
-          <button class="settings-tab active" data-panel="profile">🏪 Shop Details</button>
-          <button class="settings-tab" data-panel="security">🔒 Security</button>
-          <button class="settings-tab" data-panel="alerts">🔔 Alert Settings</button>
-          <button class="settings-tab" data-panel="email">📧 Email Alerts</button>
-          <button class="settings-tab" data-panel="appearance">🎨 Appearance</button>
-          <button class="settings-tab" data-panel="data">🗄️ Data</button>
+          <button class="settings-tab active" data-panel="profile">Shop Details</button>
+          <button class="settings-tab" data-panel="security">Security</button>
+          <button class="settings-tab" data-panel="alerts">Alert Settings</button>
+          <button class="settings-tab" data-panel="email">Email Alerts</button>
+          <button class="settings-tab" data-panel="appearance">Appearance</button>
+          <button class="settings-tab" data-panel="data">Data</button>
         </div>
 
         <!-- ── Shop Details ── -->
@@ -146,7 +146,7 @@
           <div class="card" style="margin-bottom:1rem;">
             <div class="card-header">
               <div>
-                <div class="card-title">📧 Email Alerts</div>
+                <div class="card-title">Email Alerts</div>
                 <div class="card-sub">Receive automatic alerts about expiring products and stock issues</div>
               </div>
               <label class="toggle-switch" style="flex-shrink:0;">
@@ -174,7 +174,7 @@
               <!-- Expired — always on -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:rgba(255,79,79,.05);border-radius:var(--r-md);border:1px solid rgba(255,79,79,.15);">
                 <div style="display:flex;align-items:center;gap:.65rem;">
-                  <span style="font-size:1.1rem;">🔴</span>
+                  <span class="alert-section-indicator alert-section-indicator--danger" style="width:10px;height:10px;"></span>
                   <div>
                     <div style="font-size:.875rem;font-weight:600;">Expired Products</div>
                     <div class="form-hint" style="margin:0;">Products past their expiry date — remove or mark as waste</div>
@@ -186,7 +186,7 @@
               <!-- Urgent — always on -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:rgba(255,170,0,.05);border-radius:var(--r-md);border:1px solid rgba(255,170,0,.15);">
                 <div style="display:flex;align-items:center;gap:.65rem;">
-                  <span style="font-size:1.1rem;">🟠</span>
+                  <span class="alert-section-indicator alert-section-indicator--danger" style="width:10px;height:10px;"></span>
                   <div>
                     <div style="font-size:.875rem;font-weight:600;">Expiring in 7 Days</div>
                     <div class="form-hint" style="margin:0;">Critical — expires within a week, apply discount now</div>
@@ -198,7 +198,7 @@
               <!-- 30-day warning — optional -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
                 <div style="display:flex;align-items:center;gap:.65rem;">
-                  <span style="font-size:1.1rem;">🟡</span>
+                  <span class="alert-section-indicator alert-section-indicator--warning" style="width:10px;height:10px;"></span>
                   <div>
                     <div style="font-size:.875rem;font-weight:500;">Expiring in 30 Days</div>
                     <div class="form-hint" style="margin:0;">Early warning — expires this month</div>
@@ -210,7 +210,7 @@
               <!-- Low stock — optional -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
                 <div style="display:flex;align-items:center;gap:.65rem;">
-                  <span style="font-size:1.1rem;">📦</span>
+                  <span class="alert-section-indicator alert-section-indicator--warning" style="width:10px;height:10px;"></span>
                   <div>
                     <div style="font-size:.875rem;font-weight:500;">Low Stock</div>
                     <div class="form-hint" style="margin:0;">Qty dropped below minimum stock level</div>
@@ -222,7 +222,7 @@
               <!-- Out of stock — optional -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
                 <div style="display:flex;align-items:center;gap:.65rem;">
-                  <span style="font-size:1.1rem;">⛔</span>
+                  <span class="alert-section-indicator alert-section-indicator--danger" style="width:10px;height:10px;"></span>
                   <div>
                     <div style="font-size:.875rem;font-weight:500;">Out of Stock</div>
                     <div class="form-hint" style="margin:0;">Qty has reached zero</div>
@@ -240,14 +240,14 @@
             <div style="display:flex;flex-direction:column;gap:.55rem;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
                 <div>
-                  <div style="font-size:.875rem;font-weight:500;">⚡ Instant Alerts</div>
+                  <div style="font-size:.875rem;font-weight:500;">Instant Alerts</div>
                   <div class="form-hint" style="margin:0;">Email sent the moment a product escalates to Urgent or Expired</div>
                 </div>
                 <span class="badge badge-good">Active</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.8rem 1rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
                 <div>
-                  <div style="font-size:.875rem;font-weight:500;">📅 Daily Summary</div>
+                  <div style="font-size:.875rem;font-weight:500;">Daily Summary</div>
                   <div class="form-hint" style="margin:0;">Also send a daily digest with all active alerts</div>
                 </div>
                 <label class="toggle-switch"><input type="checkbox" id="alertDailySummary"><span class="toggle-slider"></span></label>
@@ -284,7 +284,7 @@
             <div class="card-header"><div class="card-title">Appearance</div></div>
             <div style="display:flex;flex-direction:column;gap:.75rem;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.85rem;background:var(--surface-2);border-radius:var(--r-md);border:1px solid var(--border);">
-                <div><div style="font-size:.875rem;font-weight:500;">☀️ Light Mode</div><div class="form-hint" style="margin:0;">Switch to a light-themed interface</div></div>
+                <div><div style="font-size:.875rem;font-weight:500;">Light Mode</div><div class="form-hint" style="margin:0;">Switch to a light-themed interface</div></div>
                 <label class="toggle-switch"><input type="checkbox" id="lightModeToggle"><span class="toggle-slider"></span></label>
               </div>
             </div>
@@ -303,7 +303,7 @@
             </div>
           </div>
           <div class="card" style="border:1px solid rgba(239,68,68,.2);">
-            <div class="card-header"><div><div class="card-title" style="color:var(--danger);">⚠️ Danger Zone</div><div class="card-sub">These actions cannot be undone</div></div></div>
+            <div class="card-header"><div><div class="card-title" style="color:var(--danger);">Danger Zone</div><div class="card-sub">These actions cannot be undone</div></div></div>
             <div style="display:flex;flex-direction:column;gap:.75rem;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
                 <div><div style="font-size:.855rem;font-weight:500;">Clear All Sales</div><div class="form-hint" style="margin:0;">Delete all sales history</div></div>
@@ -347,7 +347,7 @@ function updateEmailStatusCard() {
 
   if (enabled && hasEmail) {
     dot.style.cssText   = 'width:10px;height:10px;border-radius:50%;background:#2dda7f;flex-shrink:0;box-shadow:0 0 0 3px rgba(45,218,127,.2),0 0 8px rgba(45,218,127,.4);transition:all .3s;';
-    title.textContent   = 'Email Alerts: Active ✅';
+    title.textContent   = 'Email Alerts: Active';
     title.style.color   = '#4ade80';
     sub.textContent     = 'Status: Connected — alerts fire automatically';
     const lastRun = cfg.ejsLastRunDate;
@@ -357,7 +357,7 @@ function updateEmailStatusCard() {
       : `<span class="badge badge-info">Will run on next page load</span>`;
   } else if (!enabled) {
     dot.style.cssText   = 'width:10px;height:10px;border-radius:50%;background:#ff4f4f;flex-shrink:0;box-shadow:0 0 0 3px rgba(255,79,79,.15);transition:all .3s;';
-    title.textContent   = 'Email Alerts: Disabled ❌';
+    title.textContent   = 'Email Alerts: Disabled';
     title.style.color   = '#fca5a5';
     sub.textContent     = 'Toggle the switch below and save to enable';
     meta.innerHTML      = '';
@@ -406,7 +406,7 @@ document.getElementById('saveEmailSettingsBtn').addEventListener('click', () => 
     ejsDailySummary: document.getElementById('alertDailySummary').checked,
   });
 
-  showToast('📧 Email alert settings saved!', 'success');
+  showToast('Email alert settings saved!', 'success');
   updateEmailStatusCard();
 });
 
@@ -435,11 +435,11 @@ document.getElementById('sendTestEmailBtn').addEventListener('click', async () =
 
     if (res.ok) {
       result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#4ade80;';
-      result.innerHTML = `✅ <strong>Test email sent!</strong> Check <em>${escapeHtml(email)}</em> — it may take a minute to arrive.`;
-      showToast('📧 Test email delivered!', 'success');
+      result.innerHTML = `<strong>Test email sent!</strong> Check <em>${escapeHtml(email)}</em> — it may take a minute to arrive.`;
+      showToast('Test email delivered!', 'success');
     } else {
       result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
-      result.innerHTML = `❌ <strong>Send failed:</strong> ${escapeHtml(res.error || 'Unknown error. Please try again.')}`;
+      result.innerHTML = `<strong>Send failed:</strong> ${escapeHtml(res.error || 'Unknown error. Please try again.')}`;
       showToast('Test email failed', 'error');
     }
   } catch (e) {
@@ -458,8 +458,8 @@ document.getElementById('enableBrowserNotifBtn').addEventListener('click', async
   }
   const permission = await Notification.requestPermission();
   if (permission === 'granted') {
-    showToast('🔔 Browser notifications enabled!', 'success');
-    new Notification('Invento', { body: '🔔 You will now receive inventory alerts in the browser!', tag: 'stocksense-test' });
+    showToast('Browser notifications enabled!', 'success');
+    new Notification('Invento', { body: 'You will now receive inventory alerts in the browser!', tag: 'stocksense-test' });
   } else {
     showToast('Notification permission denied', 'error');
   }

@@ -1447,3 +1447,19 @@ input:checked + .toggle-slider:before { transform: translateX(20px); background:
 [data-theme="light"] .scanner-footer { border-color: rgba(0,0,0,.1); }
 [data-theme="light"] .scanner-close-btn { background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.15); color: #4a5568; }
 
+/* ── Alert Section Indicators (replacing colored circle emojis) ── */
+.alert-section-indicator {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.alert-section-indicator--danger  { background: var(--danger,  #ef4444); box-shadow: 0 0 6px rgba(239,68,68,.4); }
+.alert-section-indicator--warning { background: var(--warning, #f59e0b); box-shadow: 0 0 6px rgba(245,158,11,.4); }
+.alert-section-indicator--info    { background: var(--accent,  #3b9eff); box-shadow: 0 0 6px rgba(59,158,255,.4); }
+
+/* Toast icon SVG alignment */
+.toast-icon { display:flex; align-items:center; flex-shrink:0; }
+.toast-icon svg { flex-shrink:0; }
+
+
