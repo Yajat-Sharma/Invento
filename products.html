@@ -33,6 +33,7 @@
         <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
           <button class="btn btn-secondary btn-sm" id="importExcelBtn">📥 Import Excel</button>
           <button class="btn btn-secondary btn-sm" id="exportExcelBtn">📤 Export Excel</button>
+          <button class="btn btn-secondary btn-sm" id="printLabelsBtn">🏷️ Print Labels</button>
           <button class="btn btn-primary" id="addProductBtn">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Product
           </button>
@@ -169,6 +170,33 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" id="modalCancel">Cancel</button>
       <button class="btn btn-primary" id="modalSave">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="printLabelsModal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <span class="modal-title">🏷️ Print Product Labels</span>
+      <button class="modal-close" id="printLabelsClose"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;flex-wrap:wrap;gap:.5rem;">
+        <div style="font-size:.82rem;color:var(--text-2);">Select products to print labels for:</div>
+        <div style="display:flex;gap:.5rem;">
+          <button class="btn btn-secondary btn-sm" id="labelSelectAll">Select All</button>
+          <button class="btn btn-secondary btn-sm" id="labelSelectNone">Clear</button>
+        </div>
+      </div>
+      <div class="label-grid" id="labelGrid"></div>
+    </div>
+    <div class="modal-footer">
+      <div style="font-size:.78rem;color:var(--text-3);flex:1;"><span id="labelSelectedCount">0</span> selected</div>
+      <button class="btn btn-secondary" id="printLabelsCancel">Cancel</button>
+      <button class="btn btn-primary" id="printLabelsGo">
+        <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Print Labels
+      </button>
     </div>
   </div>
 </div>
@@ -446,6 +474,107 @@ document.getElementById('modalSave').addEventListener('click', () => {
   if (editingId) { DB.updateProduct(editingId, data); showToast('Product updated!'); }
   else { DB.addProduct({ id: genId('prod'), ...data, createdAt: now() }); showToast('Product added!'); }
   closeModal(); renderProducts();
+});
+</script>
+
+<script>
+// ── Print Labels ──
+let _selectedLabelIds = new Set();
+
+document.getElementById('printLabelsBtn').addEventListener('click', () => {
+  const products = DB.getProducts();
+  if (!products.length) { showToast('No products to print labels for', 'warning'); return; }
+  _selectedLabelIds = new Set(products.map(p => p.id)); // default: all selected
+  renderLabelGrid();
+  document.getElementById('printLabelsModal').classList.add('active');
+});
+
+function renderLabelGrid() {
+  const products = DB.getProducts();
+  const cats = Object.fromEntries(DB.getCategories().map(c => [c.id, c]));
+  const grid = document.getElementById('labelGrid');
+  grid.innerHTML = products.map(p => {
+    const cat = cats[p.categoryId];
+    const es = getExpiryStatus(p.expiryDate);
+    const discActive = isDiscountActive(p);
+    const effPrice = getEffectivePrice(p);
+    const currency = DB.getCurrentShop()?.currency || '₹';
+    const sel = _selectedLabelIds.has(p.id);
+    return `<div class="label-item${sel ? ' selected' : ''}" data-lid="${p.id}" onclick="toggleLabelItem('${p.id}')">
+      <div class="label-item-name">${escapeHtml(p.name)}</div>
+      <div class="label-item-meta">
+        ${cat ? cat.icon + ' ' + escapeHtml(cat.name) + ' &nbsp;·&nbsp; ' : ''}
+        ${currency}${discActive ? Number(effPrice).toLocaleString('en-IN') + ' <span style="text-decoration:line-through;opacity:.6">' + Number(p.sellingPrice).toLocaleString('en-IN') + '</span>' : Number(p.sellingPrice).toLocaleString('en-IN')}
+      </div>
+      <div class="label-item-meta" style="margin-top:.2rem;">
+        Exp: ${formatDate(p.expiryDate)} &nbsp;·&nbsp; <span class="badge ${es.badgeClass}" style="font-size:.65rem;padding:.1rem .4rem;">${es.label}</span>
+      </div>
+      ${p.barcode ? `<div class="label-item-meta" style="font-family:monospace;margin-top:.2rem;">${escapeHtml(p.barcode)}</div>` : ''}
+    </div>`;
+  }).join('');
+  updateLabelCount();
+}
+
+function toggleLabelItem(id) {
+  if (_selectedLabelIds.has(id)) _selectedLabelIds.delete(id);
+  else _selectedLabelIds.add(id);
+  const el = document.querySelector(`[data-lid="${id}"]`);
+  if (el) el.classList.toggle('selected', _selectedLabelIds.has(id));
+  updateLabelCount();
+}
+
+function updateLabelCount() {
+  document.getElementById('labelSelectedCount').textContent = _selectedLabelIds.size;
+}
+
+document.getElementById('labelSelectAll').addEventListener('click', () => {
+  DB.getProducts().forEach(p => _selectedLabelIds.add(p.id));
+  document.querySelectorAll('.label-item').forEach(el => el.classList.add('selected'));
+  updateLabelCount();
+});
+document.getElementById('labelSelectNone').addEventListener('click', () => {
+  _selectedLabelIds.clear();
+  document.querySelectorAll('.label-item').forEach(el => el.classList.remove('selected'));
+  updateLabelCount();
+});
+
+function closePrintLabelsModal() { document.getElementById('printLabelsModal').classList.remove('active'); }
+document.getElementById('printLabelsClose').addEventListener('click', closePrintLabelsModal);
+document.getElementById('printLabelsCancel').addEventListener('click', closePrintLabelsModal);
+
+document.getElementById('printLabelsGo').addEventListener('click', () => {
+  if (!_selectedLabelIds.size) { showToast('Select at least one product to print', 'warning'); return; }
+  const products = DB.getProducts().filter(p => _selectedLabelIds.has(p.id));
+  const shop = DB.getCurrentShop();
+  const currency = shop?.currency || '₹';
+
+  // Remove previous sheet
+  let sheet = document.getElementById('printLabelsSheet');
+  if (sheet) sheet.remove();
+
+  sheet = document.createElement('div');
+  sheet.id = 'printLabelsSheet';
+  sheet.className = 'print-labels-sheet';
+  sheet.innerHTML = products.map(p => {
+    const discActive = isDiscountActive(p);
+    const effPrice = getEffectivePrice(p);
+    return `<div class="print-label-card">
+      <div class="plc-name">${escapeHtml(p.name)}</div>
+      <div class="plc-price">${currency}${Number(effPrice).toLocaleString('en-IN')}</div>
+      ${discActive ? `<div class="plc-orig">MRP: ${currency}${Number(p.sellingPrice).toLocaleString('en-IN')}</div>` : ''}
+      <div class="plc-expiry">Exp: ${formatDate(p.expiryDate)}</div>
+      ${p.barcode ? `<div class="plc-barcode">${escapeHtml(p.barcode)}</div>` : ''}
+      <div class="plc-shop">${escapeHtml(shop?.name || 'Invento')}</div>
+    </div>`;
+  }).join('');
+  document.body.appendChild(sheet);
+
+  closePrintLabelsModal();
+  document.body.classList.add('printing-labels');
+  setTimeout(() => {
+    window.print();
+    document.body.classList.remove('printing-labels');
+  }, 150);
 });
 </script>
 </body>

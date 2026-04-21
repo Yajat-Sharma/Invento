@@ -549,7 +549,63 @@ function initPage(pageName) {
     // EmailJS per-product alerts — run silently in background
     setTimeout(() => EmailJSEngine.run(), 3000);
   }
+  // Inject Quick Actions FAB (skip on login/signup/landing/shop-select)
+  const noFabPages = ['login', 'signup', 'landing', 'shop-select'];
+  if (!noFabPages.includes(pageName)) {
+    initQuickFAB(pageName);
+  }
 }
+
+// ── Quick Actions FAB ─────────────────────────────────────────
+function initQuickFAB(activePage) {
+  // Don't duplicate
+  if (document.getElementById('quickFab')) return;
+
+  const items = [
+    { icon: '📦', label: 'Add Product',    href: 'products.html',   page: 'products'  },
+    { icon: '💰', label: 'Record Sale',    href: 'sales.html',      page: 'sales'     },
+    { icon: '🔔', label: 'View Alerts',    href: 'alerts.html',     page: 'alerts'    },
+    { icon: '📊', label: 'View Reports',   href: 'reports.html',    page: 'reports'   },
+  ].filter(i => i.page !== activePage); // hide link to current page
+
+  const itemsHTML = items.map(i => `
+    <a href="${i.href}" class="fab-item" title="${i.label}">
+      <span class="fab-item-label">${i.label}</span>
+      <span class="fab-item-icon">${i.icon}</span>
+    </a>`).join('');
+
+  // Backdrop (click outside to close)
+  const backdrop = document.createElement('div');
+  backdrop.className = 'fab-backdrop';
+  backdrop.id = 'fabBackdrop';
+  document.body.appendChild(backdrop);
+
+  // FAB container
+  const fab = document.createElement('div');
+  fab.className = 'quick-fab';
+  fab.id = 'quickFab';
+  fab.innerHTML = `
+    <button class="fab-main" id="fabMainBtn" title="Quick Actions" aria-label="Quick Actions">
+      <span class="fab-main-icon">＋</span>
+    </button>
+    <div class="fab-menu" id="fabMenu">${itemsHTML}</div>`;
+  document.body.appendChild(fab);
+
+  let isOpen = false;
+  function openFab()  { isOpen = true;  fab.classList.add('open');    backdrop.classList.add('visible'); }
+  function closeFab() { isOpen = false; fab.classList.remove('open'); backdrop.classList.remove('visible'); }
+  function toggleFab() { isOpen ? closeFab() : openFab(); }
+
+  document.getElementById('fabMainBtn').addEventListener('click', e => { e.stopPropagation(); toggleFab(); });
+  backdrop.addEventListener('click', closeFab);
+
+  // Close on any fab item click
+  fab.querySelectorAll('.fab-item').forEach(el => el.addEventListener('click', closeFab));
+
+  // Keyboard: Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && isOpen) closeFab(); });
+}
+
 
 // ══════════════════════════════════════════════════════════════
 // NOTIFICATION ENGINE  (Google Apps Script + Browser Notifs)
