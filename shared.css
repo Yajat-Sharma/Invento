@@ -1240,3 +1240,210 @@ input:checked + .toggle-slider:before { transform: translateX(20px); background:
   .plc-barcode { font-size: 8pt; color: #888; font-family: monospace; margin-top: 2px; letter-spacing: .1em; }
   .plc-shop  { font-size: 7pt; color: #aaa; margin-top: 3px; border-top: 1px solid #eee; padding-top: 2px; }
 }
+
+/* ══════════════════════════════════
+   CAMERA SCANNER MODAL
+══════════════════════════════════ */
+
+.scanner-modal-box {
+  background: linear-gradient(160deg, #13161e 0%, #0e1117 100%);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.04);
+  width: min(480px, 96vw);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: scannerSlideIn .25s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes scannerSlideIn {
+  from { opacity:0; transform:translateY(18px) scale(.97); }
+  to   { opacity:1; transform:translateY(0)    scale(1);   }
+}
+
+.scanner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem .85rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.scanner-title {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .95rem;
+  font-weight: 700;
+  color: #e8ecf5;
+  letter-spacing: .02em;
+}
+.scanner-close-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  color: #7d8a9a;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .13s;
+}
+.scanner-close-btn:hover {
+  background: rgba(255,79,79,.15);
+  border-color: rgba(255,79,79,.3);
+  color: #ff4f4f;
+}
+
+.scanner-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3.5rem 2rem;
+  color: #5c6a7a;
+  font-size: .85rem;
+}
+.scanner-spinner {
+  width: 36px; height: 36px;
+  border: 3px solid rgba(59,158,255,.15);
+  border-top-color: #3b9eff;
+  border-radius: 50%;
+  animation: scanSpin .8s linear infinite;
+}
+@keyframes scanSpin { to { transform: rotate(360deg); } }
+
+.scanner-viewport {
+  position: relative;
+  background: #000;
+  overflow: hidden;
+  min-height: 220px;
+}
+.scanner-viewport video {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  object-fit: cover;
+}
+
+/* Suppress html5-qrcode's own UI chrome */
+#html5-qrcode-region > img,
+#html5-qrcode-region button,
+#html5-qrcode-region select,
+#html5-qrcode-region a[href] { display: none !important; }
+#html5-qrcode-region__dashboard { display: none !important; }
+#html5-qrcode-region__scan_region > img { display: none !important; }
+
+/* Aiming frame */
+.scanner-frame {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+.sf-corner {
+  position: absolute;
+  width: 22px; height: 22px;
+  border-color: rgba(59,158,255,.9);
+  border-style: solid;
+  transition: border-color .15s;
+}
+.sf-tl { top: calc(50% - 75px); left:  calc(50% - 105px); border-width: 3px 0 0 3px; border-radius: 4px 0 0 0; }
+.sf-tr { top: calc(50% - 75px); right: calc(50% - 105px); border-width: 3px 3px 0 0; border-radius: 0 4px 0 0; }
+.sf-bl { top: calc(50% + 53px); left:  calc(50% - 105px); border-width: 0 0 3px 3px; border-radius: 0 0 0 4px; }
+.sf-br { top: calc(50% + 53px); right: calc(50% - 105px); border-width: 0 3px 3px 0; border-radius: 0 0 4px 0; }
+
+.sf-scanline {
+  position: absolute;
+  left:  calc(50% - 105px);
+  width: 210px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,158,255,.95), transparent);
+  box-shadow: 0 0 8px rgba(59,158,255,.7);
+  border-radius: 2px;
+  animation: sfScan 1.8s ease-in-out infinite;
+}
+@keyframes sfScan {
+  0%   { top: calc(50% - 75px); opacity:.9; }
+  50%  { top: calc(50% + 55px); opacity:.7; }
+  100% { top: calc(50% - 75px); opacity:.9; }
+}
+
+.scanner-frame.frame-success .sf-corner {
+  border-color: #2dda7f;
+}
+.scanner-frame.frame-success .sf-scanline {
+  background: linear-gradient(90deg, transparent, rgba(45,218,127,.95), transparent);
+  box-shadow: 0 0 12px rgba(45,218,127,.8);
+  animation: none;
+  top: 50%;
+  opacity: 1;
+}
+
+.scanner-status {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .65rem 1.25rem;
+  font-size: .82rem;
+  color: #5c6a7a;
+  background: rgba(0,0,0,.3);
+  border-top: 1px solid rgba(255,255,255,.05);
+  min-height: 42px;
+}
+.scanner-status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #374151;
+  flex-shrink: 0;
+  transition: background .2s, box-shadow .2s;
+}
+.scanner-status-dot.dot-active  {
+  background: #3b9eff;
+  box-shadow: 0 0 6px rgba(59,158,255,.6);
+  animation: dotPulse .9s ease-in-out infinite;
+}
+.scanner-status-dot.dot-success { background: #2dda7f; box-shadow: 0 0 6px rgba(45,218,127,.6); }
+.scanner-status-dot.dot-error   { background: #ff4f4f; box-shadow: 0 0 6px rgba(255,79,79,.6);  }
+
+@keyframes dotPulse {
+  0%,100% { opacity:1; transform:scale(1);   }
+  50%      { opacity:.5; transform:scale(.75); }
+}
+
+.scanner-error {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .85rem;
+  padding: 2.5rem 2rem;
+  color: #5c6a7a;
+  text-align: center;
+}
+.scanner-error svg { opacity: .45; }
+.scanner-error p { font-size: .88rem; line-height: 1.6; max-width: 300px; margin: 0; color: #7d8a9a; }
+
+.scanner-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .85rem 1.25rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+  gap: 1rem;
+}
+
+/* Light mode overrides */
+[data-theme="light"] .scanner-modal-box {
+  background: linear-gradient(160deg, #f0f2f7 0%, #e8ecf4 100%);
+  border-color: rgba(0,0,0,.1);
+}
+[data-theme="light"] .scanner-title { color: #1a2030; }
+[data-theme="light"] .scanner-status { background: rgba(0,0,0,.04); color: #4a5568; }
+[data-theme="light"] .scanner-header,
+[data-theme="light"] .scanner-footer { border-color: rgba(0,0,0,.1); }
+[data-theme="light"] .scanner-close-btn { background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.15); color: #4a5568; }
+

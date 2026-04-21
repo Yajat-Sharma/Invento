@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="auth.js"></script><script>requireAuth();</script>
 </head>
 <body>
@@ -114,11 +115,24 @@
             <select class="form-control" id="fSupplier"><option value="">Select supplier…</option></select>
           </div>
           <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">Barcode (optional)</label>
-            <div style="position:relative;">
-              <input type="text" class="form-control barcode-input" id="fBarcode" placeholder="Scan or type barcode…" autocomplete="off">
-              <span style="position:absolute;right:.85rem;top:50%;transform:translateY(-50%);font-size:.75rem;color:var(--text-3);">📷 Scan</span>
+            <label class="form-label">Barcode / Product Code <span style="font-weight:400;color:var(--text-3);font-size:.8rem;">(optional)</span></label>
+            <div style="display:flex;gap:.5rem;align-items:stretch;">
+              <input type="text" class="form-control barcode-input" id="fBarcode"
+                     placeholder="Type or scan barcode / QR code…"
+                     autocomplete="off" maxlength="50"
+                     style="flex:1;font-family:'Share Tech Mono',monospace;letter-spacing:.06em;">
+              <button type="button" class="btn btn-secondary" id="openScannerBtn"
+                      style="flex-shrink:0;gap:.4rem;white-space:nowrap;"
+                      title="Open camera to scan barcode or QR code">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Scan Code
+              </button>
             </div>
+            <div class="form-hint" style="margin-top:.35rem;">Supports QR codes, EAN-13, EAN-8, Code-128 and all standard barcodes.</div>
           </div>
           <div class="form-group">
             <label class="form-label">Quantity <span class="req">*</span></label>
@@ -198,6 +212,74 @@
         Print Labels
       </button>
     </div>
+  </div>
+</div>
+
+<!-- ══ Camera Scanner Modal ══ -->
+<div class="modal-overlay" id="scannerModal" style="z-index:1100;">
+  <div class="scanner-modal-box">
+
+    <!-- Header -->
+    <div class="scanner-header">
+      <div class="scanner-title">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Scan Barcode / QR Code
+      </div>
+      <button class="scanner-close-btn" id="closeScannerBtn" title="Close">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24">
+          <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Camera loading state -->
+    <div class="scanner-loading" id="scannerLoading">
+      <div class="scanner-spinner"></div>
+      <span>Starting camera…</span>
+    </div>
+
+    <!-- Viewfinder -->
+    <div class="scanner-viewport" id="scannerViewport">
+      <div id="html5-qrcode-region"></div>
+      <!-- Aiming frame overlay -->
+      <div class="scanner-frame" id="scannerFrame">
+        <span class="sf-corner sf-tl"></span>
+        <span class="sf-corner sf-tr"></span>
+        <span class="sf-corner sf-bl"></span>
+        <span class="sf-corner sf-br"></span>
+        <div class="sf-scanline"></div>
+      </div>
+    </div>
+
+    <!-- Status bar -->
+    <div class="scanner-status" id="scannerStatus">
+      <div class="scanner-status-dot" id="scannerStatusDot"></div>
+      <span id="scannerStatusText">Point camera at a barcode or QR code</span>
+    </div>
+
+    <!-- Error state -->
+    <div class="scanner-error" id="scannerError" style="display:none;">
+      <svg width="32" height="32" fill="none" viewBox="0 0 24 24">
+        <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"
+              stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 13v-2m0 4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <p id="scannerErrorMsg">Camera access required for scanning.</p>
+      <button class="btn btn-secondary btn-sm" id="retryScanner">Try Again</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="scanner-footer">
+      <div style="font-size:.78rem;color:var(--text-3);">
+        📱 Use rear camera for best results &nbsp;·&nbsp; Auto-stops after scan
+      </div>
+      <button class="btn btn-secondary btn-sm" id="closeScannerFooter">Cancel</button>
+    </div>
+
   </div>
 </div>
 
@@ -475,6 +557,266 @@ document.getElementById('modalSave').addEventListener('click', () => {
   else { DB.addProduct({ id: genId('prod'), ...data, createdAt: now() }); showToast('Product added!'); }
   closeModal(); renderProducts();
 });
+</script>
+
+<script>
+// ════════════════════════════════════════════════════════
+// CAMERA SCANNER ENGINE
+// Uses html5-qrcode library (already loaded from CDN)
+// ════════════════════════════════════════════════════════
+
+(function() {
+  'use strict';
+
+  // ── Config ───────────────────────────────────────────
+  const MAX_CODE_LEN = 50; // accept all standard barcodes
+  const SCAN_BEEP_FREQ = 880;
+  const SCAN_BEEP_MS   = 120;
+
+  // ── State ────────────────────────────────────────────
+  let scanner  = null;
+  let scanning = false;
+  let lastScan = '';
+
+  // ── DOM refs (resolved lazily) ────────────────────────
+  const $ = id => document.getElementById(id);
+
+  // ── Open modal ───────────────────────────────────────
+  function openScanner() {
+    // Reset UI into loading state
+    $('scannerLoading').style.display  = 'flex';
+    $('scannerViewport').style.display = 'none';
+    $('scannerError').style.display    = 'none';
+    $('scannerFrame').style.display    = 'none';
+    setStatus('idle', 'Starting camera…');
+    $('scannerModal').classList.add('active');
+    // Small delay to let modal animation play before we init camera
+    setTimeout(startScanner, 350);
+  }
+
+  // ── Start html5-qrcode ───────────────────────────────
+  async function startScanner() {
+    if (scanning) return;
+
+    // Clean up any leftover instance
+    await destroyScanner();
+
+    // Guard: library loaded?
+    if (typeof Html5Qrcode === 'undefined') {
+      showError('Scanner library failed to load. Please refresh the page.');
+      return;
+    }
+
+    try {
+      scanner = new Html5Qrcode('html5-qrcode-region', {
+        verbose: false,
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.CODE_93,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+          Html5QrcodeSupportedFormats.AZTEC,
+          Html5QrcodeSupportedFormats.DATA_MATRIX,
+        ]
+      });
+
+      const qrConfig = {
+        fps: 12,
+        qrbox: { width: 240, height: 180 },
+        aspectRatio: 1.6,
+        disableFlip: false,
+      };
+
+      await scanner.start(
+        { facingMode: 'environment' }, // rear camera preferred
+        qrConfig,
+        onScanSuccess,
+        onScanError
+      );
+
+      scanning = true;
+
+      // Hide loading, show viewfinder
+      $('scannerLoading').style.display  = 'none';
+      $('scannerViewport').style.display = 'block';
+      $('scannerFrame').style.display    = 'flex';
+      setStatus('active', 'Point camera at a barcode or QR code');
+
+    } catch (err) {
+      const msg = err?.message || String(err);
+      if (msg.includes('permission') || msg.includes('NotAllowed') || msg.includes('denied')) {
+        showError('Camera access was denied. Please allow camera access in your browser settings and try again.');
+      } else if (msg.includes('NotFound') || msg.includes('no camera')) {
+        showError('No camera found on this device. Use manual entry below.');
+      } else {
+        showError('Could not start camera. ' + msg);
+      }
+    }
+  }
+
+  // ── Scan success callback ─────────────────────────────
+  function onScanSuccess(rawCode) {
+    // Deduplicate rapid fires
+    if (rawCode === lastScan) return;
+    lastScan = rawCode;
+
+    const code = rawCode.trim();
+
+    if (!code) return;
+    if (code.length > MAX_CODE_LEN) {
+      setStatus('error', `Code too long (${code.length} chars). Try again.`);
+      setTimeout(() => setStatus('active', 'Point camera at a barcode or QR code'), 1800);
+      lastScan = '';
+      return;
+    }
+
+    // ✅ Valid scan
+    playBeep();
+    flashFrame();
+
+    // Fill input
+    const barcodeInput = $('fBarcode');
+    if (barcodeInput) {
+      barcodeInput.value = code;
+      barcodeInput.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // Animate status
+    setStatus('success', `✓ Scanned: ${code.length > 28 ? code.slice(0, 25) + '…' : code}`);
+
+    // Auto-close after short delay
+    setTimeout(() => {
+      closeScanner();
+      showToast('Code scanned: ' + (code.length > 20 ? code.slice(0,18)+'…' : code), 'success');
+    }, 500);
+  }
+
+  // ── Scan error callback (fires continuously — suppress logs) ─
+  function onScanError() { /* intentionally silent */ }
+
+  // ── Destroy scanner instance ──────────────────────────
+  async function destroyScanner() {
+    if (!scanner) return;
+    try {
+      if (scanning) await scanner.stop();
+    } catch (_) { /* ignore */ }
+    try { scanner.clear(); } catch (_) { /* ignore */ }
+    scanner  = null;
+    scanning = false;
+    lastScan = '';
+    // Wipe the region element so html5-qrcode can re-init cleanly
+    const region = $('html5-qrcode-region');
+    if (region) region.innerHTML = '';
+  }
+
+  // ── Close modal ───────────────────────────────────────
+  async function closeScanner() {
+    await destroyScanner();
+    $('scannerModal').classList.remove('active');
+    $('scannerLoading').style.display  = 'flex';
+    $('scannerViewport').style.display = 'none';
+    $('scannerError').style.display    = 'none';
+    $('scannerFrame').style.display    = 'none';
+  }
+
+  // ── Status helpers ────────────────────────────────────
+  function setStatus(state, text) {
+    const dot = $('scannerStatusDot');
+    const txt = $('scannerStatusText');
+    if (txt) txt.textContent = text;
+    if (dot) {
+      dot.className = 'scanner-status-dot';
+      if (state === 'active')  dot.classList.add('dot-active');
+      if (state === 'success') dot.classList.add('dot-success');
+      if (state === 'error')   dot.classList.add('dot-error');
+    }
+  }
+
+  function showError(msg) {
+    $('scannerLoading').style.display  = 'none';
+    $('scannerViewport').style.display = 'none';
+    $('scannerError').style.display    = 'flex';
+    $('scannerErrorMsg').textContent   = msg;
+    setStatus('error', 'Camera unavailable');
+  }
+
+  // ── Visual feedback ───────────────────────────────────
+  function flashFrame() {
+    const frame = $('scannerFrame');
+    if (!frame) return;
+    frame.classList.add('frame-success');
+    setTimeout(() => frame.classList.remove('frame-success'), 600);
+  }
+
+  // ── Audio beep (tiny, optional) ───────────────────────
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = SCAN_BEEP_FREQ;
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + SCAN_BEEP_MS / 1000);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + SCAN_BEEP_MS / 1000);
+    } catch (_) { /* audio not supported — no-op */ }
+  }
+
+  // ── Event bindings ────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    // Open scanner button
+    document.getElementById('openScannerBtn')?.addEventListener('click', openScanner);
+
+    // Close buttons
+    document.getElementById('closeScannerBtn')?.addEventListener('click', closeScanner);
+    document.getElementById('closeScannerFooter')?.addEventListener('click', closeScanner);
+
+    // Retry button
+    document.getElementById('retryScanner')?.addEventListener('click', async () => {
+      $('scannerError').style.display    = 'none';
+      $('scannerLoading').style.display  = 'flex';
+      setStatus('idle', 'Starting camera…');
+      await destroyScanner();
+      setTimeout(startScanner, 200);
+    });
+
+    // Click backdrop to close
+    document.getElementById('scannerModal')?.addEventListener('click', e => {
+      if (e.target === document.getElementById('scannerModal')) closeScanner();
+    });
+
+    // Keyboard: Escape
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && $('scannerModal')?.classList.contains('active')) {
+        closeScanner();
+      }
+    });
+  });
+
+  // Guard: if DOMContentLoaded already fired (script at end of body)
+  if (document.readyState !== 'loading') {
+    document.getElementById('openScannerBtn')?.addEventListener('click', openScanner);
+    document.getElementById('closeScannerBtn')?.addEventListener('click', closeScanner);
+    document.getElementById('closeScannerFooter')?.addEventListener('click', closeScanner);
+    document.getElementById('retryScanner')?.addEventListener('click', async () => {
+      $('scannerError').style.display    = 'none';
+      $('scannerLoading').style.display  = 'flex';
+      setStatus('idle', 'Starting camera…');
+      await destroyScanner();
+      setTimeout(startScanner, 200);
+    });
+    document.getElementById('scannerModal')?.addEventListener('click', e => {
+      if (e.target === document.getElementById('scannerModal')) closeScanner();
+    });
+  }
+
+})();
 </script>
 
 <script>
