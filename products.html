@@ -9,10 +9,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="auth.js"></script><script>requireAuth();</script>
 </head>
 <body>
+<div class="initial-loader-overlay" id="initialLoader">
+  <div class="initial-spinner"></div>
+  <div style="font-size:0.9rem;color:var(--text-2);font-weight:600;">Loading Invento...</div>
+</div>
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="app-layout">
   <aside class="sidebar" id="sidebar"></aside>
@@ -99,7 +102,20 @@
         <div class="form-grid">
           <div class="form-group" style="grid-column:1/-1">
             <label class="form-label">Product Name <span class="req">*</span></label>
-            <input type="text" class="form-control" id="fName" placeholder="e.g. Amul Full Cream Milk 500ml">
+            <div style="display:flex;gap:.5rem;align-items:stretch;">
+              <input type="text" class="form-control" id="fName" placeholder="e.g. Amul Full Cream Milk 500ml" style="flex:1;">
+              <button type="button" class="btn btn-secondary" id="openOcrBtn"
+                      style="flex-shrink:0;gap:.4rem;white-space:nowrap;"
+                      title="Capture a photo and auto-detect product name using OCR">
+                <svg width="15" height="15" fill="none" viewBox="0 0 24 24">
+                  <path d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <polyline points="13 3 21 3 21 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M11 13L21 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Scan Name
+              </button>
+            </div>
+            <div class="form-hint" style="margin-top:.3rem;">Point camera at a product label to auto-fill the name using text recognition.</div>
             <div class="field-error" id="fNameErr">Product name is required.</div>
           </div>
           <div class="form-group">
@@ -280,6 +296,44 @@
       <button class="btn btn-secondary btn-sm" id="closeScannerFooter">Cancel</button>
     </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ══ OCR Modal ══ -->
+<div class="modal-overlay" id="ocrModal" style="z-index:1100;">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title">Scan Product Name</span>
+      <button class="modal-close" id="ocrCloseBtn"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body" style="text-align:center;">
+      <div id="ocrUploadView">
+        <label for="ocrPhotoInput" class="btn btn-primary" style="display:inline-flex;cursor:pointer;margin-bottom:1rem;">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/></svg>
+          Take Photo or Upload Image
+        </label>
+        <input type="file" id="ocrPhotoInput" accept="image/*" capture="environment" style="display:none;">
+        <p style="font-size:0.8rem;color:var(--text-3);">Point the camera clearly at the product name.</p>
+      </div>
+      
+      <div id="ocrProcessingView" style="display:none;">
+        <img id="ocrPreviewImg" style="max-width:100%;max-height:200px;border-radius:8px;margin-bottom:1rem;border:1px solid var(--border);">
+        <div style="font-weight:600;margin-bottom:0.5rem;" id="ocrStatusText">Processing image...</div>
+        <div style="width:100%;background:var(--border);height:6px;border-radius:3px;overflow:hidden;margin-bottom:1rem;">
+          <div id="ocrProgressBar" style="width:0%;height:100%;background:var(--accent);transition:width 0.2s;"></div>
+        </div>
+      </div>
+      
+      <div id="ocrResultView" style="display:none;">
+        <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:0.5rem;">Detected Text:</p>
+        <div id="ocrResultText" style="padding:0.75rem;background:rgba(255,255,255,0.05);border-radius:6px;font-family:monospace;font-size:0.9rem;word-break:break-word;max-height:120px;overflow-y:auto;border:1px solid var(--border);margin-bottom:1rem;"></div>
+      </div>
+    </div>
+    <div class="modal-footer" id="ocrFooter" style="display:none;">
+      <button class="btn btn-secondary" id="ocrRetryBtn">Try Again</button>
+      <button class="btn btn-primary" id="ocrApplyBtn">Use this Name</button>
+    </div>
   </div>
 </div>
 
@@ -601,10 +655,21 @@ document.getElementById('modalSave').addEventListener('click', () => {
     // Clean up any leftover instance
     await destroyScanner();
 
-    // Guard: library loaded?
+    // Dynamically load library if not present
     if (typeof Html5Qrcode === 'undefined') {
-      showError('Scanner library failed to load. Please refresh the page.');
-      return;
+      setStatus('idle', 'Loading scanner library…');
+      try {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Failed to load scanner library'));
+          document.head.appendChild(script);
+        });
+      } catch (err) {
+        showError('Scanner library failed to load. Please check your connection and try again.');
+        return;
+      }
     }
 
     try {
@@ -918,6 +983,143 @@ document.getElementById('printLabelsGo').addEventListener('click', () => {
     document.body.classList.remove('printing-labels');
   }, 150);
 });
+
+// Hide the loader once page is ready
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const loader = document.getElementById('initialLoader');
+    if (loader) {
+      loader.classList.add('hidden');
+      setTimeout(() => loader.remove(), 500);
+    }
+  }, 100);
+});
 </script>
+
+<script>
+// ── OCR Scanner (Tesseract.js) Lazy Loading ──
+(function() {
+  const ocrModal = document.getElementById('ocrModal');
+  const ocrBtn = document.getElementById('openOcrBtn');
+  const ocrCloseBtn = document.getElementById('ocrCloseBtn');
+  const ocrPhotoInput = document.getElementById('ocrPhotoInput');
+  
+  const vUpload = document.getElementById('ocrUploadView');
+  const vProcess = document.getElementById('ocrProcessingView');
+  const vResult = document.getElementById('ocrResultView');
+  const ocrFooter = document.getElementById('ocrFooter');
+  
+  const ocrPreviewImg = document.getElementById('ocrPreviewImg');
+  const ocrStatusText = document.getElementById('ocrStatusText');
+  const ocrProgressBar = document.getElementById('ocrProgressBar');
+  const ocrResultText = document.getElementById('ocrResultText');
+  
+  const ocrRetryBtn = document.getElementById('ocrRetryBtn');
+  const ocrApplyBtn = document.getElementById('ocrApplyBtn');
+  
+  let detectedName = '';
+
+  function resetOcrUI() {
+    vUpload.style.display = 'block';
+    vProcess.style.display = 'none';
+    vResult.style.display = 'none';
+    ocrFooter.style.display = 'none';
+    ocrPhotoInput.value = '';
+    ocrProgressBar.style.width = '0%';
+    detectedName = '';
+  }
+
+  function openOcr() {
+    resetOcrUI();
+    ocrModal.classList.add('active');
+    
+    // Lazy load tesseract if not loaded
+    if (typeof Tesseract === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      document.head.appendChild(script);
+    }
+  }
+
+  function closeOcr() {
+    ocrModal.classList.remove('active');
+  }
+
+  ocrBtn?.addEventListener('click', openOcr);
+  ocrCloseBtn?.addEventListener('click', closeOcr);
+  ocrModal?.addEventListener('click', e => { if (e.target === ocrModal) closeOcr(); });
+
+  ocrPhotoInput?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      ocrPreviewImg.src = ev.target.result;
+      vUpload.style.display = 'none';
+      vProcess.style.display = 'block';
+      runOcr(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  async function runOcr(imageSrc) {
+    if (typeof Tesseract === 'undefined') {
+      showToast('Loading OCR engine... Please wait a moment and try again.', 'info');
+      resetOcrUI();
+      return;
+    }
+
+    try {
+      ocrStatusText.textContent = 'Initializing engine...';
+      const result = await Tesseract.recognize(imageSrc, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            ocrStatusText.textContent = 'Scanning text...';
+            ocrProgressBar.style.width = (m.progress * 100) + '%';
+          }
+        }
+      });
+      
+      ocrProgressBar.style.width = '100%';
+      let text = result.data.text.trim();
+      
+      if (text) {
+        // Clean up common OCR noise
+        text = text.replace(/[\r\n]+/g, ' ').replace(/\s{2,}/g, ' ');
+        // Get just the first line/segment for a product name or limit length
+        if (text.length > 50) text = text.substring(0, 50) + '...';
+        
+        detectedName = text;
+        ocrResultText.textContent = detectedName;
+        vProcess.style.display = 'none';
+        vResult.style.display = 'block';
+        ocrFooter.style.display = 'flex';
+        showToast('Text extracted successfully!', 'success');
+      } else {
+        throw new Error("No text detected");
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Could not read text. Please try again with a clearer photo.', 'error');
+      resetOcrUI();
+    }
+  }
+
+  ocrRetryBtn?.addEventListener('click', resetOcrUI);
+  
+  ocrApplyBtn?.addEventListener('click', () => {
+    if (detectedName) {
+      document.getElementById('fName').value = detectedName;
+      // remove error class if present
+      document.getElementById('fName').classList.remove('error');
+      document.getElementById('fNameErr').classList.remove('visible');
+    }
+    closeOcr();
+  });
+})();
+</script>
+
 </body>
 </html>

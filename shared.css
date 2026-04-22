@@ -1462,4 +1462,118 @@ input:checked + .toggle-slider:before { transform: translateX(20px); background:
 .toast-icon { display:flex; align-items:center; flex-shrink:0; }
 .toast-icon svg { flex-shrink:0; }
 
+/* ══════════════════════════════════
+   MOBILE RESPONSIVE TWEAKS & UX
+══════════════════════════════════ */
 
+/* Global Mobile Fixes */
+@media (max-width: 768px) {
+  /* Fix horizontal overflow on body */
+  body, .app-layout {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* Tables horizontally scrollable but no body scroll */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    display: block;
+  }
+  
+  /* Touch-friendly buttons */
+  .btn, .icon-btn, .sidebar-toggle {
+    min-height: 44px; /* iOS Human Interface Guidelines minimum touch target */
+  }
+  
+  /* Modals must fit screen and scroll internally */
+  .modal {
+    max-height: 90vh;
+    max-width: 95vw;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-body {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+  }
+  
+  /* Form Grids collapse to 1 column */
+  .form-grid, .grid-2, .grid-3 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Make topbar inputs flex correctly */
+  .topbar-search {
+    width: 100%;
+    max-width: 180px;
+  }
+  
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  /* Flex direction for toolbars */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .table-toolbar select {
+    flex: 1;
+  }
+}
+
+/* ══════════════════════════════════
+   SKELETON LOADER STATE
+══════════════════════════════════ */
+.skeleton-loader {
+  display: block;
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(90deg, var(--metal-2) 25%, var(--metal-3) 50%, var(--metal-2) 75%);
+  background-size: 200% 100%;
+  animation: skeletonLoad 1.5s infinite;
+  border-radius: var(--r-sm);
+  margin-bottom: 0.5rem;
+}
+
+@keyframes skeletonLoad {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.initial-loader-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--panel);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.initial-loader-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.initial-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--metal-3);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

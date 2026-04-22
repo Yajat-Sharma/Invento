@@ -551,8 +551,8 @@ function initPage(pageName) {
   if (!sessionStorage.getItem('stocksense_notif_checked')) {
     sessionStorage.setItem('stocksense_notif_checked', '1');
     setTimeout(() => NotifEngine.checkAndNotify(), 1500);
-    // EmailJS per-product alerts — run silently in background
-    setTimeout(() => EmailJSEngine.run(), 3000);
+    // EmailJS per-product alerts — run silently in background (DISABLED FOR MOBILE PERF)
+    // setTimeout(() => EmailJSEngine.run(), 3000);
   }
   // Inject Quick Actions FAB (skip on login/signup/landing/shop-select)
   const noFabPages = ['login', 'signup', 'landing', 'shop-select'];
