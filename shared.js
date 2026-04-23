@@ -908,7 +908,8 @@ const EmailJSEngine = {
     const saved    = s.ejsConfig || {};
     const defaults = {
       ejsServiceId:  'service_ydqwptg',
-      ejsTemplateId: 'template_73kfz4a',
+      ejsTemplateAlert: 'template_73kfz4a',
+      ejsTemplateSummary: 'template_abcd123',
       ejsPublicKey:  'erxLyJs0D_TClA-j2',
     };
     return { ...defaults, ...saved };
@@ -994,7 +995,7 @@ const EmailJSEngine = {
         action_link:  (typeof location !== 'undefined') ? location.origin + '/alerts.html' : 'Invento → Alerts',
       };
 
-      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateId, params);
+      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateAlert, params);
       return { ok: result.status === 200, status: result.status };
     } catch (err) {
       return { ok: false, error: err?.text || err?.message || String(err) };
@@ -1009,7 +1010,7 @@ const EmailJSEngine = {
     // Guard: must be configured and enabled
     if (!cfg.ejsEnabled)    return { skipped: 'EmailJS disabled' };
     if (!cfg.ejsServiceId)  return { skipped: 'No Service ID' };
-    if (!cfg.ejsTemplateId) return { skipped: 'No Template ID' };
+    if (!cfg.ejsTemplateAlert) return { skipped: 'No Alert Template ID' };
     if (!cfg.ejsPublicKey)  return { skipped: 'No Public Key' };
 
     const products = DB.getProducts();
@@ -1094,7 +1095,112 @@ const EmailJSEngine = {
         sent_at:        new Date().toLocaleString('en-IN'),
         action_link:    (typeof location !== 'undefined') ? location.origin + '/alerts.html' : 'Invento → Alerts',
       };
-      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateId, params);
+      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateAlert, params);
+      return { ok: result.status === 200, status: result.status };
+    } catch (err) {
+      return { ok: false, error: err?.text || err?.message || String(err) };
+    }
+  },
+
+  // ── Send Full Inventory Summary Email ────────────────────────
+  async sendInventorySummary() {
+    const cfg = this.getConfig();
+    const loaded = await this._ensureSDK();
+    if (!loaded) return { ok: false, error: 'EmailJS SDK failed to load' };
+
+    try {
+      emailjs.init({ publicKey: cfg.ejsPublicKey });
+      const shop = DB.getCurrentShop();
+      const products = DB.getProducts();
+
+      let totalQty = 0;
+      let totalValue = 0;
+      let expiredCount = 0;
+      let expSoonCount = 0;
+      let warningCount = 0;
+      let lowStockCount = 0;
+      let outOfStockCount = 0;
+
+      let tableRows = '';
+
+      products.forEach(p => {
+        const qty = Number(p.quantity || 0);
+        const minStock = Number(p.minStockLevel || 0);
+        totalQty += qty;
+        totalValue += qty * Number(p.costPrice || p.sellingPrice || 0);
+
+        const es = getExpiryStatus(p.expiryDate);
+        if (es.status === 'expired') expiredCount++;
+        else if (es.status === 'expiring') expSoonCount++;
+        else if (es.status === 'warning') warningCount++;
+
+        if (qty === 0) outOfStockCount++;
+        else if (qty <= minStock && minStock > 0) lowStockCount++;
+
+        // Status logic for table as requested
+        let rowStatus = 'In Stock';
+        let rowStatusColor = '#22c55e'; // green
+
+        if (es.status === 'expired') {
+          rowStatus = 'Expired';
+          rowStatusColor = '#ef4444'; // red
+        } else if (qty <= minStock && minStock > 0 || qty === 0) {
+          rowStatus = 'Low Stock';
+          rowStatusColor = '#f59e0b'; // orange
+        }
+
+        tableRows += `
+          <tr style="border-bottom: 1px solid #e5e7eb;">
+            <td style="padding: 10px; font-family: sans-serif; font-size: 14px; color: #111827;">${escapeHtml(p.name)}</td>
+            <td style="padding: 10px; font-family: sans-serif; font-size: 14px; color: #4b5563; text-align: center;">${qty}</td>
+            <td style="padding: 10px; font-family: sans-serif; font-size: 14px; font-weight: 600; color: ${rowStatusColor}; text-align: center;">${rowStatus}</td>
+          </tr>
+        `;
+      });
+
+      const currency = shop?.currency || '₹';
+      const attentionCount = expiredCount + expSoonCount + lowStockCount + outOfStockCount;
+      const headerMsg = attentionCount > 0 
+        ? `⚠️ ${attentionCount} products require attention` 
+        : `✅ All products are in good condition`;
+
+      const htmlTable = `
+        <div style="margin-top: 20px;">
+          <h3 style="font-family: sans-serif; color: #111827; margin-bottom: 15px;">Product Details</h3>
+          <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb; background: #fff;">
+            <thead>
+              <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                <th style="padding: 12px 10px; text-align: left; font-family: sans-serif; font-size: 12px; text-transform: uppercase; color: #6b7280;">Name</th>
+                <th style="padding: 12px 10px; text-align: center; font-family: sans-serif; font-size: 12px; text-transform: uppercase; color: #6b7280;">Qty</th>
+                <th style="padding: 12px 10px; text-align: center; font-family: sans-serif; font-size: 12px; text-transform: uppercase; color: #6b7280;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows || '<tr><td colspan="3" style="padding: 15px; text-align: center; color: #6b7280; font-family: sans-serif;">No products found</td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      const params = {
+        to_email: cfg.ejsToEmail || getCurrentUser()?.email || '',
+        to_name: shop?.name || 'Shop Owner',
+        shop_name: shop?.name || 'Your Shop',
+        total_products: products.length,
+        total_quantity: totalQty,
+        total_value: `${currency}${totalValue.toLocaleString('en-IN')}`,
+        expired_count: expiredCount,
+        expiring_soon_count: expSoonCount,
+        low_stock_count: lowStockCount,
+        out_of_stock_count: outOfStockCount,
+        warning_count: warningCount,
+        product_table: htmlTable,
+        summary_header: headerMsg,
+        sent_at: new Date().toLocaleString('en-IN'),
+        action_link: (typeof location !== 'undefined') ? location.origin + '/dashboard.html' : 'Invento Dashboard',
+      };
+
+      const result = await emailjs.send(cfg.ejsServiceId, cfg.ejsTemplateSummary, params);
       return { ok: result.status === 200, status: result.status };
     } catch (err) {
       return { ok: false, error: err?.text || err?.message || String(err) };
