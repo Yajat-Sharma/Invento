@@ -86,7 +86,6 @@
           <label class="form-label">Icon (Emoji)</label>
           <input type="text" class="form-control" id="catIcon" placeholder="e.g. 🥛" maxlength="4"
             style="font-size:1.2rem;">
-          <div class="field-error" id="catIconErr">Please add an icon.</div>
         </div>
         <div class="form-group">
           <label class="form-label">Color</label>
@@ -180,8 +179,7 @@
       let ok = true;
       if (!name) { document.getElementById('catNameErr').classList.add('visible'); document.getElementById('catName').classList.add('error'); ok = false; }
       else { document.getElementById('catNameErr').classList.remove('visible'); document.getElementById('catName').classList.remove('error'); }
-      if (!icon) { document.getElementById('catIconErr').classList.add('visible'); document.getElementById('catIcon').classList.add('error'); ok = false; }
-      else { document.getElementById('catIconErr').classList.remove('visible'); document.getElementById('catIcon').classList.remove('error'); }
+      document.getElementById('catIcon').classList.remove('error');
       if (!ok) return;
 
       if (editId) { DB.updateCategory(editId, { name, icon, color }); showToast('Category updated!'); }
