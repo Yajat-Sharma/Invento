@@ -611,6 +611,16 @@ document.getElementById('modalSave').addEventListener('click', () => {
   else { DB.addProduct({ id: genId('prod'), ...data, createdAt: now() }); showToast('Product added!'); }
   closeModal(); renderProducts();
 });
+
+// Hide heavy features in Lite Mode
+window.addEventListener('DOMContentLoaded', () => {
+  if (window.APP_CONFIG && window.APP_CONFIG.isLiteMode) {
+    const ocrBtn = document.getElementById('openOcrBtn');
+    const scanBtn = document.getElementById('openScannerBtn');
+    if (ocrBtn) ocrBtn.style.display = 'none';
+    if (scanBtn) scanBtn.style.display = 'none';
+  }
+});
 </script>
 
 <script>
@@ -636,7 +646,7 @@ document.getElementById('modalSave').addEventListener('click', () => {
   const $ = id => document.getElementById(id);
 
   // ── Open modal ───────────────────────────────────────
-  function openScanner() {
+  async function openScanner() {
     // Reset UI into loading state
     $('scannerLoading').style.display  = 'flex';
     $('scannerViewport').style.display = 'none';
@@ -644,6 +654,16 @@ document.getElementById('modalSave').addEventListener('click', () => {
     $('scannerFrame').style.display    = 'none';
     setStatus('idle', 'Starting camera…');
     $('scannerModal').classList.add('active');
+    
+    // Robust permission pre-check
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach(track => track.stop());
+    } catch (err) {
+      showError('Camera access was denied or no camera found. Please use manual entry.');
+      return;
+    }
+
     // Small delay to let modal animation play before we init camera
     setTimeout(startScanner, 350);
   }
@@ -1027,6 +1047,10 @@ window.addEventListener('DOMContentLoaded', () => {
     ocrPhotoInput.value = '';
     ocrProgressBar.style.width = '0%';
     detectedName = '';
+    if (ocrPreviewImg.src && ocrPreviewImg.src.startsWith('blob:')) {
+      URL.revokeObjectURL(ocrPreviewImg.src);
+    }
+    ocrPreviewImg.src = ''; // Release memory
   }
 
   function openOcr() {
@@ -1043,6 +1067,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function closeOcr() {
     ocrModal.classList.remove('active');
+    resetOcrUI(); // Ensure memory is released
   }
 
   ocrBtn?.addEventListener('click', openOcr);
@@ -1053,15 +1078,11 @@ window.addEventListener('DOMContentLoaded', () => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      ocrPreviewImg.src = ev.target.result;
-      vUpload.style.display = 'none';
-      vProcess.style.display = 'block';
-      runOcr(ev.target.result);
-    };
-    reader.readAsDataURL(file);
+    // Show preview using ObjectURL to save memory compared to DataURL
+    ocrPreviewImg.src = URL.createObjectURL(file);
+    vUpload.style.display = 'none';
+    vProcess.style.display = 'block';
+    runOcr(ocrPreviewImg.src);
   });
 
   async function runOcr(imageSrc) {

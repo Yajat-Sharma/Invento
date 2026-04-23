@@ -3,6 +3,36 @@
 // Multi-user | Multi-shop | Role-based | Full Analytics
 // ============================================================
 
+// ── Mobile Stability: Global Error Boundary & Lite Mode Detection ──
+window.APP_CONFIG = { isLiteMode: window.innerWidth < 768 };
+
+function showErrorUI(message) {
+  let overlay = document.getElementById('error-fallback-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'error-fallback-overlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0F172A;color:#F1F5F9;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;';
+    overlay.innerHTML = `
+      <div style="background:#1E293B;padding:30px;border-radius:12px;max-width:400px;width:100%;box-sizing:border-box;">
+        <div style="font-size:40px;margin-bottom:15px;">⚠️</div>
+        <h2 style="margin:0 0 10px;font-size:20px;">Something went wrong</h2>
+        <p style="margin:0 0 20px;font-size:14px;color:#94A3B8;word-wrap:break-word;">${escapeHtml(message || 'The application encountered an unexpected error.')}</p>
+        <button onclick="window.location.reload()" style="background:#3B82F6;color:#fff;border:none;padding:12px 20px;border-radius:6px;font-weight:600;cursor:pointer;width:100%;">Reload App</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  }
+}
+
+window.addEventListener('error', (e) => {
+  console.error("Global Error Caught:", e.error);
+  if (window.APP_CONFIG.isLiteMode) showErrorUI(e.message);
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error("Unhandled Rejection:", e.reason);
+  if (window.APP_CONFIG.isLiteMode) showErrorUI(e.reason?.message || "An async operation failed.");
+});
+
 // ── Shop Session ─────────────────────────────────────────────
 function getCurrentShopId() {
   return localStorage.getItem('stocksense_current_shop_id') || null;
@@ -545,19 +575,26 @@ function showConfirm(title, message, onConfirm, confirmLabel = 'Delete') {
 
 // ── Init Page ─────────────────────────────────────────────────
 function initPage(pageName) {
-  migrateToMultiShop();
-  buildSidebar(pageName);
-  // Auto-fire notification check once per browser session
-  if (!sessionStorage.getItem('stocksense_notif_checked')) {
-    sessionStorage.setItem('stocksense_notif_checked', '1');
-    setTimeout(() => NotifEngine.checkAndNotify(), 1500);
-    // EmailJS per-product alerts — run silently in background (DISABLED FOR MOBILE PERF)
-    // setTimeout(() => EmailJSEngine.run(), 3000);
-  }
-  // Inject Quick Actions FAB (skip on login/signup/landing/shop-select)
-  const noFabPages = ['login', 'signup', 'landing', 'shop-select'];
-  if (!noFabPages.includes(pageName)) {
-    initQuickFAB(pageName);
+  try {
+    migrateToMultiShop();
+    buildSidebar(pageName);
+    // Auto-fire notification check once per browser session
+    if (!sessionStorage.getItem('stocksense_notif_checked')) {
+      sessionStorage.setItem('stocksense_notif_checked', '1');
+      if (!window.APP_CONFIG.isLiteMode) {
+        setTimeout(() => NotifEngine.checkAndNotify(), 1500);
+      }
+      // EmailJS per-product alerts — run silently in background (DISABLED FOR MOBILE PERF)
+      // setTimeout(() => EmailJSEngine.run(), 3000);
+    }
+    // Inject Quick Actions FAB (skip on login/signup/landing/shop-select)
+    const noFabPages = ['login', 'signup', 'landing', 'shop-select'];
+    if (!noFabPages.includes(pageName)) {
+      initQuickFAB(pageName);
+    }
+  } catch (error) {
+    console.error("Initialization Failed:", error);
+    showErrorUI("Failed to initialize the page.");
   }
 }
 
