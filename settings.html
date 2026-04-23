@@ -302,6 +302,14 @@
               <div><div style="font-size:1.5rem;font-weight:800;color:var(--text-1);" id="dSales">—</div><div style="font-size:.76rem;color:var(--text-2);">Sales</div></div>
             </div>
           </div>
+
+          <div class="card" style="margin-bottom:1rem;">
+            <div class="card-header"><div><div class="card-title">Demo Data</div><div class="card-sub">Populate application with realistic sample data</div></div></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
+              <div><div style="font-size:.855rem;font-weight:500;">Load Demo Data</div><div class="form-hint" style="margin:0;">Adds products, categories, and sales for testing</div></div>
+              <button class="btn btn-primary btn-sm" id="loadDemoDataBtn">Load Demo Data</button>
+            </div>
+          </div>
           <div class="card" style="border:1px solid rgba(239,68,68,.2);">
             <div class="card-header"><div><div class="card-title" style="color:var(--danger);">Danger Zone</div><div class="card-sub">These actions cannot be undone</div></div></div>
             <div style="display:flex;flex-direction:column;gap:.75rem;">
@@ -559,6 +567,58 @@ document.getElementById('changePwdBtn').addEventListener('click', async () => {
   alertEl.style.cssText = 'display:block;padding:.75rem 1rem;border-radius:10px;font-size:.84rem;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#86efac;margin-bottom:1rem;';
   alertEl.textContent = 'Password changed successfully!';
   document.getElementById('curPwd').value = document.getElementById('newPwd').value = document.getElementById('confPwd').value = '';
+});
+
+// Load Demo Data
+document.getElementById('loadDemoDataBtn').addEventListener('click', () => {
+  const existingProducts = DB.getProducts();
+  const existingCategories = DB.getCategories();
+  const existingSales = DB.getSales();
+  
+  const loadData = () => {
+    const categories = [
+      { id: 'cat-1', name: 'Dairy & Eggs', color: '#3b82f6' },
+      { id: 'cat-2', name: 'Bakery', color: '#f59e0b' },
+      { id: 'cat-3', name: 'Snacks', color: '#ef4444' },
+      { id: 'cat-4', name: 'Beverages', color: '#10b981' }
+    ];
+
+    const today = new Date();
+    const addDays = (d, days) => {
+        const date = new Date(d);
+        date.setDate(date.getDate() + days);
+        return date.toISOString().split('T')[0];
+    };
+
+    const products = [
+      { id: 'prod-1', name: 'Whole Milk 1L', category: 'cat-1', price: 65, stock: 12, minStock: 5, expiry: addDays(today, -2), barcode: '123456789012' }, // Expired
+      { id: 'prod-2', name: 'Sliced Brown Bread', category: 'cat-2', price: 40, stock: 2, minStock: 10, expiry: addDays(today, 5), barcode: '234567890123' }, // Low stock
+      { id: 'prod-3', name: 'Potato Chips Salted', category: 'cat-3', price: 20, stock: 0, minStock: 20, expiry: addDays(today, 30), barcode: '345678901234' }, // Out of stock
+      { id: 'prod-4', name: 'Cola 2L', category: 'cat-4', price: 90, stock: 45, minStock: 15, expiry: addDays(today, 180), barcode: '456789012345' }, // Normal
+      { id: 'prod-5', name: 'Cheese Slices (10 pcs)', category: 'cat-1', price: 120, stock: 25, minStock: 10, expiry: addDays(today, 15), barcode: '567890123456' }, // Normal
+      { id: 'prod-6', name: 'Chocolate Chip Cookies', category: 'cat-2', price: 60, stock: 30, minStock: 15, expiry: addDays(today, 45), barcode: '678901234567' } // Normal
+    ];
+
+    const sales = [
+      { id: 'sale-1', date: addDays(today, -1) + 'T10:30:00.000Z', items: [{ productId: 'prod-1', qty: 2, price: 65 }], total: 130, method: 'Cash' },
+      { id: 'sale-2', date: addDays(today, 0) + 'T14:15:00.000Z', items: [{ productId: 'prod-4', qty: 1, price: 90 }, { productId: 'prod-3', qty: 2, price: 20 }], total: 130, method: 'UPI' }
+    ];
+
+    DB.saveCategories(categories);
+    DB.saveProducts(products);
+    DB.saveSales(sales);
+    
+    loadProfile(); 
+    showToast('Demo data loaded successfully', 'success');
+  };
+
+  if (existingProducts.length > 0 || existingCategories.length > 0 || existingSales.length > 0) {
+    showConfirm('Overwrite existing data?', 'Are you sure you want to overwrite all current data with demo data? This cannot be undone.', () => {
+      loadData();
+    });
+  } else {
+    loadData();
+  }
 });
 
 // Danger zone
