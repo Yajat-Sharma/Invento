@@ -909,7 +909,7 @@ const EmailJSEngine = {
     const defaults = {
       ejsServiceId:  'service_ydqwptg',
       ejsTemplateAlert: 'template_73kfz4a',
-      ejsTemplateSummary: 'template_abcd123',
+      ejsTemplateSummary: 'template_zezouqc',
       ejsPublicKey:  'erxLyJs0D_TClA-j2',
     };
     return { ...defaults, ...saved };
