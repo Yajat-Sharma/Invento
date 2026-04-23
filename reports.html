@@ -412,10 +412,10 @@ if (sendSummaryBtn) {
       if (res.ok) {
         showToast('Summary sent successfully', 'success');
       } else {
-        showToast('Failed to send email', 'error');
+        showToast('Failed to send email: ' + (res.error || 'Unknown error'), 'error');
       }
     } catch (err) {
-      showToast('Failed to send email', 'error');
+      showToast('Failed to send email: ' + (err.message || String(err)), 'error');
     }
     
     sendSummaryBtn.disabled = false;
