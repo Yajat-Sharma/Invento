@@ -1,0 +1,47 @@
+Care_Consume/
+│
+├── ⚙️ Configuration & Deployment
+│   ├── .git/                # Git source control tracking
+│   ├── .gitignore           # Tells Git which files to ignore (like .vercel)
+│   └── .vercel/             # Vercel deployment configuration
+│
+├── 📂 Static Assets
+│   └── assets/              # Folder for images, SVGs, or external fonts
+│
+├── 🎨 Styling (CSS)
+│   ├── shared.css           # Global utility classes used across all pages
+│   ├── landing.css          # Styles specific to the homepage/landing page
+│   ├── styles.css           # Core styling for the main dashboard and tables
+│   ├── admin.css            # Styles for the Admin panel
+│   └── suggestions.css      # Styles for the Suggestions/Feedback page
+│
+├── 🧠 Logic & Data (JavaScript)
+│   ├── auth.js              # User authentication, registration, and Welcome Emails
+│   ├── shared.js            # Core App Engine (localStorage DB config, email alerts)
+│   ├── script.js            # Main dashboard functionality (handling products, sales)
+│   ├── landing.js           # Interactions for the landing page (animations)
+│   ├── admin.js             # Logic for the admin panel management
+│   └── suggestions.js       # Logic to handle feedback and suggestions
+│
+└── 📄 Views (HTML Pages)
+    ├── index.html           # Public-facing Landing Page
+    ├── signup.html          # Registration / Create Account page
+    ├── login.html           # User Sign-in page
+    ├── shop-select.html     # Setup and Multi-shop switching page
+    ├── dashboard.html       # Main App Dashboard (Metrics, fast-moving items)
+    ├── products.html        # View and Add/Edit inventory
+    ├── categories.html      # Product category management
+    ├── sales.html           # Point of sale and billing
+    ├── suppliers.html       # Vendor management
+    ├── alerts.html          # Low-stock and Expiry warnings
+    ├── reports.html         # Business analytics (ABC Analysis, profits)
+    ├── calendar.html        # Calendar view of expiring products
+    ├── expired.html         # Track wasted or disposed items
+    ├── team.html            # Manage staff and their roles/permissions 
+    ├── settings.html        # App settings (Dark mode, notifications, currency)
+    ├── suggestions.html     # User feedback portal
+    └── admin.html           # Super-admin portal to manage all users
+
+    git add 
+    git commit -m "Readme file addition"
+    git push
