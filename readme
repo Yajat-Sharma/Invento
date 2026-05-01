@@ -1,4 +1,4 @@
-Care_Consume/
+Invento — Smart Inventory & Expiry Management
 │
 ├── ⚙️ Configuration & Deployment
 │   ├── .git/                # Git source control tracking
@@ -9,40 +9,39 @@ Care_Consume/
 │   └── assets/              # Folder for images, SVGs, or external fonts
 │
 ├── 🎨 Styling (CSS)
-│   ├── shared.css           # Global utility classes used across all pages
-│   ├── landing.css          # Styles specific to the homepage/landing page
-│   ├── styles.css           # Core styling for the main dashboard and tables
+│   ├── shared.css           # Global modern flat dark theme & component library
+│   ├── styles.css           # Base design tokens and typography
 │   ├── admin.css            # Styles for the Admin panel
-│   └── suggestions.css      # Styles for the Suggestions/Feedback page
+│   └── suggestions.css      # Styles for the AI Insights page
 │
 ├── 🧠 Logic & Data (JavaScript)
-│   ├── auth.js              # User authentication, registration, and Welcome Emails
-│   ├── shared.js            # Core App Engine (localStorage DB config, email alerts)
-│   ├── script.js            # Main dashboard functionality (handling products, sales)
-│   ├── landing.js           # Interactions for the landing page (animations)
-│   ├── admin.js             # Logic for the admin panel management
-│   └── suggestions.js       # Logic to handle feedback and suggestions
+│   ├── auth.js              # User authentication, registration, and system emails
+│   ├── shared.js            # Core App Engine v3 (Multi-shop, Global State, Notifs)
+│   ├── script.js            # Dashboard logic (legacy bridge)
+│   ├── admin.js             # System-wide analytics and user management
+│   └── suggestions.js       # AI-driven inventory analysis logic
 │
 └── 📄 Views (HTML Pages)
-    ├── index.html           # Public-facing Landing Page
-    ├── signup.html          # Registration / Create Account page
-    ├── login.html           # User Sign-in page
-    ├── shop-select.html     # Setup and Multi-shop switching page
-    ├── dashboard.html       # Main App Dashboard (Metrics, fast-moving items)
-    ├── products.html        # View and Add/Edit inventory
-    ├── categories.html      # Product category management
-    ├── sales.html           # Point of sale and billing
-    ├── suppliers.html       # Vendor management
-    ├── alerts.html          # Low-stock and Expiry warnings
-    ├── reports.html         # Business analytics (ABC Analysis, profits)
-    ├── calendar.html        # Calendar view of expiring products
-    ├── expired.html         # Track wasted or disposed items
-    ├── team.html            # Manage staff and their roles/permissions 
-    ├── settings.html        # App settings (Dark mode, notifications, currency)
-    ├── suggestions.html     # User feedback portal
-    └── admin.html           # Super-admin portal to manage all users
+    ├── index.html           # Public Landing Page
+    ├── signup.html          # User Registration
+    ├── login.html           # User Login
+    ├── shop-select.html     # Multi-shop Switcher & Setup
+    ├── dashboard.html       # Metrics & Performance Overview
+    ├── products.html        # Inventory Management (Excel Import/Export)
+    ├── categories.html      # Product Organization
+    ├── sales.html           # Point of Sale & Transaction History
+    ├── suppliers.html       # Vendor Directory
+    ├── alerts.html          # Smart Stock & Expiry Monitoring
+    ├── reports.html         # Business Intelligence (ABC Analysis, Profitability)
+    ├── calendar.html        # Visual Expiry Timeline
+    ├── expired.html         # Waste Tracking & Loss Recovery
+    ├── team.html            # Role-based Access Control (RBAC)
+    ├── settings.html        # Personalization & System Config
+    ├── suggestions.html     # AI Insights & Optimization
+    └── admin.html           # Super-admin Control Center
 
-    git inti
-    git add .
-    git commit -m "Readme file addition"
-    git push
+Modernization v3.0:
+- Flat Dark Mode aesthetic with Slate/Blue palette.
+- Responsive, glassmorphic UI components.
+- Integrated AI Insights and multi-shop support.
+- Performance-optimized data layer via localStorage.

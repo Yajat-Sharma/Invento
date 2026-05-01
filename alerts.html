@@ -242,20 +242,20 @@ document.getElementById('discModalSave').addEventListener('click', () => {
   const iconGear  = `<svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>`;
 
   if (emailConfigured && notifGranted) {
-    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);';
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(16, 185, 129, 0.08);border:1px solid rgba(16, 185, 129, 0.2);';
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:#4ade80;">${iconCheck}</span>
-        <div><div style="font-size:.875rem;font-weight:600;color:#4ade80;">Notifications Active</div>
+        <span style="color:var(--led-green);">${iconCheck}</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:var(--led-green);">Notifications Active</div>
         <div style="font-size:.78rem;color:var(--text-2);">Email alerts &amp; browser notifications are both enabled.</div></div>
       </div>
       <a href="settings.html" class="btn btn-secondary btn-sm">${iconGear} Manage Settings</a>`;
   } else if (emailConfigured) {
-    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);';
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(59, 130, 246, 0.08);border:1px solid rgba(59, 130, 246, 0.2);';
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:#a5b4fc;">${iconMail}</span>
-        <div><div style="font-size:.875rem;font-weight:600;color:#a5b4fc;">Email Alerts Active</div>
+        <span style="color:var(--led-blue);">${iconMail}</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:var(--led-blue);">Email Alerts Active</div>
         <div style="font-size:.78rem;color:var(--text-2);">Also enable browser notifications for instant alerts.</div></div>
       </div>
       <button class="btn btn-secondary btn-sm" id="bannerEnableNotifBtn">${iconBell} Enable Browser Notifs</button>`;
@@ -265,20 +265,20 @@ document.getElementById('discModalSave').addEventListener('click', () => {
       else showToast('Permission denied', 'error');
     });
   } else if (notifGranted) {
-    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);';
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(245, 158, 11, 0.08);border:1px solid rgba(245, 158, 11, 0.2);';
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:#fbbf24;">${iconBell}</span>
-        <div><div style="font-size:.875rem;font-weight:600;color:#fbbf24;">Browser Notifications Active</div>
+        <span style="color:var(--led-amber);">${iconBell}</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:var(--led-amber);">Browser Notifications Active</div>
         <div style="font-size:.78rem;color:var(--text-2);">Set up email alerts to also receive reports in your inbox (free).</div></div>
       </div>
       <a href="settings.html" class="btn btn-secondary btn-sm">${iconMail} Setup Email Alerts</a>`;
   } else {
-    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);';
+    banner.style.cssText = 'border-radius:14px;padding:14px 18px;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(59, 130, 246, 0.08);border:1px solid rgba(59, 130, 246, 0.2);';
     banner.innerHTML = `
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="color:#a5b4fc;">${iconBellOff}</span>
-        <div><div style="font-size:.875rem;font-weight:600;color:#a5b4fc;">Notifications Not Set Up</div>
+        <span style="color:var(--led-blue);">${iconBellOff}</span>
+        <div><div style="font-size:.875rem;font-weight:600;color:var(--led-blue);">Notifications Not Set Up</div>
         <div style="font-size:.78rem;color:var(--text-2);">Enable email or browser notifications to get alerted about expiring products.</div></div>
       </div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap;">

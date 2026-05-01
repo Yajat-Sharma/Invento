@@ -119,7 +119,7 @@ async function sendWelcomeEmail(userName, userEmail, shopName) {
                 <p>Your shop <strong>${shopName}</strong> has been successfully registered.</p>
                 <p>We're excited to have you on board. You can now start managing your products, tracking sales, and monitoring expirations effortlessly.</p>
                 <div style="text-align: center; margin: 30px 0;">
-                    <a href="${loginLink}" style="background-color: #6366F1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Access Your Dashboard</a>
+                    <a href="${loginLink}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Access Your Dashboard</a>
                 </div>
                 <p style="color: #666; font-size: 14px;">If the button doesn't work, copy and paste this link into your browser:<br>${loginLink}</p>
             </div>

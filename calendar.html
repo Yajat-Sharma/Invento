@@ -1,752 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FreshAlert - Expiry Calendar">
-    <title>FreshAlert - Expiry Calendar</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- FullCalendar -->
-    <script src="auth.js"></script>
-    <script>requireAuth();</script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <style>
-        /* ============================================================
-           FreshAlert Calendar Page — Inline Styles
-           ============================================================ */
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Invento — Expiry Calendar">
+<title>Invento — Calendar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<script src="auth.js"></script><script>requireAuth();</script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<style>
+  /* FullCalendar Overrides for Modern Dark Theme */
+  .fc { font-family: inherit !important; --fc-border-color: var(--border); --fc-today-bg-color: rgba(59, 130, 246, 0.05); }
+  .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border) !important; }
+  .fc-col-header-cell { background: #0f172a; padding: 10px 0 !important; }
+  .fc-col-header-cell-cushion { color: var(--text-3) !important; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+  .fc-daygrid-day-number { color: var(--text-2) !important; font-size: .85rem; font-weight: 500; padding: 8px !important; }
+  .fc-day-today { background: rgba(59, 130, 246, 0.05) !important; }
+  .fc-day-today .fc-daygrid-day-number { color: var(--led-blue) !important; font-weight: 700; }
+  
+  .fc-event { border: none !important; padding: 2px 4px !important; border-radius: 4px !important; font-size: .75rem !important; font-weight: 600 !important; cursor: pointer; }
+  .fc-event-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  
+  .event-expired { background: rgba(239, 68, 68, 0.15) !important; color: #ef4444 !important; border-left: 3px solid #ef4444 !important; }
+  .event-expiring { background: rgba(245, 158, 11, 0.15) !important; color: #f59e0b !important; border-left: 3px solid #f59e0b !important; }
+  .event-safe { background: rgba(16, 185, 129, 0.15) !important; color: #10b981 !important; border-left: 3px solid #10b981 !important; }
 
-        /* Page wrapper */
-        .cal-page-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .cal-page-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--color-gray-900);
-            margin-bottom: 0.5rem;
-        }
-
-        .cal-page-subtitle {
-            font-size: 1rem;
-            color: var(--color-gray-500);
-        }
-
-        /* Legend */
-        .cal-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            animation: fadeInUp 0.6s ease-out 0.15s backwards;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--color-gray-700);
-        }
-
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .legend-dot.expired {
-            background: #EF4444;
-        }
-
-        .legend-dot.expiring {
-            background: #F59E0B;
-        }
-
-        .legend-dot.safe {
-            background: #10B981;
-        }
-
-        /* FullCalendar wrapper card */
-        .cal-wrapper {
-            background: var(--color-white);
-            border-radius: var(--radius-2xl);
-            box-shadow: var(--shadow-card);
-            padding: 1.75rem;
-            animation: fadeInUp 0.6s ease-out 0.3s backwards;
-        }
-
-        /* Override FullCalendar defaults to match theme */
-        .fc {
-            font-family: var(--font-family) !important;
-        }
-
-        .fc-toolbar-title {
-            font-size: 1.3rem !important;
-            font-weight: 700 !important;
-            color: var(--color-gray-900) !important;
-        }
-
-        .fc-button-primary {
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%) !important;
-            border: none !important;
-            border-radius: 0.5rem !important;
-            font-family: var(--font-family) !important;
-            font-weight: 600 !important;
-            transition: all 200ms ease-in-out !important;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
-        }
-
-        .fc-button-primary:hover {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4) !important;
-        }
-
-        .fc-button-primary:not(:disabled):active,
-        .fc-button-primary:not(:disabled).fc-button-active {
-            background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-secondary) 100%) !important;
-            transform: translateY(0) !important;
-        }
-
-        .fc-col-header-cell {
-            background: var(--color-gray-50);
-            padding: 0.6rem 0 !important;
-            font-weight: 600 !important;
-            color: var(--color-gray-600) !important;
-            font-size: 0.8rem !important;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .fc-daygrid-day {
-            transition: background 150ms ease;
-        }
-
-        .fc-daygrid-day:hover {
-            background: var(--color-gray-50) !important;
-        }
-
-        .fc-daygrid-day-number {
-            font-size: 0.85rem !important;
-            font-weight: 500 !important;
-            color: var(--color-gray-700) !important;
-            padding: 6px 8px !important;
-        }
-
-        .fc-day-today .fc-daygrid-day-number {
-            background: var(--color-primary) !important;
-            color: #fff !important;
-            border-radius: 50% !important;
-            width: 28px !important;
-            height: 28px !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            margin: 4px !important;
-        }
-
-        .fc-event {
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 2px 6px !important;
-            font-size: 0.75rem !important;
-            font-weight: 600 !important;
-            cursor: pointer !important;
-            transition: transform 150ms ease, opacity 150ms ease !important;
-        }
-
-        .fc-event:hover {
-            transform: scale(1.03) !important;
-            opacity: 0.92 !important;
-        }
-
-        .fc-event-title {
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-            white-space: nowrap !important;
-        }
-
-        /* Dark Mode adjustments */
-        [data-theme="dark"] .fc-col-header-cell {
-            background: var(--color-gray-100) !important;
-        }
-
-        [data-theme="dark"] .fc-toolbar-title {
-            color: var(--color-gray-900) !important;
-        }
-
-        [data-theme="dark"] .fc-daygrid-day-number {
-            color: var(--color-gray-600) !important;
-        }
-
-        [data-theme="dark"] .cal-wrapper {
-            border: 1px solid var(--color-gray-200);
-        }
-
-        /* ============================================================
-           Event Detail Popup (Tooltip Modal)
-           ============================================================ */
-        .event-popup-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(17, 24, 39, 0.5);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            animation: modalFadeIn 0.25s ease-out;
-        }
-
-        .event-popup-overlay.active {
-            display: flex;
-        }
-
-        .event-popup {
-            background: var(--color-white);
-            border-radius: var(--radius-2xl);
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
-            animation: modalSlideIn 0.35s ease-out;
-            overflow: hidden;
-        }
-
-        .event-popup-header {
-            padding: 1.5rem 1.5rem 0;
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-        }
-
-        .event-popup-title {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .event-popup-icon {
-            font-size: 2rem;
-            line-height: 1;
-        }
-
-        .event-popup-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--color-gray-900);
-        }
-
-        .event-popup-close {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: var(--color-gray-100);
-            border-radius: var(--radius-lg);
-            cursor: pointer;
-            color: var(--color-gray-500);
-            transition: all 200ms ease-in-out;
-            flex-shrink: 0;
-        }
-
-        .event-popup-close:hover {
-            background: var(--color-gray-200);
-            color: var(--color-gray-800);
-        }
-
-        .event-popup-status {
-            margin: 1rem 1.5rem 0;
-            padding: 0.5rem 1rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-
-        .event-popup-status.status-expired {
-            background: rgba(239, 68, 68, 0.12);
-            color: #DC2626;
-        }
-
-        .event-popup-status.status-expiring {
-            background: rgba(245, 158, 11, 0.12);
-            color: #D97706;
-        }
-
-        .event-popup-status.status-safe {
-            background: rgba(16, 185, 129, 0.12);
-            color: #059669;
-        }
-
-        .event-popup-body {
-            padding: 1.25rem 1.5rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.875rem;
-        }
-
-        .event-popup-row {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .event-popup-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--color-gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            width: 80px;
-            flex-shrink: 0;
-        }
-
-        .event-popup-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: var(--color-gray-800);
-        }
-
-        .event-popup-actions {
-            padding: 0 1.5rem 1.5rem;
-        }
-
-        .event-popup-btn {
-            display: block;
-            width: 100%;
-            padding: 0.75rem;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-family: var(--font-family);
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            text-decoration: none;
-            transition: all 200ms ease-in-out;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
-
-        .event-popup-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        /* Summary chips at top */
-        .cal-summary-bar {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-            animation: fadeInUp 0.6s ease-out 0.1s backwards;
-        }
-
-        .cal-chip {
-            flex: 1;
-            min-width: 120px;
-            background: var(--color-white);
-            border-radius: var(--radius-xl);
-            padding: 1rem 1.25rem;
-            box-shadow: var(--shadow-card);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.25rem;
-            text-align: center;
-        }
-
-        .cal-chip-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .cal-chip-label {
-            font-size: 0.78rem;
-            font-weight: 600;
-            color: var(--color-gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .cal-chip.chip-expired .cal-chip-value {
-            color: #EF4444;
-        }
-
-        .cal-chip.chip-expiring .cal-chip-value {
-            color: #F59E0B;
-        }
-
-        .cal-chip.chip-safe .cal-chip-value {
-            color: #10B981;
-        }
-
-        .cal-chip.chip-total .cal-chip-value {
-            color: var(--color-primary);
-        }
-
-        @media (max-width: 640px) {
-            .cal-wrapper {
-                padding: 1rem;
-            }
-
-            .fc-toolbar {
-                flex-wrap: wrap;
-                gap: 0.5rem;
-            }
-
-            .cal-chip {
-                min-width: 80px;
-                padding: 0.75rem;
-            }
-        }
-    </style>
+  .fc-toolbar-title { font-size: 1.1rem !important; font-weight: 700 !important; color: var(--text-1) !important; }
+  .fc-button { background: #334155 !important; border: 1px solid var(--border) !important; color: var(--text-2) !important; font-size: .85rem !important; font-weight: 600 !important; text-transform: capitalize !important; }
+  .fc-button:hover { background: #475569 !important; color: var(--text-1) !important; }
+  .fc-button-active { background: var(--led-blue) !important; color: #fff !important; border-color: var(--led-blue) !important; }
+  
+  .cal-legend { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; padding: 0 .5rem; }
+  .legend-item { display: flex; align-items: center; gap: .5rem; font-size: .8rem; font-weight: 600; color: var(--text-2); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+  
+  .cal-container { background: #1e293b; border: 1px solid var(--border); border-radius: var(--r-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); }
+</style>
 </head>
-
 <body>
-    <!-- Header / Navbar -->
-    <header class="navbar">
-        <div class="navbar-container">
-            <div class="navbar-brand" onclick="window.location.href='dashboard.html'">
-                <div class="logo-icon">
-                    <img src="assets/logo.png" alt="FreshAlert Logo" width="36" height="36">
-                </div>
-                <span class="brand-name">FreshAlert</span>
-            </div>
-
-            <nav class="nav-menu">
-                <a href="dashboard.html" class="nav-link">Dashboard</a>
-                <a href="dashboard.html#add-items" class="nav-link">Add Items</a>
-                <a href="calendar.html" class="nav-link active">📅 Calendar</a>
-                <a href="suggestions.html" class="nav-link" title="Smart AI Suggestions">🧠 AI Suggestions</a>
-            </nav>
-
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">🌙</button>
-
-            <button class="mobile-menu-toggle" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
-        </div>
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<div class="app-layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main-wrapper">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="sidebar-collapse-btn" id="sidebarCollapseBtn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M11 19l-7-7 7-7M18 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 class="page-title">Expiry Calendar</h1>
+      </div>
+      <div class="topbar-right">
+        <a href="alerts.html" class="icon-btn"><svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="notif-dot" id="notifDot" style="display:none"></span></a>
+        <div class="user-avatar" id="topbarAvatar">?</div>
+      </div>
     </header>
+    <main class="page-content">
+      <div class="page-header">
+        <div class="page-header-left"><h2>Inventory Calendar</h2><p>Visualize product expiries across the month</p></div>
+      </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Page Header -->
-        <div class="cal-page-header">
-            <h1 class="cal-page-title">📅 Expiry Calendar</h1>
-            <p class="cal-page-subtitle">Visual overview of all your item expiry dates</p>
-        </div>
+      <div class="cal-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span> Expired</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span> Expiring Soon</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#10b981;"></span> Safe</div>
+      </div>
 
-        <!-- Summary Chips -->
-        <div class="cal-summary-bar">
-            <div class="cal-chip chip-total">
-                <span class="cal-chip-value" id="chipTotal">0</span>
-                <span class="cal-chip-label">Total Items</span>
-            </div>
-            <div class="cal-chip chip-expired">
-                <span class="cal-chip-value" id="chipExpired">0</span>
-                <span class="cal-chip-label">Expired</span>
-            </div>
-            <div class="cal-chip chip-expiring">
-                <span class="cal-chip-value" id="chipExpiring">0</span>
-                <span class="cal-chip-label">Expiring Soon</span>
-            </div>
-            <div class="cal-chip chip-safe">
-                <span class="cal-chip-value" id="chipSafe">0</span>
-                <span class="cal-chip-label">Safe</span>
-            </div>
-        </div>
-
-        <!-- Legend -->
-        <div class="cal-legend">
-            <span class="legend-item"><span class="legend-dot expired"></span>Expired</span>
-            <span class="legend-item"><span class="legend-dot expiring"></span>Expiring within 3 days</span>
-            <span class="legend-item"><span class="legend-dot safe"></span>Safe</span>
-        </div>
-
-        <!-- FullCalendar Container -->
-        <div class="cal-wrapper">
-            <div id="fullCalendar"></div>
-        </div>
+      <div class="cal-container">
+        <div id="calendar"></div>
+      </div>
     </main>
+  </div>
+</div>
 
-    <!-- Event Detail Popup -->
-    <div class="event-popup-overlay" id="eventPopup">
-        <div class="event-popup">
-            <div class="event-popup-header">
-                <div class="event-popup-title">
-                    <span class="event-popup-icon" id="popupIcon">📦</span>
-                    <span class="event-popup-name" id="popupName">Item Name</span>
-                </div>
-                <button class="event-popup-close" id="closePopup" aria-label="Close">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5"
-                            stroke-linecap="round" />
-                    </svg>
-                </button>
-            </div>
-            <div class="event-popup-status" id="popupStatus"></div>
-            <div class="event-popup-body">
-                <div class="event-popup-row">
-                    <span class="event-popup-label">Category</span>
-                    <span class="event-popup-value" id="popupCategory">—</span>
-                </div>
-                <div class="event-popup-row">
-                    <span class="event-popup-label">Expires</span>
-                    <span class="event-popup-value" id="popupExpiry">—</span>
-                </div>
-                <div class="event-popup-row">
-                    <span class="event-popup-label">Quantity</span>
-                    <span class="event-popup-value" id="popupQuantity">—</span>
-                </div>
-                <div class="event-popup-row">
-                    <span class="event-popup-label">In</span>
-                    <span class="event-popup-value" id="popupDaysLeft">—</span>
-                </div>
-            </div>
-            <div class="event-popup-actions">
-                <a href="dashboard.html" class="event-popup-btn">Go to Dashboard →</a>
-            </div>
-        </div>
-    </div>
+<script src="shared.js"></script>
+<script>
+initPage('calendar');
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <p class="footer-text">Made for a Mini Project</p>
-            <div class="footer-links">
-                <a href="dashboard.html" class="footer-link">Dashboard</a>
-                <span class="footer-separator">|</span>
-                <a href="suggestions.html" class="footer-link">AI Suggestions</a>
-            </div>
-        </div>
-    </footer>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+  const products   = DB.getProducts();
+  
+  const events = products.filter(p => p.expiryDate).map(p => {
+    const es = getExpiryStatus(p.expiryDate);
+    let className = 'event-safe';
+    if (es.status === 'expired') className = 'event-expired';
+    else if (es.status === 'expiring' || es.status === 'warning') className = 'event-expiring';
+    
+    return {
+      title: p.name,
+      start: p.expiryDate,
+      className: className,
+      extendedProps: { qty: p.quantity, price: p.sellingPrice }
+    };
+  });
 
-    <script>
-        // ============================================================
-        // Theme Toggle
-        // ============================================================
-        const themeToggle = document.getElementById('themeToggle');
-        const savedTheme = localStorage.getItem('freshalert_theme') || 'light';
-        if (savedTheme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            themeToggle.textContent = '☀️';
-        }
-        themeToggle.addEventListener('click', () => {
-            const current = document.documentElement.getAttribute('data-theme');
-            if (current === 'dark') {
-                document.documentElement.removeAttribute('data-theme');
-                localStorage.setItem('freshalert_theme', 'light');
-                themeToggle.textContent = '🌙';
-            } else {
-                document.documentElement.setAttribute('data-theme', 'dark');
-                localStorage.setItem('freshalert_theme', 'dark');
-                themeToggle.textContent = '☀️';
-            }
-        });
-
-        // ============================================================
-        // Helpers
-        // ============================================================
-        // Per-user item storage
-        function getItems() {
-            try {
-                const user = getCurrentUser(); // from auth.js
-                const key = user ? ('items_user_' + user.id) : 'items_user_guest';
-                return JSON.parse(localStorage.getItem(key)) || [];
-            } catch { return []; }
-        }
-
-        const CATEGORY_INFO = {
-            medicine: { icon: '💊', label: 'Medicine' },
-            dairy: { icon: '🥛', label: 'Dairy' },
-            vegetables: { icon: '🥬', label: 'Vegetables' },
-            fruits: { icon: '🍎', label: 'Fruits' },
-            snacks: { icon: '🍪', label: 'Snacks' },
-            vitamins: { icon: '💊', label: 'Vitamins' },
-            other: { icon: '📦', label: 'Other' }
-        };
-
-        function getDiffDays(dateStr) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const expiry = new Date(dateStr + 'T00:00:00');
-            expiry.setHours(0, 0, 0, 0);
-            return Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        }
-
-        function getStatus(diffDays) {
-            if (diffDays < 0) return 'expired';
-            if (diffDays <= 3) return 'expiring';
-            return 'safe';
-        }
-
-        function formatDate(dateStr) {
-            const d = new Date(dateStr + 'T00:00:00');
-            return d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
-        function getEventColor(diffDays) {
-            if (diffDays < 0) return '#EF4444'; // red
-            if (diffDays <= 3) return '#F59E0B'; // orange
-            return '#10B981';                     // green
-        }
-
-        // ============================================================
-        // Build Calendar Events from localStorage
-        // ============================================================
-        function buildEvents() {
-            const items = getItems();
-            return items.map(item => {
-                const diffDays = getDiffDays(item.expiryDate);
-                const color = getEventColor(diffDays);
-                const catInfo = CATEGORY_INFO[item.category] || CATEGORY_INFO.other;
-                return {
-                    id: item.id,
-                    title: `${catInfo.icon} ${item.name}`,
-                    start: item.expiryDate,
-                    allDay: true,
-                    backgroundColor: color,
-                    borderColor: color,
-                    textColor: '#ffffff',
-                    extendedProps: {
-                        item: item,
-                        diffDays: diffDays
-                    }
-                };
-            });
-        }
-
-        // ============================================================
-        // Update Summary Chips
-        // ============================================================
-        function updateChips() {
-            const items = getItems();
-            let expired = 0, expiring = 0, safe = 0;
-            items.forEach(item => {
-                const d = getDiffDays(item.expiryDate);
-                if (d < 0) expired++;
-                else if (d <= 3) expiring++;
-                else safe++;
-            });
-            document.getElementById('chipTotal').textContent = items.length;
-            document.getElementById('chipExpired').textContent = expired;
-            document.getElementById('chipExpiring').textContent = expiring;
-            document.getElementById('chipSafe').textContent = safe;
-        }
-
-        // ============================================================
-        // Event Popup
-        // ============================================================
-        const popup = document.getElementById('eventPopup');
-        const closePopupBtn = document.getElementById('closePopup');
-
-        function openPopup(eventInfo) {
-            const { item, diffDays } = eventInfo.event.extendedProps;
-            const status = getStatus(diffDays);
-            const catInfo = CATEGORY_INFO[item.category] || CATEGORY_INFO.other;
-
-            // Populate
-            document.getElementById('popupIcon').textContent = catInfo.icon;
-            document.getElementById('popupName').textContent = item.name;
-            document.getElementById('popupCategory').textContent = catInfo.label;
-            document.getElementById('popupExpiry').textContent = formatDate(item.expiryDate);
-            document.getElementById('popupQuantity').textContent = `${item.quantity} unit${item.quantity !== 1 ? 's' : ''}`;
-
-            const statusEl = document.getElementById('popupStatus');
-            if (diffDays < 0) {
-                statusEl.textContent = `⛔ Expired ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''} ago`;
-                statusEl.className = 'event-popup-status status-expired';
-                document.getElementById('popupDaysLeft').textContent = 'Already expired';
-            } else if (diffDays === 0) {
-                statusEl.textContent = '⚠️ Expires Today!';
-                statusEl.className = 'event-popup-status status-expiring';
-                document.getElementById('popupDaysLeft').textContent = 'Today';
-            } else if (diffDays <= 3) {
-                statusEl.textContent = `⚠️ Expiring Soon`;
-                statusEl.className = 'event-popup-status status-expiring';
-                document.getElementById('popupDaysLeft').textContent = `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
-            } else {
-                statusEl.textContent = '✅ Safe';
-                statusEl.className = 'event-popup-status status-safe';
-                document.getElementById('popupDaysLeft').textContent = `${diffDays} days`;
-            }
-
-            popup.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closePopup() {
-            popup.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        closePopupBtn.addEventListener('click', closePopup);
-        popup.addEventListener('click', (e) => { if (e.target === popup) closePopup(); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePopup(); });
-
-        // ============================================================
-        // FullCalendar Initialization
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', () => {
-            updateChips();
-
-            const calendarEl = document.getElementById('fullCalendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,listMonth'
-                },
-                buttonText: {
-                    today: 'Today',
-                    month: 'Month',
-                    listMonth: 'List'
-                },
-                events: buildEvents(),
-                eventClick: openPopup,
-                dayMaxEvents: 3,
-                moreLinkText: (n) => `+${n} more`,
-                height: 'auto',
-                fixedWeekCount: false,
-                firstDay: 0,  // Sunday
-                eventDidMount: function (info) {
-                    // Subtle hover pulse
-                    info.el.style.cursor = 'pointer';
-                },
-                // Reload events when storage changes (in case user is on another tab)
-                windowResize: function () { calendar.updateSize(); }
-            });
-
-            calendar.render();
-
-            // Auto-update when localStorage changes (e.g., from dashboard tab)
-            window.addEventListener('storage', () => {
-                calendar.removeAllEvents();
-                calendar.addEventSource(buildEvents());
-                updateChips();
-            });
-        });
-    </script>
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+    events: events,
+    height: 'auto',
+    eventClick: function(info) {
+      showToast(`${info.event.title} - Qty: ${info.event.extendedProps.qty}`, 'info');
+    }
+  });
+  
+  calendar.render();
+});
+</script>
 </body>
-
 </html>

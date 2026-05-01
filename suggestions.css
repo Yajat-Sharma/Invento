@@ -1,26 +1,24 @@
 /* ===== FreshAlert — suggestions.css ===== */
 
 :root {
-    --ai-primary: #8B5CF6;
-    /* Purple for AI */
-    --ai-secondary: #D946EF;
-    /* Pink-ish for gradient */
+    --ai-primary: #8b5cf6;
+    --ai-secondary: #d946ef;
     --ai-glow: rgba(139, 92, 246, 0.4);
 
-    /* Reusing base dashboard themes */
-    --clr-bg: #F4F7FE;
-    --clr-card: #FFFFFF;
-    --clr-text: #2B3674;
-    --clr-text-light: #A3AED0;
-    --clr-border: #E0E5F2;
+    /* Reusing modernized base dashboard themes */
+    --clr-bg: #f1f5f9;
+    --clr-card: #ffffff;
+    --clr-text: #0f172a;
+    --clr-text-light: #64748b;
+    --clr-border: #e2e8f0;
 }
 
 [data-theme="dark"] {
-    --clr-bg: #0B1437;
-    --clr-card: #111C44;
-    --clr-text: #FFFFFF;
-    --clr-text-light: #8F9BBA;
-    --clr-border: #1B2559;
+    --clr-bg: #020617;
+    --clr-card: #0f172a;
+    --clr-text: #f8fafc;
+    --clr-text-light: #94a3b8;
+    --clr-border: rgba(255, 255, 255, 0.08);
 }
 
 /* Gradient text specifically for AI */

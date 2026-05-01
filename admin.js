@@ -261,29 +261,29 @@ function renderUsersTable() {
         } catch { return iso; }
     };
 
-    const avatarColors = ['#4f83ff', '#10b981', '#7c4dff', '#ffb547', '#ee5d50', '#0d9488'];
+    const avatarColors = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4'];
     const initials = name => name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
     tbody.innerHTML = sorted.map((user, idx) => {
         const color = avatarColors[idx % avatarColors.length];
         return `
-        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.15s;"
-            onmouseover="this.style.background='rgba(255,255,255,0.03)'"
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.15s;"
+            onmouseover="this.style.background='rgba(59,130,246,0.05)'"
             onmouseout="this.style.background='transparent'">
-            <td style="padding:0.75rem;color:#8899bb;font-size:0.8rem;">${idx + 1}</td>
+            <td style="padding:0.75rem;color:var(--text-3);font-size:0.8rem;">${idx + 1}</td>
             <td style="padding:0.75rem;">
                 <div style="display:flex;align-items:center;gap:0.6rem;">
-                    <div style="width:32px;height:32px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 4px 10px rgba(0,0,0,0.2);">
                         ${initials(user.name)}
                     </div>
-                    <span style="color:#f0f4ff;font-weight:500;">${user.name}</span>
+                    <span style="color:var(--text-1);font-weight:600;">${user.name}</span>
                 </div>
             </td>
-            <td style="padding:0.75rem;color:#8899bb;">
+            <td style="padding:0.75rem;color:var(--text-2);">
                 <span title="Email masked for privacy" style="font-family:monospace;">${maskEmail(user.email)}</span>
-                <span style="margin-left:0.4rem;font-size:0.7rem;background:rgba(79,131,255,0.12);color:#7eb3ff;padding:0.15rem 0.4rem;border-radius:4px;">masked</span>
+                <span style="margin-left:0.4rem;font-size:0.7rem;background:rgba(59,130,246,0.1);color:var(--led-blue);padding:0.15rem 0.4rem;border-radius:4px;font-weight:600;">masked</span>
             </td>
-            <td style="padding:0.75rem;color:#8899bb;font-size:0.8rem;">${formatDate(user.createdAt)}</td>
+            <td style="padding:0.75rem;color:var(--text-3);font-size:0.8rem;">${formatDate(user.createdAt)}</td>
         </tr>`;
     }).join('');
 }

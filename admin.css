@@ -3,27 +3,27 @@
 /* Custom Admin Variables */
 :root {
     --sidebar-width: 260px;
-    --admin-bg: #F4F7FE;
-    --admin-card-bg: #FFFFFF;
-    --admin-text: #2B3674;
-    --admin-text-light: #A3AED0;
-    --admin-border: #E0E5F2;
+    --admin-bg: #f1f5f9;
+    --admin-card-bg: #ffffff;
+    --admin-text: #0f172a;
+    --admin-text-light: #64748b;
+    --admin-border: #e2e8f0;
 
-    /* Colors */
-    --clr-blue: #4318FF;
-    --clr-purple: #7000FF;
-    --clr-green: #05CD99;
-    --clr-orange: #FFB547;
-    --clr-yellow: #FFCE20;
-    --clr-red: #EE5D50;
+    /* Colors - Modern Palette */
+    --clr-blue: #3b82f6;
+    --clr-purple: #8b5cf6;
+    --clr-green: #10b981;
+    --clr-orange: #f59e0b;
+    --clr-yellow: #eab308;
+    --clr-red: #ef4444;
 }
 
 [data-theme="dark"] {
-    --admin-bg: #0B1437;
-    --admin-card-bg: #111C44;
-    --admin-text: #FFFFFF;
-    --admin-text-light: #8F9BBA;
-    --admin-border: #1B2559;
+    --admin-bg: #0f172a;
+    --admin-card-bg: #1e293b;
+    --admin-text: #f8fafc;
+    --admin-text-light: #94a3b8;
+    --admin-border: #334155;
 }
 
 /* Layout */
