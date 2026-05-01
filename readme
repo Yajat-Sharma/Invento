@@ -42,6 +42,7 @@ Care_Consume/
     ├── suggestions.html     # User feedback portal
     └── admin.html           # Super-admin portal to manage all users
 
+    git inti
     git add .
     git commit -m "Readme file addition"
     git push
