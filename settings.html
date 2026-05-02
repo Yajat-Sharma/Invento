@@ -123,7 +123,7 @@
                 <label class="toggle-switch"><input type="checkbox" id="notifExpiry" checked><span class="toggle-slider"></span></label>
               </div>
             </div>
-            <div class="form-actions" style="margin-top:1rem;"><button class="btn btn-primary" id="saveAlertsBtn">Save Settings</button></div>
+            <div class="form-actions" style="margin-top:1rem;"><button class="btn btn-primary manager-only" id="saveAlertsBtn">Save Settings</button></div>
           </div>
         </div>
 
@@ -256,7 +256,7 @@
           </div>
 
           <!-- ══ ACTIONS ══ -->
-          <div class="card">
+          <div class="card manager-only">
             <div style="display:flex;flex-wrap:wrap;gap:.75rem;">
               <button class="btn btn-primary" id="saveEmailSettingsBtn">
                 <svg width="15" height="15" fill="none" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -315,15 +315,15 @@
             <div style="display:flex;flex-direction:column;gap:.75rem;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
                 <div><div style="font-size:.855rem;font-weight:500;">Clear All Sales</div><div class="form-hint" style="margin:0;">Delete all sales history</div></div>
-                <button class="btn btn-danger btn-sm" id="clearSalesBtn">Clear Sales</button>
+                <button class="btn btn-danger btn-sm owner-only" id="clearSalesBtn">Clear Sales</button>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
                 <div><div style="font-size:.855rem;font-weight:500;">Clear Disposal Log</div><div class="form-hint" style="margin:0;">Delete all waste disposal records</div></div>
-                <button class="btn btn-danger btn-sm" id="clearWasteBtn">Clear Log</button>
+                <button class="btn btn-danger btn-sm owner-only" id="clearWasteBtn">Clear Log</button>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem;background:var(--surface-2);border-radius:var(--r-sm);">
                 <div><div style="font-size:.855rem;font-weight:500;">Reset All Data</div><div class="form-hint" style="margin:0;">Delete ALL products, categories, suppliers, and sales</div></div>
-                <button class="btn btn-danger btn-sm" id="resetAllBtn">Reset All</button>
+                <button class="btn btn-danger btn-sm owner-only" id="resetAllBtn">Reset All</button>
               </div>
             </div>
           </div>

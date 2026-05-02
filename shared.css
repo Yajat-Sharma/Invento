@@ -1513,3 +1513,8 @@ input:checked + .toggle-slider:before { transform: translateX(20px); background:
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Role-based UI visibility */
+body.role-staff .manager-only { display: none !important; }
+body.role-staff .owner-only { display: none !important; }
+body.role-manager .owner-only { display: none !important; }

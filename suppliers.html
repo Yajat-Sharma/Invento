@@ -29,7 +29,7 @@
     <main class="page-content">
       <div class="page-header">
         <div class="page-header-left"><h2>Suppliers</h2><p>Manage product suppliers and their contact details</p></div>
-        <button class="btn btn-primary" id="addSupBtn">
+        <button class="btn btn-primary manager-only" id="addSupBtn">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Supplier
         </button>
       </div>
@@ -43,7 +43,7 @@
         <div class="empty-state-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="opacity:.3"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h3>No suppliers yet.</h3>
         <p>Add suppliers to link them with your products for better traceability.</p>
-        <button class="btn btn-primary" onclick="openModal()">Add Supplier</button>
+        <button class="btn btn-primary manager-only" onclick="openModal()">Add Supplier</button>
       </div>
     </main>
   </div>
@@ -124,7 +124,7 @@ function renderSuppliers() {
       ${s.email ? `<div class="sup-meta">✉️ ${escapeHtml(s.email)}</div>` : ''}
       ${s.city  ? `<div class="sup-meta">📍 ${escapeHtml(s.city)}</div>` : ''}
       ${s.notes ? `<div style="font-size:.75rem;color:var(--text-3);border-top:1px solid var(--border);padding-top:.5rem;margin-top:.25rem;">${escapeHtml(s.notes)}</div>` : ''}
-      <div class="sup-actions">
+      <div class="sup-actions manager-only">
         <button class="btn btn-secondary btn-sm edit-sup" data-id="${s.id}">✏️ Edit</button>
         <button class="btn btn-danger btn-sm del-sup" data-id="${s.id}">🗑️ Delete</button>
       </div>

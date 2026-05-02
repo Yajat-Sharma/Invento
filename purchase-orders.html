@@ -29,7 +29,7 @@
     <main class="page-content">
       <div class="page-header">
         <div class="page-header-left"><h2>Supplier Orders</h2><p>Create and track restock orders from suppliers</p></div>
-        <button class="btn btn-primary" id="addOrderBtn">
+        <button class="btn btn-primary manager-only" id="addOrderBtn">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>New Order
         </button>
       </div>
@@ -37,7 +37,7 @@
       <div class="card">
         <div class="table-wrapper">
           <table class="data-table">
-            <thead><tr><th>Order ID</th><th>Supplier</th><th>Date</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Order ID</th><th>Supplier</th><th>Date</th><th>Amount</th><th>Status</th><th class="manager-only">Actions</th></tr></thead>
             <tbody id="ordersBody"></tbody>
           </table>
         </div>
@@ -132,7 +132,7 @@ function renderOrders() {
       <td class="td-dim">${formatDate(o.date)}</td>
       <td style="font-weight:600;">${formatCurrency(o.totalAmount)}</td>
       <td><span class="badge ${statusColors[o.status] || 'badge-expired'}">${o.status}</span></td>
-      <td>
+      <td class="manager-only">
         <div style="display:flex;gap:.3rem;">
           ${!isReceived ? `<button class="btn btn-success btn-sm receive-order" data-id="${o.id}">✅ Receive</button>` : ''}
           <button class="btn btn-secondary btn-icon btn-sm edit-order" data-id="${o.id}" title="Edit">✏️</button>

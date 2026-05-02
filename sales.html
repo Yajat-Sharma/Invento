@@ -124,7 +124,7 @@
         </div>
         <div class="table-wrapper">
           <table class="data-table">
-            <thead><tr><th>Product</th><th>Customer</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th>Date</th><th>Method</th><th></th></tr></thead>
+            <thead><tr><th>Product</th><th>Customer</th><th>Qty</th><th>Price</th><th>Total</th><th>Profit</th><th>Date</th><th>Method</th><th class="manager-only">Actions</th></tr></thead>
             <tbody id="salesBody"></tbody>
           </table>
         </div>
@@ -272,7 +272,7 @@ function renderSales() {
     <td class="${profit >= 0 ? 'text-success' : 'text-danger'} fw-600">₹${profit.toLocaleString('en-IN')}</td>
     <td class="td-dim">${formatDate(s.date)}</td>
     <td><span class="badge ${methodColors[s.paymentMethod]||'badge-expired'}">${s.paymentMethod||'—'}</span></td>
-    <td>
+    <td class="manager-only">
       <div style="display:flex;gap:.3rem;">
         <button class="btn btn-secondary btn-icon btn-sm print-inv" data-id="${s.id}" title="Print Invoice">📄</button>
         <button class="btn btn-danger btn-icon btn-sm del-sale" data-id="${s.id}" title="Delete">🗑️</button>

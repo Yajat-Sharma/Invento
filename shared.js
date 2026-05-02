@@ -598,6 +598,11 @@ function initPage(pageName) {
   try {
     migrateToMultiShop();
     buildSidebar(pageName);
+    
+    // Apply role-based CSS classes to body
+    const role = DB.getCurrentUserRole() || 'staff';
+    document.body.classList.add('role-' + role);
+    
     // Auto-fire notification check once per browser session
     if (!sessionStorage.getItem('stocksense_notif_checked')) {
       sessionStorage.setItem('stocksense_notif_checked', '1');

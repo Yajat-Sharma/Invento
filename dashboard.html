@@ -122,7 +122,7 @@ function renderDashboard() {
             {svg:`<svg width="22" height="22" fill="none" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 006 17h12M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>`, step:'Step 4', label:'Record Sales'},
           ].map(s => `<div class="card" style="text-align:center;padding:1.25rem .75rem;cursor:default;"><div style="display:flex;justify-content:center;margin-bottom:.5rem;color:var(--accent);">${s.svg}</div><div style="font-size:.7rem;color:var(--text-3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;">${s.step}</div><div style="font-size:.85rem;font-weight:600;margin-top:.25rem;">${s.label}</div></div>`).join('')}
         </div>
-        <a href="products.html" class="btn btn-primary" style="font-size:1rem;padding:.85rem 2rem;">+ Add Your First Product</a>
+        <a href="products.html" class="btn btn-primary manager-only" style="font-size:1rem;padding:.85rem 2rem;">+ Add Your First Product</a>
       </div>`;
     return;
   }

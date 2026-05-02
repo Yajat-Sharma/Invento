@@ -44,7 +44,7 @@
             <h2>Product Categories</h2>
             <p>Organize your products into categories</p>
           </div>
-          <button class="btn btn-primary" id="addCategoryBtn">
+          <button class="btn btn-primary manager-only" id="addCategoryBtn">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
               <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
             </svg>
@@ -60,7 +60,7 @@
             </svg></div>
           <h3>No categories yet</h3>
           <p>Add your first category to organize products</p>
-          <button class="btn btn-primary" onclick="openModal()">Add Category</button>
+          <button class="btn btn-primary manager-only" onclick="openModal()">Add Category</button>
         </div>
       </main>
     </div>
@@ -134,7 +134,7 @@
       <div class="cat-icon-wrap" style="background:${c.color}22;border:1px solid ${c.color}33;">${c.icon}</div>
       <div class="cat-name">${escapeHtml(c.name)}</div>
       <div class="cat-count">${countMap[c.id] || 0} product${(countMap[c.id] || 0) !== 1 ? 's' : ''}</div>
-      <div class="cat-actions">
+      <div class="cat-actions manager-only">
         <button class="btn btn-secondary btn-sm edit-cat" data-id="${c.id}">✏️ Edit</button>
         <button class="btn btn-danger btn-sm del-cat" data-id="${c.id}">🗑️</button>
       </div>

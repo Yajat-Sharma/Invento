@@ -35,10 +35,10 @@
       <div class="page-header">
         <div class="page-header-left"><h2>Product Inventory</h2><p>Manage all products, stock levels, and expiry dates</p></div>
         <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-          <button class="btn btn-secondary btn-sm" id="importExcelBtn">📥 Import Excel</button>
+          <button class="btn btn-secondary btn-sm manager-only" id="importExcelBtn">📥 Import Excel</button>
           <button class="btn btn-secondary btn-sm" id="exportExcelBtn">📤 Export Excel</button>
-          <button class="btn btn-secondary btn-sm" id="printLabelsBtn">🏷️ Print Labels</button>
-          <button class="btn btn-primary" id="addProductBtn">
+          <button class="btn btn-secondary btn-sm manager-only" id="printLabelsBtn">🏷️ Print Labels</button>
+          <button class="btn btn-primary manager-only" id="addProductBtn">
             <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add Product
           </button>
         </div>
@@ -71,7 +71,7 @@
         </div>
         <div class="table-wrapper">
           <table class="data-table" id="productsTable">
-            <thead><tr><th>Product</th><th>Category</th><th>Supplier</th><th>Stock</th><th>Min</th><th>Expiry</th><th>Cost ₹</th><th>Price ₹</th><th>Margin</th><th>Status</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Product</th><th>Category</th><th>Supplier</th><th>Stock</th><th>Min</th><th>Expiry</th><th>Cost ₹</th><th>Price ₹</th><th>Margin</th><th>Status</th><th class="manager-only">Actions</th></tr></thead>
             <tbody id="productsBody"></tbody>
           </table>
         </div>
@@ -79,7 +79,7 @@
           <div class="empty-state-icon"><svg width="40" height="40" fill="none" viewBox="0 0 24 24" style="opacity:.3"><path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7l8 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
           <h3>No products yet</h3>
           <p>Add your first product or import from an Excel file</p>
-          <button class="btn btn-primary" id="addProductBtn2">Add Product</button>
+          <button class="btn btn-primary manager-only" id="addProductBtn2">Add Product</button>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:.75rem 0 0;font-size:.8rem;color:var(--text-3);">
           <span id="productCount">0 products</span>
@@ -434,7 +434,7 @@ function renderProducts() {
       <td style="font-weight:600;">${discActive ? `<div><span class="price-original">₹${Number(p.sellingPrice||0).toLocaleString('en-IN')}</span></div><div class="price-discounted">₹${effPrice.toLocaleString('en-IN')} <span class="discount-active-tag">DISC</span></div>` : `₹${Number(p.sellingPrice||0).toLocaleString('en-IN')}`}</td>
       <td class="${margin >= 0 ? 'text-success' : 'text-danger'} fw-600">${marginPct !== '—' ? marginPct + '%' : '—'}</td>
       <td><span class="badge ${status.badgeClass}">${status.label}</span></td>
-      <td>
+      <td class="manager-only">
         <div style="display:flex;gap:.3rem;">
           <button class="btn btn-secondary btn-icon btn-sm edit-btn" data-id="${p.id}" title="Edit">✏️</button>
           <button class="btn btn-danger btn-icon btn-sm del-btn" data-id="${p.id}" title="Delete">🗑️</button>
