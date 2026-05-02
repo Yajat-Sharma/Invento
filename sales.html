@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="shared.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 <script src="auth.js"></script><script>requireAuth();</script>
 </head>
 <body>
@@ -54,9 +56,19 @@
           <div class="card-header"><div class="card-title">➕ Record Sale</div></div>
           <form id="saleForm" novalidate>
             <div class="form-group">
-              <label class="form-label">Product <span class="req">*</span></label>
+              <label class="form-label" style="display:flex;justify-content:space-between;">
+                Product <span class="req">*</span>
+                <button type="button" class="btn btn-secondary btn-sm" id="openScannerBtn" style="padding:.2rem .5rem;font-size:.7rem;gap:.3rem;">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                  Scan
+                </button>
+              </label>
               <select class="form-control" id="saleProduct"><option value="">Select product…</option></select>
               <div class="field-error" id="sProductErr">Please select a product.</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer (Optional)</label>
+              <select class="form-control" id="saleCustomer"><option value="">Guest Customer</option></select>
             </div>
             <div class="form-grid">
               <div class="form-group">
@@ -112,7 +124,7 @@
         </div>
         <div class="table-wrapper">
           <table class="data-table">
-            <thead><tr><th>Product</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th>Date</th><th>Method</th><th></th></tr></thead>
+            <thead><tr><th>Product</th><th>Customer</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Profit</th><th>Date</th><th>Method</th><th></th></tr></thead>
             <tbody id="salesBody"></tbody>
           </table>
         </div>
@@ -123,6 +135,29 @@
         </div>
       </div>
     </main>
+  </div>
+</div>
+
+<!-- ══ Camera Scanner Modal ══ -->
+<div class="modal-overlay" id="scannerModal" style="z-index:1100;">
+  <div class="scanner-modal-box">
+    <div class="scanner-header">
+      <div class="scanner-title">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" style="flex-shrink:0;">
+          <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Scan Product Barcode
+      </div>
+      <button class="scanner-close-btn" id="closeScannerBtn" title="Close"><svg width="14" height="14" fill="none" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="scanner-loading" id="scannerLoading"><div class="scanner-spinner"></div><span>Starting camera…</span></div>
+    <div class="scanner-viewport" id="scannerViewport">
+      <div id="html5-qrcode-region"></div>
+      <div class="scanner-frame" id="scannerFrame"><span class="sf-corner sf-tl"></span><span class="sf-corner sf-tr"></span><span class="sf-corner sf-bl"></span><span class="sf-corner sf-br"></span><div class="sf-scanline"></div></div>
+    </div>
+    <div class="scanner-status" id="scannerStatus"><div class="scanner-status-dot" id="scannerStatusDot"></div><span id="scannerStatusText">Point camera at a barcode</span></div>
+    <div class="scanner-error" id="scannerError" style="display:none;"><svg width="32" height="32" fill="none" viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 13v-2m0 4h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><p id="scannerErrorMsg">Camera access required.</p><button class="btn btn-secondary btn-sm" id="retryScanner">Try Again</button></div>
+    <div class="scanner-footer"><button class="btn btn-secondary btn-sm" id="closeScannerFooter">Cancel</button></div>
   </div>
 </div>
 
@@ -138,6 +173,14 @@ function populateProducts() {
   sel.innerHTML = '<option value="">Select product…</option>' + products.map(p => `<option value="${p.id}" data-price="${p.sellingPrice}">${escapeHtml(p.name)}</option>`).join('');
 }
 populateProducts();
+
+// Populate customers
+function populateCustomers() {
+  const custs = DB.getCustomers();
+  const sel = document.getElementById('saleCustomer');
+  sel.innerHTML = '<option value="">Guest Customer</option>' + custs.map(c => `<option value="${c.id}">${escapeHtml(c.name)} (${c.phone})</option>`).join('');
+}
+populateCustomers();
 
 // Set default date to today
 document.getElementById('saleDate').value = todayStr();
@@ -218,21 +261,29 @@ function renderSales() {
   const methodColors = { Cash:'badge-good', UPI:'badge-info', Card:'badge-accent' };
   tbody.innerHTML = sales.map(s => {
     const prod   = DB.getProductById(s.productId);
+    const cust   = s.customerId ? DB.getCustomerById(s.customerId) : null;
     const profit = (Number(s.sellingPrice||0) - Number(prod?.costPrice||0)) * Number(s.quantitySold||0);
     return `<tr>
     <td class="td-name">${escapeHtml(s.productName||'—')}</td>
+    <td class="td-dim">${cust ? escapeHtml(cust.name) : 'Guest'}</td>
     <td>${s.quantitySold}</td>
     <td class="td-dim">₹${Number(s.sellingPrice||0).toLocaleString('en-IN')}</td>
     <td style="font-weight:600;color:var(--success);">₹${Number(s.totalAmount||0).toLocaleString('en-IN')}</td>
     <td class="${profit >= 0 ? 'text-success' : 'text-danger'} fw-600">₹${profit.toLocaleString('en-IN')}</td>
     <td class="td-dim">${formatDate(s.date)}</td>
     <td><span class="badge ${methodColors[s.paymentMethod]||'badge-expired'}">${s.paymentMethod||'—'}</span></td>
-    <td><button class="btn btn-danger btn-icon btn-sm del-sale" data-id="${s.id}" title="Delete">🗑️</button></td>
+    <td>
+      <div style="display:flex;gap:.3rem;">
+        <button class="btn btn-secondary btn-icon btn-sm print-inv" data-id="${s.id}" title="Print Invoice">📄</button>
+        <button class="btn btn-danger btn-icon btn-sm del-sale" data-id="${s.id}" title="Delete">🗑️</button>
+      </div>
+    </td>
   </tr>`;
   }).join('');
   document.querySelectorAll('.del-sale').forEach(btn => btn.addEventListener('click', () => {
     showConfirm('Delete Sale', 'Delete this sale record?', () => { DB.deleteSale(btn.dataset.id); renderSales(); loadStats(); showToast('Sale deleted','error'); });
   }));
+  document.querySelectorAll('.print-inv').forEach(btn => btn.addEventListener('click', () => generateInvoice(btn.dataset.id)));
 }
 renderSales();
 
@@ -242,9 +293,10 @@ document.getElementById('clearDateFilter').addEventListener('click', () => { doc
 // Form submit
 document.getElementById('saleForm').addEventListener('submit', e => {
   e.preventDefault();
-  const productId = document.getElementById('saleProduct').value;
-  const qty       = Number(document.getElementById('saleQty').value);
-  const date      = document.getElementById('saleDate').value;
+  const productId  = document.getElementById('saleProduct').value;
+  const customerId = document.getElementById('saleCustomer').value;
+  const qty        = Number(document.getElementById('saleQty').value);
+  const date       = document.getElementById('saleDate').value;
   let ok = true;
   if (!productId) { document.getElementById('sProductErr').classList.add('visible'); document.getElementById('saleProduct').classList.add('error'); ok=false; }
   else { document.getElementById('sProductErr').classList.remove('visible'); document.getElementById('saleProduct').classList.remove('error'); }
@@ -259,7 +311,7 @@ document.getElementById('saleForm').addEventListener('submit', e => {
   const total   = qty * price;
   const method  = document.getElementById('saleMethod').value;
 
-  DB.addSale({ id:genId('sale'), productId, productName:product?.name||'Unknown', quantitySold:qty, sellingPrice:price, totalAmount:total, date, paymentMethod:method, createdAt:now() });
+  DB.addSale({ id:genId('sale'), productId, customerId, productName:product?.name||'Unknown', quantitySold:qty, sellingPrice:price, totalAmount:total, date, paymentMethod:method, createdAt:now() });
   // Deduct stock
   if (product) DB.updateProduct(productId, { quantity: Math.max(0, Number(product.quantity)-qty) });
 
@@ -274,6 +326,131 @@ document.getElementById('saleForm').addEventListener('submit', e => {
   loadStats();
   showToast(`Sale of ₹${total.toLocaleString('en-IN')} recorded!`);
 });
+
+// ── Invoice Generation (jsPDF) ──
+function generateInvoice(saleId) {
+  const sale = DB.getSales().find(s => s.id === saleId);
+  if (!sale) return;
+  const shop = DB.getCurrentShop();
+  const cust = sale.customerId ? DB.getCustomerById(sale.customerId) : null;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  // Header
+  doc.setFontSize(22); doc.setTextColor(40); doc.text(shop?.name || 'Invento', 14, 22);
+  doc.setFontSize(10); doc.setTextColor(100);
+  doc.text(shop?.address || '', 14, 30);
+  doc.text(`Phone: ${shop?.phone || ''} | Email: ${shop?.email || ''}`, 14, 35);
+  
+  doc.setDrawColor(200); doc.line(14, 42, 196, 42);
+
+  // Invoice Details
+  doc.setFontSize(12); doc.setTextColor(40); doc.text('INVOICE', 14, 52);
+  doc.setFontSize(10); doc.text(`Date: ${formatDate(sale.date)}`, 140, 52);
+  doc.text(`Invoice #: ${sale.id.toUpperCase()}`, 140, 58);
+
+  // Customer Details
+  doc.setFontSize(11); doc.text('Bill To:', 14, 68);
+  doc.setFontSize(10); doc.setTextColor(100);
+  doc.text(cust ? cust.name : 'Guest Customer', 14, 74);
+  if (cust?.phone) doc.text(cust.phone, 14, 79);
+  if (cust?.address) doc.text(cust.address, 14, 84);
+
+  // Table
+  const tableData = [[
+    sale.productName,
+    sale.quantitySold,
+    formatCurrency(sale.sellingPrice),
+    formatCurrency(sale.totalAmount)
+  ]];
+  
+  doc.autoTable({
+    startY: 95,
+    head: [['Product', 'Qty', 'Unit Price', 'Total']],
+    body: tableData,
+    theme: 'striped',
+    headStyles: { fillColor: [108, 99, 255] }
+  });
+
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(12); doc.setTextColor(40);
+  doc.text(`Total Amount: ${formatCurrency(sale.totalAmount)}`, 140, finalY, { align: 'right' });
+  doc.setFontSize(10); doc.text(`Payment Method: ${sale.paymentMethod}`, 140, finalY + 7, { align: 'right' });
+
+  doc.setFontSize(10); doc.setTextColor(150);
+  doc.text('Thank you for your business!', 105, finalY + 30, { align: 'center' });
+
+  doc.save(`Invoice_${sale.id}.pdf`);
+  showToast('Invoice generated!');
+}
+
+// ── Barcode Scanner Logic ──
+(function() {
+  let scanner = null;
+  const modal = document.getElementById('scannerModal');
+  const btn   = document.getElementById('openScannerBtn');
+  const close = document.getElementById('closeScannerBtn');
+  const retry = document.getElementById('retryScanner');
+
+  function openScanner() {
+    modal.classList.add('active');
+    document.getElementById('scannerLoading').style.display = 'flex';
+    document.getElementById('scannerError').style.display = 'none';
+    
+    if (typeof Html5Qrcode === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+      script.onload = startCamera;
+      document.head.appendChild(script);
+    } else {
+      startCamera();
+    }
+  }
+
+  async function startCamera() {
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (!devices || !devices.length) throw new Error("No cameras found");
+      const backCam = devices.find(d => d.label.toLowerCase().includes('back')) || devices[0];
+      
+      scanner = new Html5Qrcode('html5-qrcode-region');
+      await scanner.start(backCam.id, { fps: 10, qrbox: { width: 250, height: 150 } }, onScanSuccess);
+      document.getElementById('scannerLoading').style.display = 'none';
+    } catch (err) {
+      console.error(err);
+      document.getElementById('scannerLoading').style.display = 'none';
+      document.getElementById('scannerError').style.display = 'flex';
+      document.getElementById('scannerErrorMsg').textContent = err.message || "Camera error";
+    }
+  }
+
+  function onScanSuccess(decodedText) {
+    stopScanner();
+    // Find product by barcode
+    const products = DB.getProducts();
+    const prod = products.find(p => p.barcode === decodedText);
+    if (prod) {
+      document.getElementById('saleProduct').value = prod.id;
+      document.getElementById('salePrice').value = prod.sellingPrice;
+      recalcTotal();
+      showToast(`Product found: ${prod.name}`);
+    } else {
+      showToast(`No product found for barcode: ${decodedText}`, 'warning');
+    }
+  }
+
+  function stopScanner() {
+    if (scanner) {
+      scanner.stop().then(() => { scanner.clear(); scanner = null; }).catch(e => console.error(e));
+    }
+    modal.classList.remove('active');
+  }
+
+  btn.addEventListener('click', openScanner);
+  close.addEventListener('click', stopScanner);
+  retry.addEventListener('click', startCamera);
+  document.getElementById('closeScannerFooter').addEventListener('click', stopScanner);
+})();
 </script>
 </body>
 </html>

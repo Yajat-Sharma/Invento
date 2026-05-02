@@ -160,6 +160,22 @@ const DB = {
   addSale(sale)           { const s = this.getSales(); s.unshift(sale); this.saveSales(s); return sale; },
   deleteSale(id)          { this.saveSales(this.getSales().filter(x => x.id !== id)); },
 
+  // ── Customers (shop-level) ──
+  getCustomers()          { return this._get(getShopKey('customers')); },
+  saveCustomers(c)        { this._set(getShopKey('customers'), c); },
+  addCustomer(cust)       { const c = this.getCustomers(); c.push(cust); this.saveCustomers(c); return cust; },
+  updateCustomer(id, f)   { const c = this.getCustomers(), i = c.findIndex(x => x.id === id); if (i >= 0) { c[i] = { ...c[i], ...f }; this.saveCustomers(c); } },
+  deleteCustomer(id)      { this.saveCustomers(this.getCustomers().filter(x => x.id !== id)); },
+  getCustomerById(id)     { return this.getCustomers().find(x => x.id === id) || null; },
+
+  // ── Purchase Orders (shop-level) ──
+  getPurchaseOrders()     { return this._get(getShopKey('purchase_orders')); },
+  savePurchaseOrders(p)   { this._set(getShopKey('purchase_orders'), p); },
+  addPurchaseOrder(po)    { const p = this.getPurchaseOrders(); p.unshift(po); this.savePurchaseOrders(p); return po; },
+  updatePurchaseOrder(id, f) { const p = this.getPurchaseOrders(), i = p.findIndex(x => x.id === id); if (i >= 0) { p[i] = { ...p[i], ...f }; this.savePurchaseOrders(p); } },
+  deletePurchaseOrder(id) { this.savePurchaseOrders(this.getPurchaseOrders().filter(x => x.id !== id)); },
+  getPurchaseOrderById(id) { return this.getPurchaseOrders().find(x => x.id === id) || null; },
+
   // ── Waste / Disposed (shop-level) ──
   getWaste()              { return this._get(getShopKey('waste')); },
   saveWaste(w)            { this._set(getShopKey('waste'), w); },
@@ -443,6 +459,8 @@ const NAV_ITEMS = [
   { href:'products.html',   label:'Products',     page:'products',   icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4v10M4 7l8 4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
   { href:'categories.html', label:'Categories',   page:'categories', icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
   { href:'suppliers.html',  label:'Suppliers',    page:'suppliers',  icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+  { href:'customers.html',  label:'Customers',    page:'customers',  icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
+  { href:'purchase-orders.html', label:'Orders', page:'purchase-orders', icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
   { href:'sales.html',      label:'Sales',        page:'sales',      icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293A1 1 0 006 17h12M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
   { href:'calendar.html',   label:'Calendar',     page:'calendar',   icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
   { href:'suggestions.html',label:'AI Insights',  page:'suggestions',icon:`<svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M9.5 14.5L12 17l2.5-2.5M12 17V9m-7 5.5l2.5 2.5L10 14.5M7.5 17V9m11.5 5.5L16.5 17l-2.5-2.5M16.5 17V9M12 3C7.582 3 4 5.464 4 8.5c0 1.5.873 2.856 2.305 3.791.138.091.21.261.18.426l-.4 2.2a.5.5 0 00.73.535l2.1-1.05a.5.5 0 01.447 0c.854.427 1.8.648 2.738.648 4.418 0 8-2.464 8-5.5S16.418 3 12 3z" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg>` },
