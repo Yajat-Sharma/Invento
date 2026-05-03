@@ -88,13 +88,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <span class="auth-logo-name">Invento</span>
     </div>
     <h2 class="auth-heading">Sign in</h2>
-    <p class="auth-sub">Enter your credentials to access your dashboard</p>
-
+    <p class="auth-sub">Enter your credentials to access your dashboard </p>
     <div class="alert-banner" id="alertBanner" role="alert">
       <span id="alertIcon">⚠️</span>
       <span id="alertText"></span>
     </div>
-
     <form id="loginForm" novalidate>
       <div class="form-group">
         <label class="form-label" for="loginEmail">Email Address</label>
@@ -118,15 +116,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
         <span class="btn-spinner" id="btnSpinner"></span>
       </button>
     </form>
-
     <div class="auth-divider">Don't have an account? <a href="signup.html" class="switch-link">Create one free →</a></div>
   </div>
 </div>
-
 <script src="auth.js"></script>
 <script>
   redirectIfLoggedIn();
-
   // Smart Login Link: auto-fill email from URL parameter
   const urlParams = new URLSearchParams(window.location.search);
   const emailParam = urlParams.get('email');
