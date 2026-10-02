@@ -57,17 +57,17 @@ function generateId() {
 // 2. CATEGORY CONFIG
 // =====================
 const CATEGORIES = {
-    medicine: { icon: '💊', label: 'Medicine', badge: 'badge-medicine', color: '#8B5CF6' },
-    dairy: { icon: '🥛', label: 'Dairy', badge: 'badge-dairy', color: '#2563EB' },
-    vegetables: { icon: '🥬', label: 'Vegetables', badge: 'badge-vegetables', color: '#059669' },
-    fruits: { icon: '🍎', label: 'Fruits', badge: 'badge-fruits', color: '#DC2626' },
-    snacks: { icon: '🍪', label: 'Snacks', badge: 'badge-snacks', color: '#D97706' },
-    vitamins: { icon: '💊', label: 'Vitamins', badge: 'badge-vitamins', color: '#0D9488' },
-    other: { icon: '📦', label: 'Other', badge: 'badge-other', color: '#6B7280' }
+    medicine: { icon: '', label: 'Medicine', badge: 'badge-medicine', color: '#8B5CF6' },
+    dairy: { icon: '', label: 'Dairy', badge: 'badge-dairy', color: '#2563EB' },
+    vegetables: { icon: '', label: 'Vegetables', badge: 'badge-vegetables', color: '#059669' },
+    fruits: { icon: '', label: 'Fruits', badge: 'badge-fruits', color: '#DC2626' },
+    snacks: { icon: '', label: 'Snacks', badge: 'badge-snacks', color: '#D97706' },
+    vitamins: { icon: '', label: 'Vitamins', badge: 'badge-vitamins', color: '#0D9488' },
+    other: { icon: '', label: 'Other', badge: 'badge-other', color: '#6B7280' }
 };
 
 function getCategoryInfo(category) {
-    return CATEGORIES[category] || { icon: '📦', label: category, badge: 'badge-other', color: '#6B7280' };
+    return CATEGORIES[category] || { icon: '', label: category, badge: 'badge-other', color: '#6B7280' };
 }
 
 // Pill selection handler
@@ -288,10 +288,10 @@ settingsForm?.addEventListener('submit', (e) => {
     const email = userEmailInput.value.trim();
     if (email) {
         localStorage.setItem('freshalert_user_email', email);
-        showToast('⚙️ Email settings saved!', 'success');
+        showToast(' Email settings saved!', 'success');
     } else {
         localStorage.removeItem('freshalert_user_email');
-        showToast('⚙️ Email removed. Reminders disabled.', 'success');
+        showToast(' Email removed. Reminders disabled.', 'success');
     }
     closeSettings();
 });
@@ -400,7 +400,7 @@ addItemForm?.addEventListener('submit', (e) => {
         renderItems();
         updateDashboardCards();
         renderCalendar();
-        showToast(`✏️ "${name}" updated successfully!`);
+        showToast(` "${name}" updated successfully!`);
     } else {
         // Add new item
         const item = {
@@ -413,7 +413,7 @@ addItemForm?.addEventListener('submit', (e) => {
         renderItems();
         updateDashboardCards();
         renderCalendar();
-        showToast(`✅ "${name}" added successfully!`);
+        showToast(` "${name}" added successfully!`);
     }
 });
 
@@ -451,7 +451,7 @@ function renderItems() {
     emptyState.classList.remove('visible');
 
     if (filtered.length === 0) {
-        itemsList.innerHTML = `<div class="empty-state visible" style="grid-column:1/-1;padding:2rem"><div class="empty-icon">🔍</div><h3>No matching items</h3><p>Try a different filter</p></div>`;
+        itemsList.innerHTML = `<div class="empty-state visible" style="grid-column:1/-1;padding:2rem"><div class="empty-icon"></div><h3>No matching items</h3><p>Try a different filter</p></div>`;
         return;
     }
 
@@ -484,7 +484,7 @@ function renderItems() {
                     <span>Exp: ${formatDate(item.expiryDate)}</span>
                 </div>
             </div>
-            ${item.notes ? `<div class="item-notes">📝 ${escapeHtml(item.notes)}</div>` : ''}
+            ${item.notes ? `<div class="item-notes"> ${escapeHtml(item.notes)}</div>` : ''}
         </div>`;
     }).join('');
 
@@ -578,7 +578,7 @@ confirmDeleteBtn?.addEventListener('click', () => {
         renderItems();
         updateDashboardCards();
         renderCalendar();
-        showToast(`🗑️ "${item?.name || 'Item'}" deleted`, 'error');
+        showToast(` "${item?.name || 'Item'}" deleted`, 'error');
     }
 });
 
@@ -720,7 +720,7 @@ function updateCharts(categoryCounts, fresh, expiring, expired) {
     expiryChart = new Chart(expCtx, {
         type: 'doughnut',
         data: {
-            labels: ['✅ Fresh', '⚠️ Expiring', '❌ Expired'],
+            labels: [' Fresh', ' Expiring', ' Expired'],
             datasets: [{
                 data: [fresh, expiring, expired],
                 backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
@@ -790,7 +790,7 @@ function updateGreeting() {
     if (hour < 12) greeting = 'Good morning';
     else if (hour < 17) greeting = 'Good afternoon';
     else greeting = 'Good evening';
-    welcomeTitle.textContent = `${greeting}! Let's stay healthy and reduce waste 💚`;
+    welcomeTitle.textContent = `${greeting}! Let's stay healthy and reduce waste `;
 }
 
 updateGreeting();
@@ -843,7 +843,7 @@ const NOTIF_KEY = 'freshalert_last_notif_date';
 // Request browser notification permission
 async function requestNotificationPermission() {
     if (!('Notification' in window)) {
-        console.log('⚠️ Browser does not support notifications');
+        console.log(' Browser does not support notifications');
         return false;
     }
     if (Notification.permission === 'granted') return true;
@@ -854,7 +854,7 @@ async function requestNotificationPermission() {
 }
 
 // Send a browser notification
-function sendNotification(title, body, icon = '⚠️') {
+function sendNotification(title, body, icon = '') {
     if (Notification.permission !== 'granted') return;
 
     const notif = new Notification(title, {
@@ -889,7 +889,7 @@ function checkExpiringItems() {
         const expiry = new Date(item.expiryDate);
         expiry.setHours(0, 0, 0, 0);
         const diffDays = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
-        const icon = item.category === 'medicine' ? '💊' : '🛒';
+        const icon = item.category === 'medicine' ? '' : '';
 
         let message;
         if (diffDays === 0) {
@@ -902,7 +902,7 @@ function checkExpiringItems() {
 
         // Stagger notifications slightly
         setTimeout(() => {
-            sendNotification('FreshAlert ⏰', message);
+            sendNotification('FreshAlert ', message);
         }, index * 1500);
     });
 
@@ -910,7 +910,7 @@ function checkExpiringItems() {
     if (expiringItems.length > 3) {
         setTimeout(() => {
             sendNotification(
-                'FreshAlert ⏰',
+                'FreshAlert ',
                 `You have ${expiringItems.length} items expiring soon. Open the app to check!`
             );
         }, 5000);
@@ -921,14 +921,14 @@ function checkExpiringItems() {
     const firstExpiry = new Date(first.expiryDate);
     firstExpiry.setHours(0, 0, 0, 0);
     const firstDiff = Math.ceil((firstExpiry - today) / (1000 * 60 * 60 * 24));
-    const firstIcon = first.category === 'medicine' ? '💊' : '🛒';
+    const firstIcon = first.category === 'medicine' ? '' : '';
 
     if (firstDiff === 0) {
         showToast(`${firstIcon} "${first.name}" expires today!`, 'error');
     } else if (firstDiff === 1) {
         showToast(`${firstIcon} "${first.name}" expires tomorrow!`, 'error');
     } else {
-        showToast(`⚠️ ${expiringItems.length} item${expiringItems.length > 1 ? 's' : ''} expiring soon`, 'error');
+        showToast(` ${expiringItems.length} item${expiringItems.length > 1 ? 's' : ''} expiring soon`, 'error');
     }
 }
 
@@ -952,10 +952,10 @@ function runDailyNotificationCheck() {
 async function initNotifications() {
     const granted = await requestNotificationPermission();
     if (granted) {
-        console.log('🔔 Notifications enabled');
+        console.log(' Notifications enabled');
         runDailyNotificationCheck();
     } else {
-        console.log('🔕 Notifications not permitted');
+        console.log(' Notifications not permitted');
         // Even if browser notifications fail, try to run email check once per session.
         runDailyNotificationCheck();
     }
@@ -1125,7 +1125,7 @@ function renderCalendar() {
 function showCalendarDetail(dateStr, items) {
     const d = new Date(dateStr + 'T00:00:00');
     const formatted = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-    calDetailTitle.textContent = `📋 Items expiring on ${formatted}`;
+    calDetailTitle.textContent = ` Items expiring on ${formatted}`;
 
     calDetailList.innerHTML = items.map(item => {
         const cat = getCategoryInfo(item.category);
@@ -1161,9 +1161,9 @@ const currentTheme = localStorage.getItem('freshalert_theme') || 'light';
 
 if (currentTheme === 'dark') {
     document.documentElement.setAttribute('data-theme', 'dark');
-    themeToggle.textContent = '☀️';
+    themeToggle.textContent = '';
 } else {
-    themeToggle.textContent = '🌙';
+    themeToggle.textContent = '';
 }
 
 themeToggle?.addEventListener('click', () => {
@@ -1171,11 +1171,11 @@ themeToggle?.addEventListener('click', () => {
     if (theme === 'dark') {
         document.documentElement.removeAttribute('data-theme');
         localStorage.setItem('freshalert_theme', 'light');
-        themeToggle.textContent = '🌙';
+        themeToggle.textContent = '';
     } else {
         document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('freshalert_theme', 'dark');
-        themeToggle.textContent = '☀️';
+        themeToggle.textContent = '';
     }
 });
 
@@ -1184,11 +1184,11 @@ updateDashboardCards();
 renderCalendar();
 initNotifications();
 
-console.log('🌿 FreshAlert Dashboard initialized successfully!');
-console.log('📱 Mobile-first responsive design active');
-console.log('♿ Accessibility features enabled');
-console.log('🔔 Expiry notifications system active');
-console.log('📅 Expiry calendar active');
+console.log(' FreshAlert Dashboard initialized successfully!');
+console.log(' Mobile-first responsive design active');
+console.log(' Accessibility features enabled');
+console.log(' Expiry notifications system active');
+console.log(' Expiry calendar active');
 
 // =====================
 // 17. BARCODE SCANNER
@@ -1272,7 +1272,7 @@ console.log('📅 Expiry calendar active');
         detectionBuffer = {};
         scannerFrame.classList.remove('detected');
         scannerFlash.classList.remove('flash');
-        setStatus('🔍', 'Point camera at a barcode');
+        setStatus('', 'Point camera at a barcode');
         resultPanel.style.display = 'none';
         productNameRow.style.display = 'none';
         useBarcodeBtn.style.display = 'none';
@@ -1291,9 +1291,9 @@ console.log('📅 Expiry calendar active');
         clearNoCameraMsg();
         const el = document.createElement('div');
         el.className = 'scanner-no-camera';
-        el.innerHTML = `<div class="no-cam-icon">📷</div><p>${msg}</p>`;
+        el.innerHTML = `<div class="no-cam-icon"></div><p>${msg}</p>`;
         scannerViewport.appendChild(el);
-        setStatus('❌', 'Camera unavailable', 'status-error');
+        setStatus('', 'Camera unavailable', 'status-error');
     }
 
     // ── QuaggaJS Init ──
@@ -1303,7 +1303,7 @@ console.log('📅 Expiry calendar active');
             return;
         }
 
-        setStatus('⏳', 'Requesting camera access…');
+        setStatus('', 'Requesting camera access…');
         clearNoCameraMsg();
 
         Quagga.init({
@@ -1347,7 +1347,7 @@ console.log('📅 Expiry calendar active');
             }
             Quagga.start();
             quaggaRunning = true;
-            setStatus('🔍', 'Point camera at a barcode');
+            setStatus('', 'Point camera at a barcode');
         });
 
         // Barcode detected callback
@@ -1404,7 +1404,7 @@ console.log('📅 Expiry calendar active');
 
     // ── OpenFoodFacts lookup ──
     async function fetchProduct(barcode) {
-        setStatus('⏳', 'Looking up product…', 'status-loading');
+        setStatus('', 'Looking up product…', 'status-loading');
 
         // Append a spinner to status text
         const spinner = document.createElement('span');
@@ -1433,14 +1433,14 @@ console.log('📅 Expiry calendar active');
                     detectedName = name.trim();
                     productNameEl.textContent = detectedName;
                     productNameRow.style.display = 'flex';
-                    setStatus('✅', `Found: ${detectedName}`, 'status-success');
+                    setStatus('', `Found: ${detectedName}`, 'status-success');
                 } else {
                     detectedName = null;
-                    setStatus('⚠️', 'Product found but no name available. Enter manually.', '');
+                    setStatus('', 'Product found but no name available. Enter manually.', '');
                 }
             } else {
                 detectedName = null;
-                setStatus('📦', 'Product not in database. Enter name manually.', '');
+                setStatus('', 'Product not in database. Enter name manually.', '');
             }
         } catch (err) {
             console.warn('OpenFoodFacts fetch error:', err);
@@ -1448,7 +1448,7 @@ console.log('📅 Expiry calendar active');
             const msg = err.name === 'TimeoutError'
                 ? 'Lookup timed out. Enter name manually.'
                 : 'Could not fetch product info. Enter name manually.';
-            setStatus('⚠️', msg, '');
+            setStatus('', msg, '');
         } finally {
             // Show "Use This Item" button regardless
             useBarcodeBtn.style.display = 'inline-flex';
@@ -1486,8 +1486,8 @@ console.log('📅 Expiry calendar active');
 
         showToast(
             detectedName
-                ? `📷 Scanned: "${detectedName}"`
-                : `📷 Barcode scanned — enter product name`,
+                ? ` Scanned: "${detectedName}"`
+                : ` Barcode scanned — enter product name`,
             'success'
         );
     }
@@ -1510,7 +1510,7 @@ console.log('📅 Expiry calendar active');
         }
     });
 
-    console.log('📷 Barcode scanner module initialized');
+    console.log(' Barcode scanner module initialized');
 })();
 
 // =====================
@@ -1733,7 +1733,7 @@ console.log('📅 Expiry calendar active');
 
     async function runOCR(imageSource) {
         if (typeof Tesseract === 'undefined') {
-            showToast('⚠️ Tesseract.js not loaded. Check your connection.', 'error');
+            showToast(' Tesseract.js not loaded. Check your connection.', 'error');
             return;
         }
 
@@ -1776,10 +1776,10 @@ console.log('📅 Expiry calendar active');
                 detectedDate.style.display = '';
                 applyBtn.style.display = 'inline-flex';
                 playBeep();
-                showToast(`📅 Expiry date detected: ${parsed.display}`, 'success');
+                showToast(` Expiry date detected: ${parsed.display}`, 'success');
             } else {
                 noDateEl.style.display = '';
-                showToast('⚠️ No expiry date found. Try a clearer photo.', 'error');
+                showToast(' No expiry date found. Try a clearer photo.', 'error');
             }
 
         } catch (err) {
@@ -1788,7 +1788,7 @@ console.log('📅 Expiry calendar active');
             noDateEl.style.display = '';
             rawDetail.style.display = '';
             rawTextEl.textContent = 'OCR failed: ' + (err.message || err);
-            showToast('❌ OCR failed. Try again with a clearer image.', 'error');
+            showToast(' OCR failed. Try again with a clearer image.', 'error');
         }
     }
 
@@ -1830,7 +1830,7 @@ console.log('📅 Expiry calendar active');
             document.body.style.overflow = '';
         }
 
-        showToast(`📅 Expiry date applied: ${dateValueEl.textContent.split('(')[0].trim()}`, 'success');
+        showToast(` Expiry date applied: ${dateValueEl.textContent.split('(')[0].trim()}`, 'success');
 
         // Focus expiry field
         setTimeout(() => expiryInput?.focus(), 150);
@@ -1876,5 +1876,5 @@ console.log('📅 Expiry calendar active');
     // Reset OCR when switching back to barcode tab
     document.getElementById('tabBarcode')?.addEventListener('click', resetOCR);
 
-    console.log('📅 Expiry date OCR scanner initialized (Tesseract.js)');
+    console.log(' Expiry date OCR scanner initialized (Tesseract.js)');
 })();

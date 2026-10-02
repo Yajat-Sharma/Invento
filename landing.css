@@ -1,9 +1,9 @@
 /* ===== FreshAlert — landing.css ===== */
 
 :root {
-    --clr-primary: #10B981;
-    --clr-primary-dark: #059669;
-    --clr-primary-glow: rgba(16, 185, 129, 0.4);
+    --clr-primary: #3b82f6;
+    --clr-primary-dark: #2563eb;
+    --clr-primary-glow: rgba(59, 130, 246, 0.4);
 
     --clr-secondary: #0ea5e9;
     --clr-teal: #14b8a6;
@@ -13,11 +13,11 @@
     --clr-text-light: #64748b;
 
     --clr-bg-start: #ffffff;
-    --clr-bg-end: #f0fdf4;
+    --clr-bg-end: #eff6ff;
 
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(16, 185, 129, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.1);
 
     --font-main: 'Outfit', -apple-system, sans-serif;
 }

@@ -84,7 +84,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Icon (Emoji)</label>
-          <input type="text" class="form-control" id="catIcon" placeholder="e.g. 🥛" maxlength="4"
+          <input type="text" class="form-control" id="catIcon" placeholder="e.g. " maxlength="4"
             style="font-size:1.2rem;">
         </div>
         <div class="form-group" <label class="form-label">Color</label>
@@ -135,8 +135,8 @@
       <div class="cat-name">${escapeHtml(c.name)}</div>
       <div class="cat-count">${countMap[c.id] || 0} product${(countMap[c.id] || 0) !== 1 ? 's' : ''}</div>
       <div class="cat-actions manager-only">
-        <button class="btn btn-secondary btn-sm edit-cat" data-id="${c.id}">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm del-cat" data-id="${c.id}">🗑️</button>
+        <button class="btn btn-secondary btn-sm edit-cat" data-id="${c.id}"> Edit</button>
+        <button class="btn btn-danger btn-sm del-cat" data-id="${c.id}"></button>
       </div>
     </div>`).join('');
 

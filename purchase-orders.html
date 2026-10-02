@@ -134,9 +134,9 @@ function renderOrders() {
       <td><span class="badge ${statusColors[o.status] || 'badge-expired'}">${o.status}</span></td>
       <td class="manager-only">
         <div style="display:flex;gap:.3rem;">
-          ${!isReceived ? `<button class="btn btn-success btn-sm receive-order" data-id="${o.id}">✅ Receive</button>` : ''}
-          <button class="btn btn-secondary btn-icon btn-sm edit-order" data-id="${o.id}" title="Edit">✏️</button>
-          <button class="btn btn-danger btn-icon btn-sm del-order" data-id="${o.id}" title="Delete">🗑️</button>
+          ${!isReceived ? `<button class="btn btn-success btn-sm receive-order" data-id="${o.id}"> Receive</button>` : ''}
+          <button class="btn btn-secondary btn-icon btn-sm edit-order" data-id="${o.id}" title="Edit"></button>
+          <button class="btn btn-danger btn-icon btn-sm del-order" data-id="${o.id}" title="Delete"></button>
         </div>
       </td>
     </tr>`;
@@ -198,7 +198,7 @@ function renderItems() {
       <td><input type="number" class="form-control item-qty" data-idx="${idx}" value="${item.quantity}" min="1"></td>
       <td><input type="number" class="form-control item-cost" data-idx="${idx}" value="${item.cost}" min="0" step="0.01"></td>
       <td style="font-weight:600;">₹${(item.quantity * item.cost).toFixed(2)}</td>
-      <td><button class="btn btn-danger btn-icon btn-sm remove-item" data-idx="${idx}">✕</button></td>
+      <td><button class="btn btn-danger btn-icon btn-sm remove-item" data-idx="${idx}"></button></td>
     </tr>
   `).join('');
   

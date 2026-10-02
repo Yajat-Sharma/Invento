@@ -452,7 +452,7 @@ document.getElementById('sendTestEmailBtn').addEventListener('click', async () =
     }
   } catch (e) {
     result.style.cssText = 'display:block;margin-top:1rem;padding:12px 16px;border-radius:10px;font-size:.84rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#fca5a5;';
-    result.innerHTML = `❌ <strong>Error:</strong> ${escapeHtml(String(e))}`;
+    result.innerHTML = ` <strong>Error:</strong> ${escapeHtml(String(e))}`;
   }
 
   btn.disabled = false;

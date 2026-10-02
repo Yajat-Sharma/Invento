@@ -1,9 +1,9 @@
 /* ===== FreshAlert — suggestions.css ===== */
 
 :root {
-    --ai-primary: #8b5cf6;
-    --ai-secondary: #d946ef;
-    --ai-glow: rgba(139, 92, 246, 0.4);
+    --ai-primary: #3b82f6;
+    --ai-secondary: #0ea5e9;
+    --ai-glow: rgba(59, 130, 246, 0.4);
 
     /* Reusing modernized base dashboard themes */
     --clr-bg: #f1f5f9;

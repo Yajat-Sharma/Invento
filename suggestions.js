@@ -72,7 +72,7 @@ async function generateAISuggestions() {
 
             try {
                 const fallbackResponse = await mockAiJSONApi(urgentItems);
-                fallbackResponse.insights.unshift("⚠️ *Running in Offline Simulation Mode due to API Quota Limits.*");
+                fallbackResponse.insights.unshift(" *Running in Offline Simulation Mode due to API Quota Limits.*");
                 renderAIResponse(fallbackResponse);
                 showUIState('content');
             } catch (fallbackError) {
@@ -107,15 +107,15 @@ function mockAiJSONApi(items) {
                 if (item.category === 'vegetables') vegCount++;
 
                 // Build suggestion logic based on name heuristics
-                let emoji = "📦";
+                let emoji = "";
                 let action = `Consider consuming this ${item.category} item soon to prevent waste.`;
 
-                if (nameLow.includes('milk')) { emoji = "🥛"; action = "Blend into a smoothie, make pancakes, or use in a creamy pasta sauce."; }
-                else if (nameLow.includes('banana')) { emoji = "🍌"; action = "Bake banana bread, freeze for smoothies, or top your morning oatmeal."; }
-                else if (nameLow.includes('bread')) { emoji = "🍞"; action = "Make french toast, croutons, or freeze the slices for later use."; }
-                else if (nameLow.includes('egg')) { emoji = "🥚"; action = "Boil them for salads, make an omelette, or bake a quiche."; }
-                else if (item.category === 'vegetables') { emoji = "🥦"; action = "Chop and roast them for a side dish, or blend them into a healthy soup base."; }
-                else if (item.category === 'medicine' || item.category === 'vitamins') { emoji = "💊"; action = "Safely dispose of this if expired, or ensure you take your required doses."; }
+                if (nameLow.includes('milk')) { emoji = ""; action = "Blend into a smoothie, make pancakes, or use in a creamy pasta sauce."; }
+                else if (nameLow.includes('banana')) { emoji = ""; action = "Bake banana bread, freeze for smoothies, or top your morning oatmeal."; }
+                else if (nameLow.includes('bread')) { emoji = ""; action = "Make french toast, croutons, or freeze the slices for later use."; }
+                else if (nameLow.includes('egg')) { emoji = ""; action = "Boil them for salads, make an omelette, or bake a quiche."; }
+                else if (item.category === 'vegetables') { emoji = ""; action = "Chop and roast them for a side dish, or blend them into a healthy soup base."; }
+                else if (item.category === 'medicine' || item.category === 'vitamins') { emoji = ""; action = "Safely dispose of this if expired, or ensure you take your required doses."; }
 
                 let statusBadge = diff < 0 ? "Already Expired" : (diff === 0 ? "Expires Today" : `Expires in ${diff} Days`);
                 let badgeClass = diff <= 0 ? "danger" : "warning";
@@ -165,8 +165,8 @@ You MUST return the response ONLY as a raw JSON object exactly matching this str
        "You should consume vegetables today to avoid waste."
    ],
    "suggestions": [
-       { "itemName": "Milk", "emoji": "🥛", "expiryStatus": "Expires Tomorrow", "suggestion": "Make pancakes or milkshake." },
-       { "itemName": "Bananas", "emoji": "🍌", "expiryStatus": "Expires Today", "suggestion": "Make banana smoothie." }
+       { "itemName": "Milk", "emoji": "", "expiryStatus": "Expires Tomorrow", "suggestion": "Make pancakes or milkshake." },
+       { "itemName": "Bananas", "emoji": "", "expiryStatus": "Expires Today", "suggestion": "Make banana smoothie." }
    ]
 }`;
 }
@@ -244,7 +244,7 @@ function renderAIResponse(data) {
                 <div class="card-icon">${sg.emoji}</div>
             </div>
             <div class="card-body">
-                <div class="ai-tag">✨ AI Suggestion</div>
+                <div class="ai-tag"> AI Suggestion</div>
                 <p>"${escapeHtml(sg.suggestion)}"</p>
             </div>
         </div>
@@ -270,7 +270,7 @@ const themeToggleBtn = document.getElementById('themeToggle');
 if (themeToggleBtn) {
     if (localStorage.getItem('freshalert_theme') === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
-        themeToggleBtn.textContent = '☀️';
+        themeToggleBtn.textContent = '';
     }
 
     themeToggleBtn.addEventListener('click', () => {
@@ -278,7 +278,7 @@ if (themeToggleBtn) {
         const next = current === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('freshalert_theme', next);
-        themeToggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+        themeToggleBtn.textContent = next === 'dark' ? '' : '';
     });
 }
 

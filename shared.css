@@ -22,24 +22,24 @@ img { max-width: 100%; }
 
 /* ── Design Tokens ── */
 :root {
-  /* Modern Dark Palette - Slate/Zinc Scale */
-  --panel:    #0f172a;
-  --metal-0:  #020617;
-  --metal-1:  #1e293b;
-  --metal-2:  #334155;
-  --metal-3:  #475569;
-  --metal-4:  #64748b;
+  /* Modern Light Palette - Standard Scale */
+  --panel:    #ffffff;
+  --metal-0:  #f8fafc;
+  --metal-1:  #f1f5f9;
+  --metal-2:  #e2e8f0;
+  --metal-3:  #cbd5e1;
+  --metal-4:  #94a3b8;
 
   /* Legacy aliases for compatibility */
-  --bg:       #0f172a;
-  --surface:  rgba(30, 41, 59, 0.7);
-  --surface-2: rgba(51, 65, 85, 0.7);
-  --surface-3: rgba(71, 85, 105, 0.7);
+  --bg:       #ffffff;
+  --surface:  rgba(241, 245, 249, 0.7);
+  --surface-2: rgba(226, 232, 240, 0.7);
+  --surface-3: rgba(203, 213, 225, 0.7);
 
   /* Modern Design System Tokens */
-  --border:     rgba(255, 255, 255, 0.08);
-  --border-hi:  rgba(255, 255, 255, 0.15);
-  --groove:     rgba(0, 0, 0, 0.3);
+  --border:     rgba(0, 0, 0, 0.08);
+  --border-hi:  rgba(0, 0, 0, 0.15);
+  --groove:     rgba(255, 255, 255, 0.3);
   
   /* Bevel system (legacy - softening for backwards compatibility) */
   --bevel-hi:   rgba(255, 255, 255, 0.03);
@@ -71,8 +71,8 @@ img { max-width: 100%; }
   --info-dim:    rgba(6, 182, 212, 0.1);
 
   /* Text */
-  --text-1: #f8fafc;
-  --text-2: #94a3b8;
+  --text-1: #0f172a;
+  --text-2: #334155;
   --text-3: #64748b;
 
   /* Layout */

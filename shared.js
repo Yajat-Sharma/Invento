@@ -14,7 +14,7 @@ function showErrorUI(message) {
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0F172A;color:#F1F5F9;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;';
     overlay.innerHTML = `
       <div style="background:#1E293B;padding:30px;border-radius:12px;max-width:400px;width:100%;box-sizing:border-box;">
-        <div style="font-size:40px;margin-bottom:15px;">⚠️</div>
+        <div style="font-size:40px;margin-bottom:15px;"></div>
         <h2 style="margin:0 0 10px;font-size:20px;">Something went wrong</h2>
         <p style="margin:0 0 20px;font-size:14px;color:#94A3B8;word-wrap:break-word;">${escapeHtml(message || 'The application encountered an unexpected error.')}</p>
         <button onclick="window.location.reload()" style="background:#3B82F6;color:#fff;border:none;padding:12px 20px;border-radius:6px;font-weight:600;cursor:pointer;width:100%;">Reload App</button>
@@ -724,13 +724,13 @@ const NotifEngine = {
       lines.push('');
     };
 
-    section('🔴 EXPIRED — Needs immediate removal', summary.expired);
+    section(' EXPIRED — Needs immediate removal', summary.expired);
     section('🟠 Expiring Within 7 Days', summary.exp7);
     section('🟡 Expiring Within 30 Days', summary.exp30);
-    section('📦 Low Stock', summary.low);
-    section('⛔ Out of Stock', summary.out);
+    section(' Low Stock', summary.low);
+    section(' Out of Stock', summary.out);
 
-    if (!summary.total) lines.push('✅ All products are in good shape! No urgent alerts.');
+    if (!summary.total) lines.push(' All products are in good shape! No urgent alerts.');
     lines.push('---');
     lines.push('Manage alerts: open Invento → Alerts page');
     return lines.join('\n');
@@ -774,7 +774,7 @@ const NotifEngine = {
 <div style="max-width:640px;margin:0 auto;padding:32px 16px;">
   <div style="text-align:center;margin-bottom:28px;">
     <div style="display:inline-block;background:linear-gradient(135deg,#6366F1,#8B5CF6);padding:12px 24px;border-radius:12px;margin-bottom:12px;">
-      <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;">📦 Invento</span>
+      <span style="font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.5px;"> Invento</span>
     </div>
     <h1 style="margin:0;font-size:20px;font-weight:700;color:#F1F5F9;">Inventory Alert Report</h1>
     <p style="color:#64748B;font-size:13px;margin:4px 0 0;">${shopName} · ${escapeHtml(ts)}</p>
@@ -782,15 +782,15 @@ const NotifEngine = {
 
   ${summary.total === 0 ? `
     <div style="background:#14532D22;border:1px solid #16A34A44;border-radius:12px;padding:24px;text-align:center;">
-      <div style="font-size:32px;margin-bottom:8px;">✅</div>
+      <div style="font-size:32px;margin-bottom:8px;"></div>
       <h3 style="color:#4ADE80;margin:0 0 6px;">All Clear!</h3>
       <p style="color:#64748B;margin:0;font-size:14px;">All your products are in good condition. No urgent alerts.</p>
     </div>` : `
-    ${section('🔴', 'Expired — Remove Immediately', summary.expired, 'danger')}
+    ${section('', 'Expired — Remove Immediately', summary.expired, 'danger')}
     ${section('🟠', 'Expiring Within 7 Days', summary.exp7, 'danger')}
     ${section('🟡', 'Expiring Within 30 Days', summary.exp30, 'warning')}
-    ${section('📦', 'Low Stock', summary.low, 'low')}
-    ${section('⛔', 'Out of Stock', summary.out, 'out')}
+    ${section('', 'Low Stock', summary.low, 'low')}
+    ${section('', 'Out of Stock', summary.out, 'out')}
   `}
 
   <div style="text-align:center;margin-top:24px;padding:16px;border-top:1px solid #1E293B;">
@@ -840,7 +840,7 @@ const NotifEngine = {
       new Notification(title, {
         body,
         tag,
-        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">📦</text></svg>'
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90"></text></svg>'
       });
     } catch (_) { /* ignore */ }
   },
@@ -881,7 +881,7 @@ const NotifEngine = {
       if (filtered.exp7.length)    parts.push(`${filtered.exp7.length} expiring soon`);
       if (filtered.low.length)     parts.push(`${filtered.low.length} low stock`);
       if (filtered.out.length)     parts.push(`${filtered.out.length} out of stock`);
-      this.sendBrowserNotif(`⚠️ Invento Alert — ${shop.name}`, parts.join(', ') + '. Open Alerts page for details.');
+      this.sendBrowserNotif(` Invento Alert — ${shop.name}`, parts.join(', ') + '. Open Alerts page for details.');
     }
 
     // Email notification
@@ -956,7 +956,7 @@ const EmailJSEngine = {
 
   // ── Human status label ───────────────────────────────────────
   _statusLabel(level) {
-    return { expired: '🔴 EXPIRED', urgent: '🟠 URGENT', warning: '🟡 WARNING', safe: '✅ SAFE' }[level] || level;
+    return { expired: ' EXPIRED', urgent: '🟠 URGENT', warning: '🟡 WARNING', safe: ' SAFE' }[level] || level;
   },
 
   // ── Build alert message ──────────────────────────────────────
@@ -1186,8 +1186,8 @@ const EmailJSEngine = {
       const currency = shop?.currency || '₹';
       const attentionCount = expiredCount + expSoonCount + lowStockCount + outOfStockCount;
       const headerMsg = attentionCount > 0 
-        ? `⚠️ ${attentionCount} products require attention` 
-        : `✅ All products are in good condition`;
+        ? ` ${attentionCount} products require attention` 
+        : ` All products are in good condition`;
 
       const htmlTable = `
         <div style="margin-top: 20px;">

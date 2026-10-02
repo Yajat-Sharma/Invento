@@ -69,12 +69,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
 <div class="auth-brand-panel">
   <div class="brand-panel-glow"></div>
   <div class="brand-panel-glow2"></div>
-  <div class="bp-logo">📦</div>
+  <div class="bp-logo"></div>
   <h1 class="bp-title">Welcome back<br>to Invento</h1>
   <p class="bp-desc">Manage your store's inventory, track expiry dates, and grow your business — all in one place.</p>
-  <div class="bp-feature"><div class="bp-feat-icon">📦</div><span class="bp-feat-text">Real-time inventory tracking</span></div>
-  <div class="bp-feature"><div class="bp-feat-icon">🔔</div><span class="bp-feat-text">Expiry & low stock alerts</span></div>
-  <div class="bp-feature"><div class="bp-feat-icon">📊</div><span class="bp-feat-text">Sales reports & profit analysis</span></div>
+  <div class="bp-feature"><div class="bp-feat-icon"></div><span class="bp-feat-text">Real-time inventory tracking</span></div>
+  <div class="bp-feature"><div class="bp-feat-icon"></div><span class="bp-feat-text">Expiry & low stock alerts</span></div>
+  <div class="bp-feature"><div class="bp-feat-icon"></div><span class="bp-feat-text">Sales reports & profit analysis</span></div>
 </div>
 <!-- Form Panel -->
 <div class="auth-form-panel">
@@ -84,20 +84,20 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       Back to home
     </a>
     <div class="auth-logo-row">
-      <div class="auth-logo">📦</div>
+      <div class="auth-logo"></div>
       <span class="auth-logo-name">Invento</span>
     </div>
     <h2 class="auth-heading">Sign in</h2>
     <p class="auth-sub">Enter your credentials to access your dashboard </p>
     <div class="alert-banner" id="alertBanner" role="alert">
-      <span id="alertIcon">⚠️</span>
+      <span id="alertIcon"></span>
       <span id="alertText"></span>
     </div>
     <form id="loginForm" novalidate>
       <div class="form-group">
         <label class="form-label" for="loginEmail">Email Address</label>
         <div class="input-wrap">
-          <span class="input-icon">✉️</span>
+          <span class="input-icon"></span>
           <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" autocomplete="email">
         </div>
         <div class="field-error" id="emailErr">Please enter a valid email.</div>
@@ -105,9 +105,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <div class="form-group">
         <label class="form-label" for="loginPwd">Password</label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"></span>
           <input type="password" class="form-input" id="loginPwd" placeholder="••••••••" autocomplete="current-password">
-          <button type="button" class="toggle-pw" id="togglePwd" aria-label="Toggle password">👁️</button>
+          <button type="button" class="toggle-pw" id="togglePwd" aria-label="Toggle password"></button>
         </div>
         <div class="field-error" id="pwdErr">Password is required.</div>
       </div>
@@ -133,7 +133,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       setTimeout(() => document.getElementById('loginPwd')?.focus(), 100);
       
       // Show a helpful welcome message
-      document.getElementById('alertIcon').textContent = '👋';
+      document.getElementById('alertIcon').textContent = '';
       document.getElementById('alertText').textContent = 'Welcome! Enter your password to log in.';
       document.getElementById('alertBanner').className = 'alert-banner vis success';
     }
@@ -144,12 +144,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
   toggleBtn.addEventListener('click', () => {
     const isText = pwdInput.type === 'text';
     pwdInput.type = isText ? 'password' : 'text';
-    toggleBtn.textContent = isText ? '👁️' : '🙈';
+    toggleBtn.textContent = isText ? '' : '';
   });
 
   function showAlert(type, msg) {
     const b = document.getElementById('alertBanner');
-    document.getElementById('alertIcon').textContent = type === 'error' ? '⚠️' : '✅';
+    document.getElementById('alertIcon').textContent = type === 'error' ? '' : '';
     document.getElementById('alertText').textContent = msg;
     b.className = `alert-banner vis ${type}`;
   }

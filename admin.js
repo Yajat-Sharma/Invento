@@ -186,8 +186,8 @@ function renderLists() {
     if (trackedEl) {
         const analytics = getAdminAnalytics();
         const catIcons = {
-            medicine: '💊', dairy: '🥛', vegetables: '🥬',
-            fruits: '🍎', snacks: '🍪', vitamins: '💊', other: '📦'
+            medicine: '', dairy: '', vegetables: '',
+            fruits: '', snacks: '', vitamins: '', other: ''
         };
         const sorted = Object.entries(analytics.categoryCounts)
             .filter(([, v]) => v > 0)
@@ -200,7 +200,7 @@ function renderLists() {
                 <li class="tracked-item">
                     <div class="item-left">
                         <span class="item-rank">${idx + 1}</span>
-                        <span class="item-name">${catIcons[cat] || '📦'} ${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
+                        <span class="item-name">${catIcons[cat] || ''} ${cat.charAt(0).toUpperCase() + cat.slice(1)}</span>
                     </div>
                     <span class="item-count">${count} item${count !== 1 ? 's' : ''}</span>
                 </li>`).join('');
@@ -211,7 +211,7 @@ function renderLists() {
     const feedEl = document.getElementById('activityFeed');
     if (feedEl) {
         const analytics = getAdminAnalytics();
-        const catIcons = { medicine: '💊', dairy: '🥛', vegetables: '🥬', fruits: '🍎', snacks: '🍪', vitamins: '💊', other: '📦' };
+        const catIcons = { medicine: '', dairy: '', vegetables: '', fruits: '', snacks: '', vitamins: '', other: '' };
         const bgs = { medicine: 'bg-purple', dairy: 'bg-blue', vegetables: 'bg-green', fruits: 'bg-red', snacks: 'bg-yellow', vitamins: 'bg-purple', other: 'bg-orange' };
         const catCounts = analytics.categoryCounts;
         const topCats = Object.entries(catCounts).filter(([, v]) => v > 0).sort(([, a], [, b]) => b - a).slice(0, 5);
@@ -221,7 +221,7 @@ function renderLists() {
         } else {
             feedEl.innerHTML = topCats.map(([cat, count]) => `
                 <li class="feed-item">
-                    <div class="feed-icon ${bgs[cat] || 'bg-orange'}">${catIcons[cat] || '📦'}</div>
+                    <div class="feed-icon ${bgs[cat] || 'bg-orange'}">${catIcons[cat] || ''}</div>
                     <div class="feed-content">
                         <p class="feed-text"><strong style="color:var(--clr-blue)">${count}</strong> ${cat} item${count !== 1 ? 's' : ''} tracked across all users</p>
                         <span class="feed-time">Aggregated analytics</span>
@@ -300,7 +300,7 @@ if (themeToggleBtn) {
         const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', next);
         localStorage.setItem('freshalert_theme', next);
-        themeToggleBtn.textContent = next === 'dark' ? '☀️' : '🌙';
+        themeToggleBtn.textContent = next === 'dark' ? '' : '';
         location.reload();
     });
 }
@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Theme icon sync
     if (localStorage.getItem('freshalert_theme') === 'dark') {
         const btn = document.getElementById('adminThemeToggle');
-        if (btn) btn.textContent = '☀️';
+        if (btn) btn.textContent = '';
     }
 
     // Show admin's own name in the header profile

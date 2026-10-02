@@ -141,20 +141,20 @@ function renderCustomers() {
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;">
         <div>
           <div class="sup-name">${escapeHtml(c.name)}</div>
-          <div class="sup-meta">📞 ${escapeHtml(c.phone)}</div>
+          <div class="sup-meta"> ${escapeHtml(c.phone)}</div>
         </div>
         <div style="text-align:right;">
           <div style="font-size:.7rem;color:var(--text-3);text-transform:uppercase;letter-spacing:.05em;">Total Spent</div>
           <div style="font-weight:700;color:var(--success);font-size:1rem;">${formatCurrency(spentMap[c.id] || 0)}</div>
         </div>
       </div>
-      ${c.email ? `<div class="sup-meta">✉️ ${escapeHtml(c.email)}</div>` : ''}
-      ${c.address ? `<div class="sup-meta">📍 ${escapeHtml(c.address)}</div>` : ''}
-      <div style="font-size:.75rem;color:var(--text-3);margin-top:.5rem;">🛍️ ${countMap[c.id] || 0} purchase${(countMap[c.id] || 0) !== 1 ? 's' : ''}</div>
+      ${c.email ? `<div class="sup-meta"> ${escapeHtml(c.email)}</div>` : ''}
+      ${c.address ? `<div class="sup-meta"> ${escapeHtml(c.address)}</div>` : ''}
+      <div style="font-size:.75rem;color:var(--text-3);margin-top:.5rem;"> ${countMap[c.id] || 0} purchase${(countMap[c.id] || 0) !== 1 ? 's' : ''}</div>
       <div class="sup-actions manager-only">
-        <button class="btn btn-secondary btn-sm view-history" data-id="${c.id}">🕒 History</button>
-        <button class="btn btn-secondary btn-sm edit-cust" data-id="${c.id}">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm del-cust" data-id="${c.id}">🗑️</button>
+        <button class="btn btn-secondary btn-sm view-history" data-id="${c.id}"> History</button>
+        <button class="btn btn-secondary btn-sm edit-cust" data-id="${c.id}"> Edit</button>
+        <button class="btn btn-danger btn-sm del-cust" data-id="${c.id}"></button>
       </div>
     </div>`).join('');
 

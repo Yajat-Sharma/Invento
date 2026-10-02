@@ -66,7 +66,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
 
 <div class="auth-brand-panel">
   <div class="brand-panel-glow"></div>
-  <div class="bp-logo">📦</div>
+  <div class="bp-logo"></div>
   <h1 class="bp-title">Start managing your shop today</h1>
   <p class="bp-desc">Join hundreds of shop owners who use Invento to reduce losses and increase profits.</p>
   <div class="bp-step"><div class="bp-step-num">1</div><div class="bp-step-text"><strong>Create your account</strong><br>Sign up with your shop name and email</div></div>
@@ -81,14 +81,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       Back to home
     </a>
     <div class="auth-logo-row">
-      <div class="auth-logo">📦</div>
+      <div class="auth-logo"></div>
       <span class="auth-logo-name">Invento</span>
     </div>
     <h2 class="auth-heading">Create account</h2>
     <p class="auth-sub">Set up your store's inventory management in minutes</p>
 
     <div class="alert-banner" id="alertBanner" role="alert">
-      <span id="alertIcon">⚠️</span>
+      <span id="alertIcon"></span>
       <span id="alertText"></span>
     </div>
 
@@ -96,7 +96,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <div class="form-group">
         <label class="form-label" for="shopName">Shop Name <span style="color:var(--danger)">*</span></label>
         <div class="input-wrap">
-          <span class="input-icon">🏪</span>
+          <span class="input-icon"></span>
           <input type="text" class="form-input" id="shopName" placeholder="e.g. Sharma General Store" autocomplete="organization">
         </div>
         <div class="field-error" id="shopErr">Shop name is required</div>
@@ -104,7 +104,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <div class="form-group">
         <label class="form-label" for="ownerName">Owner Name <span style="color:var(--danger)">*</span></label>
         <div class="input-wrap">
-          <span class="input-icon">👤</span>
+          <span class="input-icon"></span>
           <input type="text" class="form-input" id="ownerName" placeholder="Your full name" autocomplete="name">
         </div>
         <div class="field-error" id="nameErr">Owner name is required.</div>
@@ -112,7 +112,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <div class="form-group">
         <label class="form-label" for="signupEmail">Email Address <span style="color:var(--danger)">*</span></label>
         <div class="input-wrap">
-          <span class="input-icon">✉️</span>
+          <span class="input-icon"></span>
           <input type="email" class="form-input" id="signupEmail" placeholder="you@example.com" autocomplete="email">
         </div>
         <div class="field-error" id="emailErr">Please enter a valid email address.</div>
@@ -120,9 +120,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
       <div class="form-group">
         <label class="form-label" for="signupPwd">Password <span style="color:var(--danger)">*</span></label>
         <div class="input-wrap">
-          <span class="input-icon">🔒</span>
+          <span class="input-icon"></span>
           <input type="password" class="form-input" id="signupPwd" placeholder="Minimum 6 characters" autocomplete="new-password">
-          <button type="button" class="toggle-pw" id="togglePwd" aria-label="Toggle password">👁️</button>
+          <button type="button" class="toggle-pw" id="togglePwd" aria-label="Toggle password"></button>
         </div>
         <div class="field-error" id="pwdErr">Password must be at least 6 characters.</div>
         <div class="pwd-hint">Minimum 6 characters</div>
@@ -146,12 +146,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text-1);min
   toggleBtn.addEventListener('click', () => {
     const isText = pwdInput.type === 'text';
     pwdInput.type = isText ? 'password' : 'text';
-    toggleBtn.textContent = isText ? '👁️' : '🙈';
+    toggleBtn.textContent = isText ? '' : '';
   });
 
   function showAlert(type, msg) {
     const b = document.getElementById('alertBanner');
-    document.getElementById('alertIcon').textContent = type === 'error' ? '⚠️' : '✅';
+    document.getElementById('alertIcon').textContent = type === 'error' ? '' : '';
     document.getElementById('alertText').textContent = msg;
     b.className = `alert-banner vis ${type}`;
   }

@@ -18,17 +18,17 @@
         <!-- Sidebar -->
         <aside class="admin-sidebar" id="adminSidebar">
             <div class="sidebar-header">
-                <div style="width:32px;height:32px;background:linear-gradient(135deg, #3b82f6, #8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;">📦</div>
+                <div style="width:32px;height:32px;background:linear-gradient(135deg, #3b82f6, #8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;color:#fff;"></div>
                 <span class="brand-name">Invento Admin</span>
             </div>
             <nav class="sidebar-nav">
-                <a href="admin.html" class="nav-item active"><span class="icon">📊</span> Overview</a>
-                <a href="dashboard.html" class="nav-item"><span class="icon">📱</span> User Dashboard</a>
-                <a href="suggestions.html" class="nav-item" title="Smart AI Suggestions"><span class="icon">🧠</span> AI Insights</a>
+                <a href="admin.html" class="nav-item active"><span class="icon"></span> Overview</a>
+                <a href="dashboard.html" class="nav-item"><span class="icon"></span> User Dashboard</a>
+                <a href="suggestions.html" class="nav-item" title="Smart AI Suggestions"><span class="icon"></span> AI Insights</a>
                 <div class="divider"></div>
-                <a href="index.html" class="nav-item back-home"><span class="icon">🏠</span> Landing Page</a>
+                <a href="index.html" class="nav-item back-home"><span class="icon"></span> Landing Page</a>
                 <a href="login.html" class="nav-item back-home" onclick="event.preventDefault();logoutUser()"
-                    style="color:var(--clr-red);"><span class="icon">🚪</span> Logout</a>
+                    style="color:var(--clr-red);"><span class="icon"></span> Logout</a>
             </nav>
         </aside>
 
@@ -41,7 +41,7 @@
                     <p class="page-subtitle">Real-time system insights and user analytics</p>
                 </div>
                 <div class="header-actions">
-                    <button class="theme-toggle" id="adminThemeToggle" aria-label="Toggle dark mode">🌙</button>
+                    <button class="theme-toggle" id="adminThemeToggle" aria-label="Toggle dark mode"></button>
                     <div class="admin-profile">
                         <div class="avatar" style="background:var(--clr-blue);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;">A</div>
                         <div class="profile-info">
@@ -57,7 +57,7 @@
                 <div class="admin-stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Total Users</span>
-                        <span class="stat-icon purple">👥</span>
+                        <span class="stat-icon purple"></span>
                     </div>
                     <div class="stat-value" id="totalUsers">0</div>
                     <div class="stat-desc">Registered accounts</div>
@@ -65,7 +65,7 @@
                 <div class="admin-stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Total Items</span>
-                        <span class="stat-icon blue">📦</span>
+                        <span class="stat-icon blue"></span>
                     </div>
                     <div class="stat-value" id="totalItems">0</div>
                     <div class="stat-desc">Tracked across all shops</div>
@@ -73,7 +73,7 @@
                 <div class="admin-stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Expiring Soon</span>
-                        <span class="stat-icon orange">⚠️</span>
+                        <span class="stat-icon orange"></span>
                     </div>
                     <div class="stat-value" id="expiringSoon">0</div>
                     <div class="stat-desc">Next 3 days</div>
@@ -81,7 +81,7 @@
                 <div class="admin-stat-card">
                     <div class="stat-header">
                         <span class="stat-title">Expired Items</span>
-                        <span class="stat-icon red">⏰</span>
+                        <span class="stat-icon red"></span>
                     </div>
                     <div class="stat-value" id="expiredItems">0</div>
                     <div class="stat-desc">Total system waste</div>
@@ -143,21 +143,21 @@
                     </div>
                     <div class="admin-activity-list">
                         <div class="activity-item">
-                            <div class="act-icon green">📊</div>
+                            <div class="act-icon green"></div>
                             <div class="act-content">
                                 <div class="act-title">Avg Items Per User</div>
                                 <div class="act-val" id="avgItemsUser">0</div>
                             </div>
                         </div>
                         <div class="activity-item">
-                            <div class="act-icon blue">⚡</div>
+                            <div class="act-icon blue"></div>
                             <div class="act-content">
                                 <div class="act-title">Items Added Today</div>
                                 <div class="act-val" id="itemsAddedToday">0</div>
                             </div>
                         </div>
                         <div class="activity-item">
-                            <div class="act-icon purple">✅</div>
+                            <div class="act-icon purple"></div>
                             <div class="act-content">
                                 <div class="act-title">Consumed Before Expiry</div>
                                 <div class="act-val" id="consumedBeforeExp">0</div>
