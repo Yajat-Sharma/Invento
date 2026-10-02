@@ -3,19 +3,19 @@
 /* Custom Admin Variables */
 :root {
     --sidebar-width: 260px;
-    --admin-bg: #f7f7f7;
-    --admin-card-bg: #ffffff;
-    --admin-text: #0a0a0a;
-    --admin-text-light: #666666;
-    --admin-border: #e5e5e5;
+    --admin-bg: var(--color-background);
+    --admin-card-bg: var(--color-white);
+    --admin-text: var(--color-black);
+    --admin-text-light: var(--color-text-secondary);
+    --admin-border: var(--color-border);
 
     /* Colors - Modern Palette */
-    --clr-blue: #000000;
-    --clr-purple: #000000;
-    --clr-green: #16a34a;
-    --clr-orange: #f59e0b;
-    --clr-yellow: #eab308;
-    --clr-red: #dc2626;
+    --clr-blue: var(--color-black);
+    --clr-purple: var(--color-black);
+    --clr-green: var(--color-success);
+    --clr-orange: var(--color-yellow);
+    --clr-yellow: var(--color-yellow);
+    --clr-red: var(--color-danger);
 }
 
 [data-theme="dark"] {
@@ -89,7 +89,7 @@ body {
 }
 
 .nav-item:hover {
-    background: rgba(67, 24, 255, 0.05);
+    background: var(--color-yellow-soft);
     color: var(--clr-blue);
 }
 
@@ -118,7 +118,7 @@ body {
 }
 
 .back-home:hover {
-    background: rgba(255, 181, 71, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-orange);
 }
 
@@ -222,32 +222,32 @@ body {
 }
 
 .bg-blue {
-    background: rgba(67, 24, 255, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-blue);
 }
 
 .bg-purple {
-    background: rgba(112, 0, 255, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-purple);
 }
 
 .bg-green {
-    background: rgba(5, 205, 153, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-green);
 }
 
 .bg-orange {
-    background: rgba(255, 181, 71, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-orange);
 }
 
 .bg-yellow {
-    background: rgba(255, 206, 32, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-yellow);
 }
 
 .bg-red {
-    background: rgba(238, 93, 80, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-red);
 }
 
@@ -296,14 +296,14 @@ body {
 .chart-badge {
     padding: 4px 12px;
     border-radius: 20px;
-    background: rgba(67, 24, 255, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-blue);
     font-size: 0.75rem;
     font-weight: 700;
 }
 
 .chart-badge.warning {
-    background: rgba(238, 93, 80, 0.1);
+    background: var(--color-yellow-soft);
     color: var(--clr-red);
 }
 
@@ -353,7 +353,7 @@ body {
 .insight-stats {
     display: flex;
     justify-content: space-between;
-    background: rgba(67, 24, 255, 0.03);
+    background: var(--color-yellow-soft);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 8px;
@@ -430,7 +430,7 @@ body {
 .user-score {
     font-weight: 700;
     color: var(--clr-blue);
-    background: rgba(67, 24, 255, 0.1);
+    background: var(--color-yellow-soft);
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 0.8rem;

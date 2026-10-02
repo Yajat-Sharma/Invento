@@ -1,19 +1,26 @@
 :root {
-    /* Global Monochrome Tokens */
-    --color-bg: #ffffff;
-    --color-surface: #ffffff;
-    --color-surface-muted: #f7f7f7;
-    --color-text: #0a0a0a;
-    --color-text-secondary: #666666;
-    --color-text-muted: #888888;
+    /* Global Theme Tokens */
+    --color-white: #ffffff;
+    --color-background: #f7f7f5;
+    --color-black: #111111;
+    --color-text: #111111;
+    --color-text-secondary: #6b6b6b;
     --color-border: #e5e5e5;
-    --color-border-dark: #d0d0d0;
-    
-    /* Functional Colors */
-    --color-primary: #000000;
-    --color-primary-hover: #222222;
-    --color-danger: #dc2626;
+
+    --color-yellow: #facc15;
+    --color-yellow-soft: #fef9c3;
+
     --color-success: #16a34a;
+    --color-danger: #dc2626;
+
+    /* Semantic mappings */
+    --color-bg: var(--color-background);
+    --color-surface: var(--color-white);
+    --color-surface-muted: var(--color-background);
+    --color-border-dark: var(--color-text-secondary);
+    --color-text-muted: var(--color-text-secondary);
+    --color-primary: var(--color-black);
+    --color-primary-hover: #000000;
 
     /* Semantic mapping for backward compatibility */
     --color-secondary: var(--color-surface);
@@ -705,8 +712,8 @@ body {
 }
 
 .form-input:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    border-color: var(--color-black);
+    box-shadow: 0 0 0 3px var(--color-yellow-soft);
 }
 
 .form-input::placeholder {
@@ -880,8 +887,8 @@ body {
 }
 
 .search-bar:focus-within {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+    border-color: var(--color-black);
+    box-shadow: 0 0 0 3px var(--color-yellow-soft);
 }
 
 .search-icon {
@@ -1792,7 +1799,7 @@ body {
 /* Focus Styles for Accessibility */
 a:focus,
 button:focus {
-    outline: 2px solid var(--color-primary);
+    outline: 2px solid var(--color-black);
     outline-offset: 2px;
 }
 
