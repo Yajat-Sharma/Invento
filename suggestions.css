@@ -1,16 +1,16 @@
 /* ===== FreshAlert — suggestions.css ===== */
 
 :root {
-    --ai-primary: #3b82f6;
-    --ai-secondary: #0ea5e9;
-    --ai-glow: rgba(59, 130, 246, 0.4);
+    --ai-primary: #000000;
+    --ai-secondary: #222222;
+    --ai-glow: transparent;
 
     /* Reusing modernized base dashboard themes */
-    --clr-bg: #f1f5f9;
+    --clr-bg: #f7f7f7;
     --clr-card: #ffffff;
-    --clr-text: #0f172a;
-    --clr-text-light: #64748b;
-    --clr-border: #e2e8f0;
+    --clr-text: #0a0a0a;
+    --clr-text-light: #666666;
+    --clr-border: #e5e5e5;
 }
 
 [data-theme="dark"] {

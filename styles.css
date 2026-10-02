@@ -1,22 +1,25 @@
 :root {
-    /* Modern Dark Palette - Slate/Zinc Scale */
-    --color-primary: #3b82f6;
-    --color-primary-light: #60a5fa;
-    --color-primary-dark: #2563eb;
-    --color-secondary: #06b6d4;
-    --color-secondary-light: #22d3ee;
+    /* Global Monochrome Tokens */
+    --color-bg: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f7f7f7;
+    --color-text: #0a0a0a;
+    --color-text-secondary: #666666;
+    --color-text-muted: #888888;
+    --color-border: #e5e5e5;
+    --color-border-dark: #d0d0d0;
+    
+    /* Functional Colors */
+    --color-primary: #000000;
+    --color-primary-hover: #222222;
+    --color-danger: #dc2626;
+    --color-success: #16a34a;
 
-    /* Card Colors - Modern Palette */
-    --color-purple: #8b5cf6;
-    --color-purple-light: #a78bfa;
-    --color-orange: #f59e0b;
-    --color-orange-light: #fbbf24;
-    --color-blue: #3b82f6;
-    --color-blue-light: #60a5fa;
-    --color-green: #10b981;
-    --color-green-light: #34d399;
+    /* Semantic mapping for backward compatibility */
+    --color-secondary: var(--color-surface);
+    --color-secondary-light: var(--color-surface-muted);
 
-    /* Neutral Colors - Standard Light Surface Scale */
+    /* Legacy scales */
     --color-white: #ffffff;
     --color-gray-50: #f8fafc;
     --color-gray-100: #f1f5f9;
@@ -745,10 +748,10 @@ body {
 
 .btn-cancel {
     padding: var(--spacing-3) var(--spacing-6);
-    border: 2px solid var(--color-gray-200);
-    border-radius: var(--radius-lg);
-    background: var(--color-white);
-    color: var(--color-gray-600);
+    border: 1px solid var(--color-border-dark);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-text);
     font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
@@ -757,8 +760,8 @@ body {
 }
 
 .btn-cancel:hover {
-    border-color: var(--color-gray-300);
-    background: var(--color-gray-50);
+    border-color: var(--color-primary);
+    background: var(--color-surface-muted);
 }
 
 .btn-submit {
@@ -767,20 +770,18 @@ body {
     gap: var(--spacing-2);
     padding: var(--spacing-3) var(--spacing-6);
     border: none;
-    border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    color: var(--color-white);
+    border-radius: var(--radius-sm);
+    background: var(--color-primary);
+    color: var(--color-bg);
     font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     font-family: var(--font-family);
     transition: all var(--transition-base);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .btn-submit:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    background: var(--color-primary-hover);
 }
 
 .btn-submit:active {
@@ -1616,20 +1617,18 @@ body {
 .btn-delete {
     padding: var(--spacing-3) var(--spacing-6);
     border: none;
-    border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, #DC2626, #EF4444);
-    color: var(--color-white);
+    border-radius: var(--radius-sm);
+    background: var(--color-danger);
+    color: var(--color-bg);
     font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     font-family: var(--font-family);
     transition: all var(--transition-base);
-    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .btn-delete:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    background: #b91c1c; /* slightly darker red */
 }
 
 .btn-delete:active {
@@ -1818,23 +1817,21 @@ button:focus {
     align-items: center;
     gap: 0.375rem;
     padding: 0 1rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    color: #fff;
+    background: var(--color-primary);
+    color: var(--color-bg);
     border: none;
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
     font-family: var(--font-family);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: all var(--transition-base);
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
     flex-shrink: 0;
 }
 
 .btn-scan:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
+    background: var(--color-primary-hover);
 }
 
 .btn-scan:active {

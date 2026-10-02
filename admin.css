@@ -3,19 +3,19 @@
 /* Custom Admin Variables */
 :root {
     --sidebar-width: 260px;
-    --admin-bg: #f1f5f9;
+    --admin-bg: #f7f7f7;
     --admin-card-bg: #ffffff;
-    --admin-text: #0f172a;
-    --admin-text-light: #64748b;
-    --admin-border: #e2e8f0;
+    --admin-text: #0a0a0a;
+    --admin-text-light: #666666;
+    --admin-border: #e5e5e5;
 
     /* Colors - Modern Palette */
-    --clr-blue: #3b82f6;
-    --clr-purple: #8b5cf6;
-    --clr-green: #10b981;
+    --clr-blue: #000000;
+    --clr-purple: #000000;
+    --clr-green: #16a34a;
     --clr-orange: #f59e0b;
     --clr-yellow: #eab308;
-    --clr-red: #ef4444;
+    --clr-red: #dc2626;
 }
 
 [data-theme="dark"] {

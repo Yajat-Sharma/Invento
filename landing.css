@@ -1,23 +1,23 @@
 /* ===== FreshAlert — landing.css ===== */
 
 :root {
-    --clr-primary: #3b82f6;
-    --clr-primary-dark: #2563eb;
-    --clr-primary-glow: rgba(59, 130, 246, 0.4);
+    --clr-primary: #000000;
+    --clr-primary-dark: #222222;
+    --clr-primary-glow: transparent;
 
-    --clr-secondary: #0ea5e9;
-    --clr-teal: #14b8a6;
+    --clr-secondary: #ffffff;
+    --clr-teal: #000000;
 
-    --clr-dark: #0f172a;
-    --clr-text: #334155;
-    --clr-text-light: #64748b;
+    --clr-dark: #000000;
+    --clr-text: #0a0a0a;
+    --clr-text-light: #666666;
 
     --clr-bg-start: #ffffff;
-    --clr-bg-end: #eff6ff;
+    --clr-bg-end: #f7f7f7;
 
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.1);
+    --glass-bg: #ffffff;
+    --glass-border: #e5e5e5;
+    --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
     --font-main: 'Outfit', -apple-system, sans-serif;
 }
@@ -358,45 +358,37 @@ p {
 .btn-primary {
     background: var(--clr-primary);
     color: white;
-    box-shadow:
-        0 8px 0 var(--clr-primary-dark),
-        0 15px 20px rgba(16, 185, 129, 0.4);
+    box-shadow: none;
+    border: none;
 }
 
 .btn-primary:hover {
-    top: 2px;
-    box-shadow:
-        0 6px 0 var(--clr-primary-dark),
-        0 10px 15px rgba(16, 185, 129, 0.4);
+    top: -1px;
+    background: var(--clr-primary-dark);
+    box-shadow: none;
 }
 
 .btn-primary:active {
-    top: 8px;
-    box-shadow:
-        0 0 0 var(--clr-primary-dark),
-        0 5px 5px rgba(16, 185, 129, 0.4);
+    top: 0;
+    box-shadow: none;
 }
 
 .btn-secondary {
     background: white;
-    color: var(--clr-primary-dark);
-    box-shadow:
-        0 8px 0 #cbd5e1,
-        0 15px 20px rgba(0, 0, 0, 0.05);
+    color: var(--clr-primary);
+    border: 1px solid #d0d0d0;
+    box-shadow: none;
 }
 
 .btn-secondary:hover {
-    top: 2px;
-    box-shadow:
-        0 6px 0 #cbd5e1,
-        0 10px 15px rgba(0, 0, 0, 0.05);
+    top: -1px;
+    background: #f7f7f7;
+    box-shadow: none;
 }
 
 .btn-secondary:active {
-    top: 8px;
-    box-shadow:
-        0 0 0 #cbd5e1,
-        0 5px 5px rgba(0, 0, 0, 0.05);
+    top: 0;
+    box-shadow: none;
 }
 
 /* ===== Demo Section ===== */
