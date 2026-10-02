@@ -19,8 +19,8 @@ a{text-decoration:none;color:inherit;}
 .nav-brand{display:flex;align-items:center;gap:.6rem;font-size:1.05rem;font-weight:700;color:var(--text-1);}
 .nav-logo{width:32px;height:32px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
 .nav-links{display:flex;align-items:center;gap:1.5rem;}
-.nav-links a{font-size:.875rem;color:var(--text-2);transition:color .2s;}
-.nav-links a:hover{color:var(--text-1);}
+.nav-links a{font-size:.875rem;color:var(--text-1);font-weight:600;transition:opacity .2s;}
+.nav-links a:hover{opacity:0.7;}
 .nav-btn{padding:.5rem 1.1rem;border-radius:8px;font-size:.855rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .2s;}
 .btn-ghost{background:#fff;color:var(--text-1);border:1px solid var(--border);}
 .btn-ghost:hover{background:#f7f7f7;}
@@ -90,7 +90,7 @@ a{text-decoration:none;color:inherit;}
 .footer-links a:hover{color:var(--text-1);}
 .footer-copyright{font-size:.78rem;color:var(--text-3);}
 
-@media(max-width:640px){.nav-links a{display:none;}.floating-stats{gap:.5rem;}}
+@media(max-width:640px){.nav-back-text{display:none;}.floating-stats{gap:.5rem;}}
 </style>
 </head>
 <body>
@@ -98,11 +98,7 @@ a{text-decoration:none;color:inherit;}
 <nav class="landing-nav">
   <div class="nav-brand"><div class="nav-logo"></div> Invento</div>
   <div class="nav-links">
-    <a href="https://horizonbs.in/" target="_blank">Get back to Horizon Business</a>
-    <a href="#features">Features</a>
-    <a href="#how">How it works</a>
-    <button class="nav-btn btn-ghost" onclick="location.href='login.html'">Login</button>
-    <button class="nav-btn btn-accent" onclick="location.href='signup.html'">Get Started Free</button>
+    <a href="https://horizonbs.in/" target="_blank" class="nav-back-link">&larr; <span class="nav-back-text">Back to </span>HorizonBS.in</a>
   </div>
 </nav>
 
